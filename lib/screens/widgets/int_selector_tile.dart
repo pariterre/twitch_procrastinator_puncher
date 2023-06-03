@@ -1,16 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:twitch_pomorodo_timer/common/app_theme.dart';
+
+class DigitOnly extends TextInputFormatter {
+  static final _reg = RegExp(r'^\d+$'); // any number
+
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    if (newValue.text.isEmpty) return newValue;
+
+    return _reg.hasMatch(newValue.text) ? newValue : oldValue;
+  }
+}
 
 class IntSelectorTile extends StatefulWidget {
   const IntSelectorTile({
     super.key,
     required this.title,
-    required this.controller,
+    required this.initialValue,
     required this.onValidChange,
   });
 
   final String title;
-  final TextEditingController controller;
+  final int initialValue;
   final Function(int value) onValidChange;
 
   @override
@@ -18,6 +31,9 @@ class IntSelectorTile extends StatefulWidget {
 }
 
 class _IntSelectorTileState extends State<IntSelectorTile> {
+  late final _controller =
+      TextEditingController(text: widget.initialValue.toString());
+
   @override
   Widget build(BuildContext context) {
     final windowHeight = MediaQuery.of(context).size.height;
@@ -44,13 +60,11 @@ class _IntSelectorTileState extends State<IntSelectorTile> {
           child: SizedBox(
               width: windowHeight * 0.1,
               child: TextField(
-                controller: widget.controller,
+                controller: _controller,
+                inputFormatters: [DigitOnly()],
                 onChanged: (value) {
                   final valueAsInt = int.tryParse(value);
-                  if (valueAsInt == null) {
-                    setState(() => widget.controller.text = '');
-                    return;
-                  }
+                  if (valueAsInt == null) return;
                   widget.onValidChange(valueAsInt);
                 },
               )),

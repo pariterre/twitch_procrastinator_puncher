@@ -36,6 +36,14 @@ class AppPreferences with ChangeNotifier {
     notifyListeners();
   }
 
+  // Pause time
+  Duration _pauseDuration;
+  Duration get pauseDuration => _pauseDuration;
+  set pauseDuration(Duration value) {
+    _pauseDuration = value;
+    notifyListeners();
+  }
+
   // Background image during the countdown
   String? _activeBackgroundImageFilename;
   String? get activeBackgroundImagePath =>
@@ -95,9 +103,11 @@ class AppPreferences with ChangeNotifier {
       previousPreferences = jsonDecode(await preferencesFile.readAsString());
     }
     return AppPreferences._(
-        nbOfSession: previousPreferences?['nbOfSession'] ?? -1,
+        nbOfSession: previousPreferences?['nbOfSession'] ?? 0,
         sessionDuration:
-            Duration(minutes: previousPreferences?['sessionTime'] ?? -1),
+            Duration(minutes: previousPreferences?['sessionTime'] ?? 0),
+        pauseDuration:
+            Duration(minutes: previousPreferences?['pauseDuration'] ?? 0),
         directory: directory,
         activeBackgroundImageFilename:
             previousPreferences?['activeBackgroundImageFilename'],
@@ -111,12 +121,14 @@ class AppPreferences with ChangeNotifier {
   AppPreferences._({
     required int nbOfSession,
     required Duration sessionDuration,
+    required Duration pauseDuration,
     required Directory directory,
     required String? activeBackgroundImageFilename,
     required String? pauseBackgroundImageFilename,
     required Directory lastVisitedDirectory,
   })  : _nbOfSession = nbOfSession,
         _sessionDuration = sessionDuration,
+        _pauseDuration = pauseDuration,
         preferencesDirectory = directory,
         _activeBackgroundImageFilename = activeBackgroundImageFilename,
         _pauseBackgroundImageFilename = pauseBackgroundImageFilename,
@@ -140,6 +152,7 @@ class AppPreferences with ChangeNotifier {
   Map<String, dynamic> get _serializePreferences => {
         'nbOfSession': _nbOfSession,
         'sessionTime': _sessionDuration.inMinutes,
+        'pauseDuration': _pauseDuration.inMinutes,
         'activeBackgroundImageFilename': _activeBackgroundImageFilename,
         'pauseBackgroundImageFilename': _pauseBackgroundImageFilename,
         'lastVisitedDirectory': _lastVisitedDirectory.path,

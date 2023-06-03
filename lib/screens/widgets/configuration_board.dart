@@ -8,32 +8,10 @@ import 'package:twitch_pomorodo_timer/providers/app_preferences.dart';
 import 'package:twitch_pomorodo_timer/screens/widgets/file_selector_tile.dart';
 import 'package:twitch_pomorodo_timer/screens/widgets/int_selector_tile.dart';
 
-class ConfigurationBoard extends StatefulWidget {
+class ConfigurationBoard extends StatelessWidget {
   const ConfigurationBoard({super.key, required this.startTimerCallback});
 
   final Function() startTimerCallback;
-
-  @override
-  State<ConfigurationBoard> createState() => _ConfigurationBoardState();
-}
-
-class _ConfigurationBoardState extends State<ConfigurationBoard> {
-  late final _nbSessionTextController = TextEditingController(
-      text: AppPreferences.of(this.context, listen: false).nbOfSession > 0
-          ? AppPreferences.of(this.context, listen: false)
-              .nbOfSession
-              .toString()
-          : '');
-  late final _sessionDurationTextController = TextEditingController(
-      text: AppPreferences.of(this.context, listen: false)
-                  .sessionDuration
-                  .inMinutes >
-              0
-          ? AppPreferences.of(this.context, listen: false)
-              .sessionDuration
-              .inMinutes
-              .toString()
-          : '');
 
   @override
   Widget build(BuildContext context) {
@@ -54,18 +32,9 @@ class _ConfigurationBoardState extends State<ConfigurationBoard> {
             _buildTimerConfiguration(context),
             const Divider(),
             _buildImageSelectors(context),
-            SizedBox(height: 2 * padding),
-            ElevatedButton(
-              onPressed: () => _savePreferences(context),
-              style: ThemeButton.elevated,
-              child: const Text(
-                'Save preferences',
-                style: TextStyle(color: Colors.black),
-              ),
-            ),
             const Divider(),
             ElevatedButton(
-              onPressed: widget.startTimerCallback,
+              onPressed: startTimerCallback,
               style: ThemeButton.elevated,
               child: const Text(
                 'Start timer',
@@ -85,16 +54,34 @@ class _ConfigurationBoardState extends State<ConfigurationBoard> {
       children: [
         IntSelectorTile(
           title: 'Number of sessions',
-          controller: _nbSessionTextController,
-          onValidChange: (value) =>
-              AppPreferences.of(context, listen: false).nbOfSession = value,
+          initialValue: AppPreferences.of(context, listen: false).nbOfSession,
+          onValidChange: (value) {
+            AppPreferences.of(context, listen: false).nbOfSession = value;
+            _savePreferences(context);
+          },
         ),
         SizedBox(height: padding),
         IntSelectorTile(
           title: 'Session duration (min)',
-          controller: _sessionDurationTextController,
-          onValidChange: (value) => AppPreferences.of(context, listen: false)
-              .sessionDuration = Duration(minutes: value),
+          initialValue: AppPreferences.of(context, listen: false)
+              .sessionDuration
+              .inMinutes,
+          onValidChange: (value) {
+            AppPreferences.of(context, listen: false).sessionDuration =
+                Duration(minutes: value);
+            _savePreferences(context);
+          },
+        ),
+        SizedBox(height: padding),
+        IntSelectorTile(
+          title: 'Pause duration (min)',
+          initialValue:
+              AppPreferences.of(context, listen: false).pauseDuration.inMinutes,
+          onValidChange: (value) {
+            AppPreferences.of(context, listen: false).pauseDuration =
+                Duration(minutes: value);
+            _savePreferences(context);
+          },
         ),
       ],
     );
@@ -113,7 +100,9 @@ class _ConfigurationBoardState extends State<ConfigurationBoard> {
             selectFileCallback: () async {
               final filename = await _pickFile(context);
               if (filename == null) return;
-              await appPreferences.setActiveBackgroundImagePath(filename);
+              await appPreferences
+                  .setActiveBackgroundImagePath(filename)
+                  .then((value) => _savePreferences(context));
             }),
         FileSelectorTile(
             title: 'Paused image',
@@ -123,7 +112,9 @@ class _ConfigurationBoardState extends State<ConfigurationBoard> {
             selectFileCallback: () async {
               final filename = await _pickFile(context);
               if (filename == null) return;
-              await appPreferences.setPauseBackgroundImagePath(filename);
+              await appPreferences
+                  .setPauseBackgroundImagePath(filename)
+                  .then((value) => _savePreferences(context));
             }),
       ],
     );
@@ -145,11 +136,6 @@ class _ConfigurationBoardState extends State<ConfigurationBoard> {
   }
 
   void _savePreferences(context) {
-    final appPreferences = AppPreferences.of(context, listen: false);
-    appPreferences.save();
-
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      content: Text('Preferences saved'),
-    ));
+    AppPreferences.of(context, listen: false).save();
   }
 }
