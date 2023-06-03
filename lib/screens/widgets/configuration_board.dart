@@ -7,6 +7,7 @@ import 'package:twitch_pomorodo_timer/common/app_theme.dart';
 import 'package:twitch_pomorodo_timer/providers/app_preferences.dart';
 import 'package:twitch_pomorodo_timer/screens/widgets/file_selector_tile.dart';
 import 'package:twitch_pomorodo_timer/screens/widgets/int_selector_tile.dart';
+import 'package:twitch_pomorodo_timer/screens/widgets/string_selector_tile.dart';
 
 class ConfigurationBoard extends StatelessWidget {
   const ConfigurationBoard({super.key, required this.startTimerCallback});
@@ -34,6 +35,8 @@ class ConfigurationBoard extends StatelessWidget {
             _buildTimerConfiguration(context),
             const Divider(),
             _buildImageSelectors(context),
+            const Divider(),
+            _buildTextSelectors(context),
           ],
         ),
       ),
@@ -71,11 +74,9 @@ class ConfigurationBoard extends StatelessWidget {
       children: [
         IntSelectorTile(
           title: 'Number of sessions',
-          initialValue: AppPreferences.of(context, listen: false).nbOfSession,
-          onValidChange: (value) {
-            AppPreferences.of(context, listen: false).nbOfSession = value;
-            _savePreferences(context);
-          },
+          initialValue: AppPreferences.of(context, listen: false).nbSessions,
+          onValidChange: (value) =>
+              AppPreferences.of(context, listen: false).nbSessions = value,
         ),
         SizedBox(height: padding),
         IntSelectorTile(
@@ -83,22 +84,16 @@ class ConfigurationBoard extends StatelessWidget {
           initialValue: AppPreferences.of(context, listen: false)
               .sessionDuration
               .inMinutes,
-          onValidChange: (value) {
-            AppPreferences.of(context, listen: false).sessionDuration =
-                Duration(minutes: value);
-            _savePreferences(context);
-          },
+          onValidChange: (value) => AppPreferences.of(context, listen: false)
+              .sessionDuration = Duration(minutes: value),
         ),
         SizedBox(height: padding),
         IntSelectorTile(
           title: 'Pause duration (min)',
           initialValue:
               AppPreferences.of(context, listen: false).pauseDuration.inMinutes,
-          onValidChange: (value) {
-            AppPreferences.of(context, listen: false).pauseDuration =
-                Duration(minutes: value);
-            _savePreferences(context);
-          },
+          onValidChange: (value) => AppPreferences.of(context, listen: false)
+              .pauseDuration = Duration(minutes: value),
         ),
       ],
     );
@@ -118,9 +113,7 @@ class ConfigurationBoard extends StatelessWidget {
             selectFileCallback: () async {
               final filename = await _pickFile(context);
               if (filename == null) return;
-              await appPreferences
-                  .setActiveBackgroundImagePath(filename)
-                  .then((value) => _savePreferences(context));
+              await appPreferences.setActiveBackgroundImagePath(filename);
             }),
         SizedBox(height: padding * 0.5),
         FileSelectorTile(
@@ -131,10 +124,44 @@ class ConfigurationBoard extends StatelessWidget {
             selectFileCallback: () async {
               final filename = await _pickFile(context);
               if (filename == null) return;
-              await appPreferences
-                  .setPauseBackgroundImagePath(filename)
-                  .then((value) => _savePreferences(context));
+              await appPreferences.setPauseBackgroundImagePath(filename);
             }),
+      ],
+    );
+  }
+
+  Widget _buildTextSelectors(BuildContext context) {
+    final appPreferences = AppPreferences.of(context);
+    final padding = ThemePadding.normal(context);
+
+    return Column(
+      children: [
+        Row(children: [
+          const Text(
+            'Text to print on the images',
+            style:
+                TextStyle(color: ThemeColor.text, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(width: padding),
+          const Tooltip(
+            message: 'You can use tags that will change automatically\n'
+                '{currentSession} is the current session\n'
+                '{maxSessions} is the max sessions\n'
+                '{timer} is the timer\n'
+                '\\n is a linebreak',
+            child: Icon(
+              Icons.info,
+              color: Colors.white,
+            ),
+          ),
+        ]),
+        SizedBox(height: padding),
+        StringSelectorTile(
+          title: 'Text during session',
+          initialValue: appPreferences.textDuringActiveSession,
+          onValidChange: (String value) =>
+              appPreferences.textDuringActiveSession = value,
+        ),
       ],
     );
   }
@@ -152,9 +179,5 @@ class ConfigurationBoard extends StatelessWidget {
       fileTileSelectMode: FileTileSelectMode.wholeTile,
     );
     return path;
-  }
-
-  void _savePreferences(context) {
-    AppPreferences.of(context, listen: false).save();
   }
 }

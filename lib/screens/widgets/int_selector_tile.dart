@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:twitch_pomorodo_timer/common/app_theme.dart';
 
-class DigitOnly extends TextInputFormatter {
+class _DigitOnly extends TextInputFormatter {
   static final _reg = RegExp(r'^\d+$'); // any number
 
   @override
@@ -50,7 +50,6 @@ class _IntSelectorTileState extends State<IntSelectorTile> {
             inputDecorationTheme: const InputDecorationTheme(
               labelStyle: TextStyle(color: Colors.black),
               hintStyle: TextStyle(color: Colors.black),
-              border: OutlineInputBorder(gapPadding: 100),
               filled: true,
               fillColor: Colors.white,
               enabledBorder: InputBorder.none,
@@ -61,7 +60,7 @@ class _IntSelectorTileState extends State<IntSelectorTile> {
               width: windowHeight * 0.1,
               child: TextField(
                 controller: _controller,
-                inputFormatters: [DigitOnly()],
+                inputFormatters: [_DigitOnly()],
                 onChanged: (value) {
                   final valueAsInt = int.tryParse(value);
                   if (valueAsInt == null) return;
