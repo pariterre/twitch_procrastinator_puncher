@@ -1,0 +1,23 @@
+name: twitch_pomorodo_timer
+description: This is a complete pomodoro timer with which add number of sessions for each of the viewers that are present.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+version: 1.0.0
+
+environment:
+  sdk: '>=3.0.3 <4.0.0'
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  path_provider: ^2.0.15
+  provider: ^6.0.5
+  twitch_manager:
+    path: ./plugins/twitch_manager
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
