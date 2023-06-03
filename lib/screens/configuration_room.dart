@@ -25,11 +25,6 @@ class _ConfigurationRoomState extends State<ConfigurationRoom> {
     fileIo ??= await AppPreferences.factory();
   }
 
-  void _goToIdleRoom() {
-    // Navigator.of(context)
-    //     .pushReplacementNamed(IdleRoom.route, arguments: _mainInterface);
-  }
-
   @override
   Widget build(BuildContext context) {
     final windowHeight = MediaQuery.of(context).size.height;
@@ -39,28 +34,47 @@ class _ConfigurationRoomState extends State<ConfigurationRoom> {
       body: Container(
         height: windowHeight,
         decoration: const BoxDecoration(color: ThemeColor.greenScreen),
-        child: Center(
-          child: Container(
-            width: windowHeight * 0.5,
-            decoration: const BoxDecoration(color: ThemeColor.main),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: _goToIdleRoom,
-                  style:
-                      ElevatedButton.styleFrom(backgroundColor: Colors.white),
-                  child: const Text(
-                    'Start',
-                    style: TextStyle(color: Colors.black),
-                  ),
-                )
-              ],
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            ConfigurationBoard(
+              startTimerCallback: () => {},
             ),
-          ),
+            ConfigurationBoard(
+              startTimerCallback: () => {},
+            ),
+          ],
         ),
+      ),
+    );
+  }
+}
+
+class ConfigurationBoard extends StatelessWidget {
+  const ConfigurationBoard({super.key, required this.startTimerCallback});
+
+  final Function() startTimerCallback;
+
+  @override
+  Widget build(BuildContext context) {
+    final windowHeight = MediaQuery.of(context).size.height;
+    return Container(
+      width: windowHeight * 0.5,
+      decoration: const BoxDecoration(color: ThemeColor.main),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          ElevatedButton(
+            onPressed: startTimerCallback,
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
+            child: const Text(
+              'Start',
+              style: TextStyle(color: Colors.black),
+            ),
+          )
+        ],
       ),
     );
   }
