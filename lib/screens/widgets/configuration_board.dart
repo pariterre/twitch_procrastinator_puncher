@@ -27,23 +27,40 @@ class ConfigurationBoard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            _buildController(context),
+            const Divider(),
             _buildTimerConfiguration(context),
             const Divider(),
             _buildImageSelectors(context),
-            const Divider(),
-            ElevatedButton(
-              onPressed: startTimerCallback,
-              style: ThemeButton.elevated,
-              child: const Text(
-                'Start timer',
-                style: TextStyle(color: Colors.black),
-              ),
-            ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildController(context) {
+    final padding = ThemePadding.normal(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Pomodoro controller',
+            style:
+                TextStyle(color: ThemeColor.text, fontWeight: FontWeight.bold)),
+        SizedBox(height: padding),
+        Center(
+          child: ElevatedButton(
+            onPressed: startTimerCallback,
+            style: ThemeButton.elevated,
+            child: const Text(
+              'Start timer',
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -89,6 +106,7 @@ class ConfigurationBoard extends StatelessWidget {
 
   Widget _buildImageSelectors(BuildContext context) {
     final appPreferences = AppPreferences.of(context);
+    final padding = ThemePadding.normal(context);
 
     return Column(
       children: [
@@ -104,6 +122,7 @@ class ConfigurationBoard extends StatelessWidget {
                   .setActiveBackgroundImagePath(filename)
                   .then((value) => _savePreferences(context));
             }),
+        SizedBox(height: padding * 0.5),
         FileSelectorTile(
             title: 'Paused image',
             path: appPreferences.pauseBackgroundImagePath == null

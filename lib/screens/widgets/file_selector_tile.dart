@@ -18,33 +18,32 @@ class FileSelectorTile extends StatelessWidget {
     final windowHeight = MediaQuery.of(context).size.height;
     final padding = ThemePadding.normal(context);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text(title,
-            style: const TextStyle(
-                color: ThemeColor.text, fontWeight: FontWeight.bold)),
-        Padding(
-          padding: EdgeInsets.only(left: padding),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
+        SizedBox(
+          width: windowHeight * 0.3,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(
-                width: windowHeight * 0.3,
+              Text(title,
+                  style: const TextStyle(
+                      color: ThemeColor.text, fontWeight: FontWeight.bold)),
+              Padding(
+                padding: EdgeInsets.only(left: padding),
                 child: Text(
                   path ?? 'None selected',
                   style: const TextStyle(color: ThemeColor.text),
                 ),
               ),
-              ElevatedButton(
-                onPressed: selectFileCallback,
-                style: ThemeButton.elevated,
-                child:
-                    const Text('Select', style: TextStyle(color: Colors.black)),
-              ),
             ],
           ),
+        ),
+        ElevatedButton(
+          onPressed: selectFileCallback,
+          style: ThemeButton.elevated,
+          child: const Text('Select', style: TextStyle(color: Colors.black)),
         ),
       ],
     );
