@@ -38,7 +38,7 @@ class _ConfigurationRoomState extends State<ConfigurationRoom> {
             ConfigurationBoard(
               startTimerCallback: () => {},
             ),
-            PomodoroTimer(),
+            const PomodoroTimer(),
           ],
         ),
       ),

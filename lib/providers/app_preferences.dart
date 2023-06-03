@@ -20,6 +20,22 @@ class AppPreferences with ChangeNotifier {
   Directory _lastVisitedDirectory = Directory('');
   Directory get lastVisitedDirectory => _lastVisitedDirectory;
 
+  // Number of total session
+  int _nbOfSession;
+  int get nbOfSession => _nbOfSession;
+  set nbOfSession(int value) {
+    _nbOfSession = value;
+    notifyListeners();
+  }
+
+  // Session time
+  Duration _sessionDuration;
+  Duration get sessionDuration => _sessionDuration;
+  set sessionDuration(Duration value) {
+    _sessionDuration = value;
+    notifyListeners();
+  }
+
   // Background image during the countdown
   String? _activeBackgroundImageFilename;
   String? get activeBackgroundImagePath =>
@@ -60,7 +76,7 @@ class AppPreferences with ChangeNotifier {
 
   ///
   /// Main accessor of the AppPreference
-  static AppPreferences of(context, {listen = true}) =>
+  static AppPreferences of(BuildContext context, {listen = true}) =>
       Provider.of(context, listen: listen);
 
   ///
@@ -79,6 +95,9 @@ class AppPreferences with ChangeNotifier {
       previousPreferences = jsonDecode(await preferencesFile.readAsString());
     }
     return AppPreferences._(
+        nbOfSession: previousPreferences?['nbOfSession'] ?? -1,
+        sessionDuration:
+            Duration(minutes: previousPreferences?['sessionTime'] ?? -1),
         directory: directory,
         activeBackgroundImageFilename:
             previousPreferences?['activeBackgroundImageFilename'],
@@ -90,11 +109,15 @@ class AppPreferences with ChangeNotifier {
   }
 
   AppPreferences._({
+    required int nbOfSession,
+    required Duration sessionDuration,
     required Directory directory,
     required String? activeBackgroundImageFilename,
     required String? pauseBackgroundImageFilename,
     required Directory lastVisitedDirectory,
-  })  : preferencesDirectory = directory,
+  })  : _nbOfSession = nbOfSession,
+        _sessionDuration = sessionDuration,
+        preferencesDirectory = directory,
         _activeBackgroundImageFilename = activeBackgroundImageFilename,
         _pauseBackgroundImageFilename = pauseBackgroundImageFilename,
         _lastVisitedDirectory = lastVisitedDirectory;
@@ -115,6 +138,8 @@ class AppPreferences with ChangeNotifier {
   ///
   /// Serialize all the values
   Map<String, dynamic> get _serializePreferences => {
+        'nbOfSession': _nbOfSession,
+        'sessionTime': _sessionDuration.inMinutes,
         'activeBackgroundImageFilename': _activeBackgroundImageFilename,
         'pauseBackgroundImageFilename': _pauseBackgroundImageFilename,
         'lastVisitedDirectory': _lastVisitedDirectory.path,
