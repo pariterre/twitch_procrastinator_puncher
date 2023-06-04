@@ -1,3 +1,4 @@
+import 'package:arrow_pad/arrow_pad.dart';
 import 'package:flutter/material.dart';
 
 class StringSelectorTile extends StatefulWidget {
@@ -6,11 +7,13 @@ class StringSelectorTile extends StatefulWidget {
     required this.title,
     required this.initialValue,
     required this.onValidChange,
+    required this.onMoveText,
   });
 
   final String title;
   final String initialValue;
   final Function(String value) onValidChange;
+  final Function(PressDirection direction) onMoveText;
 
   @override
   State<StringSelectorTile> createState() => _StringSelectorTileState();
@@ -21,6 +24,8 @@ class _StringSelectorTileState extends State<StringSelectorTile> {
 
   @override
   Widget build(BuildContext context) {
+    final windowHeight = MediaQuery.of(context).size.height;
+
     return Theme(
       data: ThemeData(
         inputDecorationTheme: const InputDecorationTheme(
@@ -33,10 +38,26 @@ class _StringSelectorTileState extends State<StringSelectorTile> {
           focusedBorder: InputBorder.none,
         ),
       ),
-      child: TextFormField(
-        controller: _controller,
-        decoration: InputDecoration(labelText: widget.title),
-        onChanged: (value) => widget.onValidChange(value),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextFormField(
+              controller: _controller,
+              decoration: InputDecoration(labelText: widget.title),
+              onChanged: (value) => widget.onValidChange(value),
+              maxLines: 3,
+              minLines: 1,
+            ),
+          ),
+          ArrowPad(
+            height: windowHeight * 0.10,
+            width: windowHeight * 0.10,
+            innerColor: Colors.blue,
+            arrowPadIconStyle: ArrowPadIconStyle.chevron,
+            clickTrigger: ClickTrigger.onTapUp,
+            onPressed: widget.onMoveText,
+          ),
+        ],
       ),
     );
   }

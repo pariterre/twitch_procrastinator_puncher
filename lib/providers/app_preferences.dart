@@ -6,6 +6,7 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:twitch_pomorodo_timer/common/config.dart';
+import 'package:twitch_pomorodo_timer/common/text_on_pomodoro.dart';
 
 String _path(Directory directory, String filename) =>
     '${directory.path}/$filename';
@@ -25,8 +26,7 @@ class AppPreferences with ChangeNotifier {
   int get nbSessions => _nbSessions;
   set nbSessions(int value) {
     _nbSessions = value;
-    notifyListeners();
-    save();
+    _save();
   }
 
   // Session time
@@ -34,8 +34,7 @@ class AppPreferences with ChangeNotifier {
   Duration get sessionDuration => _sessionDuration;
   set sessionDuration(Duration value) {
     _sessionDuration = value;
-    notifyListeners();
-    save();
+    _save();
   }
 
   // Pause time
@@ -43,8 +42,7 @@ class AppPreferences with ChangeNotifier {
   Duration get pauseDuration => _pauseDuration;
   set pauseDuration(Duration value) {
     _pauseDuration = value;
-    notifyListeners();
-    save();
+    _save();
   }
 
   // Background image during the countdown
@@ -59,8 +57,7 @@ class AppPreferences with ChangeNotifier {
     } else {
       _activeBackgroundImageFilename = await _copyFile(original: value);
     }
-    notifyListeners();
-    save();
+    _save();
   }
 
   // Background image during the pause
@@ -74,24 +71,19 @@ class AppPreferences with ChangeNotifier {
     } else {
       _pauseBackgroundImageFilename = await _copyFile(original: value);
     }
-    notifyListeners();
-    save();
+    _save();
   }
 
-  // Background image during the pause
-  String _textDuringActiveSession;
-  String get textDuringActiveSession => _textDuringActiveSession;
-  set textDuringActiveSession(String value) {
-    _textDuringActiveSession = value;
-    notifyListeners();
-    save();
-  }
+  // Foreground texts
+  TextOnPomodoro textDuringInitialization;
+  TextOnPomodoro textDuringActiveSession;
 
   ///
-  /// Vanilla way to save the current preferences to a file
-  void save() async {
+  /// Save the current preferences to a file
+  void _save() async {
     final file = File(_preferencesPath);
     await file.writeAsString(json.encode(_serializePreferences));
+    notifyListeners();
   }
 
   // CONSTRUCTOR AND ACCESSORS
@@ -127,8 +119,12 @@ class AppPreferences with ChangeNotifier {
             previousPreferences?['activeBackgroundImageFilename'],
         pauseBackgroundImageFilename:
             previousPreferences?['pauseBackgroundImageFilename'],
-        textDuringActiveSession:
+        textDuringInitialization: TextOnPomodoro.deserialize(
+            previousPreferences?['textDuringInitialization'],
+            defaultText: 'Bienvenue!'),
+        textDuringActiveSession: TextOnPomodoro.deserialize(
             previousPreferences?['textDuringActiveSession'],
+            defaultText: r'Session {currentSession}/{maxSessions}\n{timer}!'),
         lastVisitedDirectory: Directory(
             previousPreferences?['lastVisitedDirectory'] ??
                 documentDirectory.path));
@@ -141,7 +137,8 @@ class AppPreferences with ChangeNotifier {
     required Directory directory,
     required String? activeBackgroundImageFilename,
     required String? pauseBackgroundImageFilename,
-    required String? textDuringActiveSession,
+    required this.textDuringInitialization,
+    required this.textDuringActiveSession,
     required Directory lastVisitedDirectory,
   })  : _nbSessions = nbSessions,
         _sessionDuration = sessionDuration,
@@ -149,9 +146,10 @@ class AppPreferences with ChangeNotifier {
         preferencesDirectory = directory,
         _activeBackgroundImageFilename = activeBackgroundImageFilename,
         _pauseBackgroundImageFilename = pauseBackgroundImageFilename,
-        _textDuringActiveSession = textDuringActiveSession ??
-            'Session {currentSession}/{maxSessions}\n{timer}',
-        _lastVisitedDirectory = lastVisitedDirectory;
+        _lastVisitedDirectory = lastVisitedDirectory {
+    textDuringInitialization.saveCallback = _save;
+    textDuringActiveSession.saveCallback = _save;
+  }
 
   // INTERNAL METHODS
 
@@ -174,7 +172,8 @@ class AppPreferences with ChangeNotifier {
         'pauseDuration': _pauseDuration.inMinutes,
         'activeBackgroundImageFilename': _activeBackgroundImageFilename,
         'pauseBackgroundImageFilename': _pauseBackgroundImageFilename,
-        'textDuringActiveSession': _textDuringActiveSession,
+        'textDuringInitialization': textDuringInitialization.serialize(),
+        'textDuringActiveSession': textDuringActiveSession.serialize(),
         'lastVisitedDirectory': _lastVisitedDirectory.path,
       };
 }

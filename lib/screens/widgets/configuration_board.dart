@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:arrow_pad/arrow_pad.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
@@ -130,6 +131,25 @@ class ConfigurationBoard extends StatelessWidget {
     );
   }
 
+  void _moveText(
+      context, Function(Offset) textPointer, PressDirection direction) {
+    final windowHeight = MediaQuery.of(context).size.height;
+    switch (direction) {
+      case PressDirection.up:
+        textPointer(Offset(0, -windowHeight * 0.01));
+        return;
+      case PressDirection.right:
+        textPointer(Offset(windowHeight * 0.01, 0));
+        return;
+      case PressDirection.down:
+        textPointer(Offset(0, windowHeight * 0.01));
+        return;
+      case PressDirection.left:
+        textPointer(Offset(-windowHeight * 0.01, 0));
+        return;
+    }
+  }
+
   Widget _buildTextSelectors(BuildContext context) {
     final appPreferences = AppPreferences.of(context);
     final padding = ThemePadding.normal(context);
@@ -157,10 +177,34 @@ class ConfigurationBoard extends StatelessWidget {
         ]),
         SizedBox(height: padding),
         StringSelectorTile(
-          title: 'Text during session',
-          initialValue: appPreferences.textDuringActiveSession,
+          title: 'Text during initialization',
+          initialValue: appPreferences.textDuringInitialization.text,
           onValidChange: (String value) =>
-              appPreferences.textDuringActiveSession = value,
+              appPreferences.textDuringInitialization.text = value,
+          onMoveText: (direction) {
+            _moveText(context,
+                appPreferences.textDuringInitialization.addToOffset, direction);
+          },
+        ),
+        StringSelectorTile(
+          title: 'Text during session',
+          initialValue: appPreferences.textDuringActiveSession.text,
+          onValidChange: (String value) =>
+              appPreferences.textDuringActiveSession.text = value,
+          onMoveText: (direction) {
+            _moveText(context,
+                appPreferences.textDuringActiveSession.addToOffset, direction);
+          },
+        ),
+        StringSelectorTile(
+          title: 'Text during pause',
+          initialValue: appPreferences.textDuringActiveSession.text,
+          onValidChange: (String value) =>
+              appPreferences.textDuringActiveSession.text = value,
+          onMoveText: (direction) {
+            _moveText(context,
+                appPreferences.textDuringActiveSession.addToOffset, direction);
+          },
         ),
       ],
     );
