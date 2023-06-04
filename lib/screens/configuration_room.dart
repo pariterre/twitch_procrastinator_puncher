@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:twitch_manager/twitch_manager.dart';
 import 'package:twitch_pomorodo_timer/models/app_theme.dart';
+import 'package:twitch_pomorodo_timer/models/config.dart';
 import 'package:twitch_pomorodo_timer/providers/app_preferences.dart';
 import 'package:twitch_pomorodo_timer/providers/pomodoro_status.dart';
 import 'package:twitch_pomorodo_timer/screens/widgets/configuration_board.dart';
@@ -59,9 +60,18 @@ class _ConfigurationRoomState extends State<ConfigurationRoom> {
     setState(() {});
   }
 
-  void _connectToTwitch() {
-    Navigator.of(context)
-        .pushReplacementNamed(TwitchAuthenticationScreen.route);
+  void _connectToTwitch() async {
+    _twitchManager = await showDialog<TwitchManager>(
+      context: context,
+      builder: (context) => Dialog(
+          child: TwitchAuthenticationScreen(
+        onFinishedConnexion: (manager) => Navigator.pop(context, manager),
+        appId: twitchAppId,
+        scope: twitchScope,
+        withModerator: true,
+        forceNewAuthentication: false,
+      )),
+    );
   }
 
   @override
@@ -85,7 +95,7 @@ class _ConfigurationRoomState extends State<ConfigurationRoom> {
                 _statusWithFocus = hasFocus;
                 if (isInitialized) setState(() {});
               },
-              connectToTwitch: _connectToTwitch,
+              connectToTwitch: _twitchManager == null ? _connectToTwitch : null,
             ),
             Column(
               children: [

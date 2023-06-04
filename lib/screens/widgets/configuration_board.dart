@@ -28,7 +28,7 @@ class ConfigurationBoard extends StatelessWidget {
   final Function() pauseTimerCallback;
   final Function() resetTimerCallback;
   final Function(StopWatchStatus hasFocus) gainFocusCallback;
-  final Function() connectToTwitch;
+  final Function()? connectToTwitch;
 
   @override
   Widget build(BuildContext context) {
@@ -105,7 +105,7 @@ class ConfigurationBoard extends StatelessWidget {
             ),
           ],
         ),
-        if (preferences.useHallOfFame)
+        if (connectToTwitch != null && preferences.useHallOfFame)
           Center(
             child: Padding(
               padding: EdgeInsets.only(top: padding),

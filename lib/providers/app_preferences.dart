@@ -113,7 +113,7 @@ class AppPreferences with ChangeNotifier {
   /// previously saved folder is ignored
   static Future<AppPreferences> factory({reload = true}) async {
     final documentDirectory = await getApplicationDocumentsDirectory();
-    final directory = Directory('${documentDirectory.path}/$appName');
+    final directory = Directory('${documentDirectory.path}/$twitchAppName');
     if (!(await directory.exists())) {
       await directory.create(recursive: true);
     }
@@ -121,7 +121,11 @@ class AppPreferences with ChangeNotifier {
     final preferencesFile = File(_path(directory, preferencesFilename));
     Map<String, dynamic>? previousPreferences;
     if (reload && await preferencesFile.exists()) {
-      previousPreferences = jsonDecode(await preferencesFile.readAsString());
+      try {
+        previousPreferences = jsonDecode(await preferencesFile.readAsString());
+      } catch (_) {
+        previousPreferences = null;
+      }
     }
     return AppPreferences._(
         nbSessions: previousPreferences?['nbSessions'] ?? 0,
