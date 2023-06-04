@@ -72,9 +72,11 @@ class ConfigurationBoard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             ElevatedButton(
-              onPressed: pomodoro.stopWatchStatus == StopWatchStatus.inSession
-                  ? pauseTimerCallback
-                  : startTimerCallback,
+              onPressed:
+                  pomodoro.stopWatchStatus == StopWatchStatus.initialized ||
+                          pomodoro.stopWatchStatus == StopWatchStatus.paused
+                      ? startTimerCallback
+                      : pauseTimerCallback,
               style: ThemeButton.elevated,
               child: Text(
                 pomodoro.stopWatchStatus == StopWatchStatus.initialized

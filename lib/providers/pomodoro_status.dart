@@ -45,6 +45,7 @@ class PomodoroStatus with ChangeNotifier {
 
   Duration _timer = const Duration();
   StopWatchStatus _stopWatchStatus = StopWatchStatus.initialized;
+  StopWatchStatus? _stopWatchStatusBeforePausing;
   StopWatchStatus get stopWatchStatus => _stopWatchStatus;
 
   Duration get timer => _timer;
@@ -56,18 +57,21 @@ class PomodoroStatus with ChangeNotifier {
   ///
   /// Start the counter if it is not done
   void start() {
-    _stopWatchStatus = _stopWatchStatus == StopWatchStatus.done
-        ? StopWatchStatus.done
-        : StopWatchStatus.inSession;
+    if (_stopWatchStatus == StopWatchStatus.done) return;
+
+    _stopWatchStatus =
+        _stopWatchStatusBeforePausing ?? StopWatchStatus.inSession;
+    _stopWatchStatusBeforePausing = null;
     notifyListeners();
   }
 
   ///
   /// Pause the counter if it is not done
   void pause() {
-    _stopWatchStatus = _stopWatchStatus == StopWatchStatus.done
-        ? StopWatchStatus.done
-        : StopWatchStatus.paused;
+    if (_stopWatchStatus == StopWatchStatus.done) return;
+
+    _stopWatchStatusBeforePausing = _stopWatchStatus;
+    _stopWatchStatus = StopWatchStatus.paused;
     notifyListeners();
   }
 
@@ -106,7 +110,6 @@ class PomodoroStatus with ChangeNotifier {
       // Decrement the counter, if it gets to zeros advance the session
       int newTimerValue = _timer.inSeconds - 1;
       if (newTimerValue <= 0) {
-        _currentSession++;
         if (_currentSession == _nbSessions) {
           // If we got to last session, it is over
           _stopWatchStatus = StopWatchStatus.done;
@@ -122,7 +125,8 @@ class PomodoroStatus with ChangeNotifier {
       // Decrement the counter, if it gets to zeros starts the next session
       int newTimerValue = _timer.inSeconds - 1;
       if (newTimerValue <= 0) {
-        // Otherwise start the pause
+        // Start the next session
+        _currentSession++;
         _stopWatchStatus = StopWatchStatus.inSession;
         newTimerValue = _focusSessionDuration.inSeconds;
       }
