@@ -20,11 +20,13 @@ class ConfigurationBoard extends StatelessWidget {
     required this.startTimerCallback,
     required this.pauseTimerCallback,
     required this.resetTimerCallback,
+    required this.gainFocusCallback,
   });
 
   final Function() startTimerCallback;
   final Function() pauseTimerCallback;
   final Function() resetTimerCallback;
+  final Function(StopWatchStatus hasFocus) gainFocusCallback;
 
   @override
   Widget build(BuildContext context) {
@@ -74,13 +76,13 @@ class ConfigurationBoard extends StatelessWidget {
           children: [
             ElevatedButton(
               onPressed:
-                  pomodoro.stopWatchStatus == StopWatchStatus.initialized ||
+                  pomodoro.stopWatchStatus == StopWatchStatus.initializing ||
                           pomodoro.stopWatchStatus == StopWatchStatus.paused
                       ? startTimerCallback
                       : pauseTimerCallback,
               style: ThemeButton.elevated,
               child: Text(
-                pomodoro.stopWatchStatus == StopWatchStatus.initialized
+                pomodoro.stopWatchStatus == StopWatchStatus.initializing
                     ? 'Start timer'
                     : pomodoro.stopWatchStatus == StopWatchStatus.paused
                         ? 'Resume timer'
@@ -218,34 +220,60 @@ class ConfigurationBoard extends StatelessWidget {
           ),
         ]),
         SizedBox(height: padding),
-        _buildStringSelectorTile(context,
-            title: 'Text during initialization',
-            textOnPomodoro: appPreferences.textDuringInitialization),
-        _buildStringSelectorTile(context,
-            title: 'Text during focus sessions',
-            textOnPomodoro: appPreferences.textDuringActiveSession),
-        _buildStringSelectorTile(context,
-            title: 'Text during pause sessions',
-            textOnPomodoro: appPreferences.textDuringPauseSession),
-        _buildStringSelectorTile(context,
-            title: 'Text during pauses',
-            textOnPomodoro: appPreferences.textDuringPause),
-        _buildStringSelectorTile(context,
-            title: 'Text when done', textOnPomodoro: appPreferences.textDone),
+        _buildStringSelectorTile(
+          context,
+          title: 'Text during initialization',
+          textOnPomodoro: appPreferences.textDuringInitialization,
+          focus: StopWatchStatus.initializing,
+        ),
+        _buildStringSelectorTile(
+          context,
+          title: 'Text during focus sessions',
+          textOnPomodoro: appPreferences.textDuringActiveSession,
+          focus: StopWatchStatus.inSession,
+        ),
+        _buildStringSelectorTile(
+          context,
+          title: 'Text during pause sessions',
+          textOnPomodoro: appPreferences.textDuringPauseSession,
+          focus: StopWatchStatus.inPauseSession,
+        ),
+        _buildStringSelectorTile(
+          context,
+          title: 'Text during pauses',
+          textOnPomodoro: appPreferences.textDuringPause,
+          focus: StopWatchStatus.paused,
+        ),
+        _buildStringSelectorTile(
+          context,
+          title: 'Text when done',
+          textOnPomodoro: appPreferences.textDone,
+          focus: StopWatchStatus.done,
+        ),
       ],
     );
   }
 
   StringSelectorTile _buildStringSelectorTile(context,
-      {required String title, required TextOnPomodoro textOnPomodoro}) {
+      {required String title,
+      required TextOnPomodoro textOnPomodoro,
+      required StopWatchStatus focus}) {
     return StringSelectorTile(
       title: title,
       initialValue: textOnPomodoro.text,
-      onTextChanged: (String value) => textOnPomodoro.text = value,
-      onSizeChanged: (direction) => textOnPomodoro
-          .increaseSize(direction == PlusOrMinusSelection.plus ? 0.01 : -0.01),
+      onGainedFocus: gainFocusCallback(focus),
+      onTextChanged: (String value) {
+        textOnPomodoro.text = value;
+        gainFocusCallback(focus);
+      },
+      onSizeChanged: (direction) {
+        textOnPomodoro.increaseSize(
+            direction == PlusOrMinusSelection.plus ? 0.01 : -0.01);
+        gainFocusCallback(focus);
+      },
       onMoveText: (direction) {
         _moveText(context, textOnPomodoro.addToOffset, direction);
+        gainFocusCallback(focus);
       },
     );
   }

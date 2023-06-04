@@ -7,7 +7,13 @@ import 'package:twitch_pomorodo_timer/providers/app_preferences.dart';
 import 'package:twitch_pomorodo_timer/providers/pomodoro_status.dart';
 
 class PomodoroTimer extends StatelessWidget {
-  const PomodoroTimer({super.key});
+  const PomodoroTimer({
+    super.key,
+    required this.textWithFocus,
+  });
+
+  // This is so during initialization phase, one can see what they are modifying
+  final StopWatchStatus textWithFocus;
 
   Widget _buildText(context) {
     final windowHeight = MediaQuery.of(context).size.height;
@@ -19,8 +25,11 @@ class PomodoroTimer extends StatelessWidget {
     final appPreferences = AppPreferences.of(context);
 
     late TextOnPomodoro textOnPomodoro;
-    switch (pomodoro.stopWatchStatus) {
-      case StopWatchStatus.initialized:
+    // If we are on initializing phase, show the text with the focus
+    switch (pomodoro.stopWatchStatus == StopWatchStatus.initializing
+        ? textWithFocus
+        : pomodoro.stopWatchStatus) {
+      case StopWatchStatus.initializing:
         textOnPomodoro = appPreferences.textDuringInitialization;
         break;
       case StopWatchStatus.inSession:

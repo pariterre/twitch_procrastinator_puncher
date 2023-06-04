@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-enum StopWatchStatus { initialized, inSession, inPauseSession, paused, done }
+enum StopWatchStatus { initializing, inSession, inPauseSession, paused, done }
 
 class PomodoroStatus with ChangeNotifier {
   int _nbSessions = 0;
@@ -19,7 +19,7 @@ class PomodoroStatus with ChangeNotifier {
   Duration get focusSessionDuration => _focusSessionDuration;
   set focusSessionDuration(Duration duration) {
     _focusSessionDuration = duration;
-    if (_stopWatchStatus == StopWatchStatus.initialized) {
+    if (_stopWatchStatus == StopWatchStatus.initializing) {
       _timer = duration;
     }
     notifyListeners();
@@ -33,7 +33,7 @@ class PomodoroStatus with ChangeNotifier {
   }
 
   Duration _timer = const Duration();
-  StopWatchStatus _stopWatchStatus = StopWatchStatus.initialized;
+  StopWatchStatus _stopWatchStatus = StopWatchStatus.initializing;
   StopWatchStatus? _stopWatchStatusBeforePausing;
   StopWatchStatus get stopWatchStatus => _stopWatchStatus;
 
@@ -78,7 +78,7 @@ class PomodoroStatus with ChangeNotifier {
     _focusSessionDuration = focusSessionDuration;
     _pauseSessionDuration = pauseSessionDuration;
 
-    _stopWatchStatus = StopWatchStatus.initialized;
+    _stopWatchStatus = StopWatchStatus.initializing;
     _timer = Duration(seconds: _focusSessionDuration.inSeconds);
 
     if (notify) notifyListeners();

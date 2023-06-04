@@ -17,6 +17,8 @@ class ConfigurationRoom extends StatefulWidget {
 
 class _ConfigurationRoomState extends State<ConfigurationRoom> {
   TwitchManager? _twitchManager;
+  StopWatchStatus _statusWithFocus = StopWatchStatus.initializing;
+  bool isInitialized = false;
 
   @override
   void initState() {
@@ -55,6 +57,7 @@ class _ConfigurationRoomState extends State<ConfigurationRoom> {
           Duration(seconds: appPreferences.pauseDuration.inSeconds),
       notify: !preventFromNotifying,
     );
+    _statusWithFocus = StopWatchStatus.initializing;
     setState(() {});
   }
 
@@ -62,7 +65,7 @@ class _ConfigurationRoomState extends State<ConfigurationRoom> {
   Widget build(BuildContext context) {
     final windowHeight = MediaQuery.of(context).size.height;
 
-    return Scaffold(
+    final widget = Scaffold(
       body: Container(
         height: windowHeight,
         decoration: const BoxDecoration(color: ThemeColor.greenScreen),
@@ -70,14 +73,19 @@ class _ConfigurationRoomState extends State<ConfigurationRoom> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             ConfigurationBoard(
-              startTimerCallback: _startTimer,
-              pauseTimerCallback: _pauseTimer,
-              resetTimerCallback: _resetTimer,
-            ),
-            const PomodoroTimer(),
+                startTimerCallback: _startTimer,
+                pauseTimerCallback: _pauseTimer,
+                resetTimerCallback: _resetTimer,
+                gainFocusCallback: (hasFocus) => () {
+                      _statusWithFocus = hasFocus;
+                      if (isInitialized) setState(() {});
+                    }),
+            PomodoroTimer(textWithFocus: _statusWithFocus),
           ],
         ),
       ),
     );
+    isInitialized = true; // Prevent from calling setState on gainFocus
+    return widget;
   }
 }
