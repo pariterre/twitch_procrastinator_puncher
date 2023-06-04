@@ -114,9 +114,9 @@ class AppPreferences with ChangeNotifier {
     return AppPreferences._(
         nbSessions: previousPreferences?['nbSessions'] ?? 0,
         sessionDuration:
-            Duration(minutes: previousPreferences?['sessionTime'] ?? 0),
+            Duration(seconds: previousPreferences?['sessionTime'] ?? 0),
         pauseDuration:
-            Duration(minutes: previousPreferences?['pauseDuration'] ?? 0),
+            Duration(seconds: previousPreferences?['pauseDuration'] ?? 0),
         directory: directory,
         activeBackgroundImageFilename:
             previousPreferences?['activeBackgroundImageFilename'],
@@ -184,8 +184,8 @@ class AppPreferences with ChangeNotifier {
   /// Serialize all the values
   Map<String, dynamic> get _serializePreferences => {
         'nbSessions': _nbSessions,
-        'sessionTime': _sessionDuration.inMinutes,
-        'pauseDuration': _pauseDuration.inMinutes,
+        'sessionTime': _sessionDuration.inSeconds,
+        'pauseDuration': _pauseDuration.inSeconds,
         'activeBackgroundImageFilename': _activeBackgroundImageFilename,
         'pauseBackgroundImageFilename': _pauseBackgroundImageFilename,
         'textDuringInitialization': textDuringInitialization.serialize(),

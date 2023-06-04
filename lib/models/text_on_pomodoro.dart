@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:twitch_pomorodo_timer/models/helpers.dart';
 import 'package:twitch_pomorodo_timer/providers/pomodoro_status.dart';
 
 class TextOnPomodoro {

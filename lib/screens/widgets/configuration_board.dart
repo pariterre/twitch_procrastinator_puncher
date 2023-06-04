@@ -11,6 +11,7 @@ import 'package:twitch_pomorodo_timer/providers/pomodoro_status.dart';
 import 'package:twitch_pomorodo_timer/screens/widgets/file_selector_tile.dart';
 import 'package:twitch_pomorodo_timer/screens/widgets/int_selector_tile.dart';
 import 'package:twitch_pomorodo_timer/screens/widgets/string_selector_tile.dart';
+import 'package:twitch_pomorodo_timer/screens/widgets/time_selector_tile.dart';
 import 'package:twitch_pomorodo_timer/widgets/plus_or_minus.dart';
 
 class ConfigurationBoard extends StatelessWidget {
@@ -115,29 +116,24 @@ class ConfigurationBoard extends StatelessWidget {
           },
         ),
         SizedBox(height: padding),
-        IntSelectorTile(
-          title: 'Session duration (min)',
-          initialValue: AppPreferences.of(context, listen: false)
-              .sessionDuration
-              .inMinutes,
+        TimeSelectorTile(
+          title: 'Session duration (mm:ss)',
+          initialValue:
+              AppPreferences.of(context, listen: false).sessionDuration,
           onValidChange: (value) {
-            final duration = Duration(minutes: value);
-            AppPreferences.of(context, listen: false).sessionDuration =
-                duration;
+            AppPreferences.of(context, listen: false).sessionDuration = value;
             PomodoroStatus.of(context, listen: false).focusSessionDuration =
-                duration;
+                value;
           },
         ),
         SizedBox(height: padding),
-        IntSelectorTile(
-          title: 'Pause duration (min)',
-          initialValue:
-              AppPreferences.of(context, listen: false).pauseDuration.inMinutes,
+        TimeSelectorTile(
+          title: 'Pause duration (mm:ss)',
+          initialValue: AppPreferences.of(context, listen: false).pauseDuration,
           onValidChange: (value) {
-            final duration = Duration(minutes: value);
-            AppPreferences.of(context, listen: false).pauseDuration = duration;
+            AppPreferences.of(context, listen: false).pauseDuration = value;
             PomodoroStatus.of(context, listen: false).pauseSessionDuration =
-                duration;
+                value;
           },
         ),
       ],
