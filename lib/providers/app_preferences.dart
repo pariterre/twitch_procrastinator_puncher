@@ -81,8 +81,17 @@ class AppPreferences with ChangeNotifier {
   TextOnPomodoro textDuringPause;
   TextOnPomodoro textDone;
 
-  bool useHallOfFame;
+  bool _useHallOfFame;
+  bool get useHallOfFame => _useHallOfFame;
+  set useHallOfFame(bool value) {
+    _useHallOfFame = value;
+    _save();
+  }
+
   PlainText textHallOfFameTitle;
+  PlainText textHallOfFameName;
+  PlainText textHallOfFameToday;
+  PlainText textHallOfFameAlltime;
 
   ///
   /// Save the current preferences to a file
@@ -141,6 +150,9 @@ class AppPreferences with ChangeNotifier {
         useHallOfFame: previousPreferences?['useHallOfFame'] ?? true,
         textHallOfFameTitle: PlainText.deserialize(previousPreferences?['textHallOfFameTitle'],
             defaultText: r'Hall of fame'),
+        textHallOfFameName: PlainText.deserialize(previousPreferences?['textHallOfFameName'], defaultText: r'Name of the viewers'),
+        textHallOfFameToday: PlainText.deserialize(previousPreferences?['textHallOfFameToday'], defaultText: r'Today'),
+        textHallOfFameAlltime: PlainText.deserialize(previousPreferences?['textHallOfFameAlltime'], defaultText: r'All time'),
         lastVisitedDirectory: Directory(previousPreferences?['lastVisitedDirectory'] ?? documentDirectory.path));
   }
 
@@ -156,8 +168,11 @@ class AppPreferences with ChangeNotifier {
     required this.textDuringPauseSession,
     required this.textDuringPause,
     required this.textDone,
-    required this.useHallOfFame,
+    required bool useHallOfFame,
     required this.textHallOfFameTitle,
+    required this.textHallOfFameName,
+    required this.textHallOfFameToday,
+    required this.textHallOfFameAlltime,
     required Directory lastVisitedDirectory,
   })  : _nbSessions = nbSessions,
         _sessionDuration = sessionDuration,
@@ -165,6 +180,7 @@ class AppPreferences with ChangeNotifier {
         preferencesDirectory = directory,
         _activeBackgroundImageFilename = activeBackgroundImageFilename,
         _pauseBackgroundImageFilename = pauseBackgroundImageFilename,
+        _useHallOfFame = useHallOfFame,
         _lastVisitedDirectory = lastVisitedDirectory {
     textDuringInitialization.saveCallback = _save;
     textDuringActiveSession.saveCallback = _save;
@@ -172,6 +188,9 @@ class AppPreferences with ChangeNotifier {
     textDuringPause.saveCallback = _save;
     textDone.saveCallback = _save;
     textHallOfFameTitle.saveCallback = _save;
+    textHallOfFameName.saveCallback = _save;
+    textHallOfFameToday.saveCallback = _save;
+    textHallOfFameAlltime.saveCallback = _save;
   }
 
   // INTERNAL METHODS
@@ -202,6 +221,9 @@ class AppPreferences with ChangeNotifier {
         'textDone': textDone.serialize(),
         'useHallOfFame': useHallOfFame,
         'textHallOfFameTitle': textHallOfFameTitle.serialize(),
+        'textHallOfFameName': textHallOfFameName.serialize(),
+        'textHallOfFameToday': textHallOfFameToday.serialize(),
+        'textHallOfFameAlltime': textHallOfFameAlltime.serialize(),
         'lastVisitedDirectory': _lastVisitedDirectory.path,
       };
 }

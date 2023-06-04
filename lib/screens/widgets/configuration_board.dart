@@ -21,12 +21,14 @@ class ConfigurationBoard extends StatelessWidget {
     required this.pauseTimerCallback,
     required this.resetTimerCallback,
     required this.gainFocusCallback,
+    required this.connectToTwitch,
   });
 
   final Function() startTimerCallback;
   final Function() pauseTimerCallback;
   final Function() resetTimerCallback;
   final Function(StopWatchStatus hasFocus) gainFocusCallback;
+  final Function() connectToTwitch;
 
   @override
   Widget build(BuildContext context) {
@@ -63,6 +65,7 @@ class ConfigurationBoard extends StatelessWidget {
   }
 
   Widget _buildController(context) {
+    final preferences = AppPreferences.of(context);
     final pomodoro = PomodoroStatus.of(context, listen: false);
     final padding = ThemePadding.normal(context);
 
@@ -102,6 +105,20 @@ class ConfigurationBoard extends StatelessWidget {
             ),
           ],
         ),
+        if (preferences.useHallOfFame)
+          Center(
+            child: Padding(
+              padding: EdgeInsets.only(top: padding),
+              child: ElevatedButton(
+                onPressed: connectToTwitch,
+                style: ThemeButton.elevated,
+                child: const Text(
+                  'Connect to Twitch',
+                  style: TextStyle(color: Colors.black),
+                ),
+              ),
+            ),
+          )
       ],
     );
   }
@@ -268,11 +285,39 @@ class ConfigurationBoard extends StatelessWidget {
           style: TextStyle(color: ThemeColor.text, fontWeight: FontWeight.bold),
         ),
         SizedBox(height: padding),
+        CheckboxListTile(
+          title: const Text(
+            'Use hall of fame',
+            style: TextStyle(color: Colors.white),
+          ),
+          visualDensity: VisualDensity.compact,
+          value: appPreferences.useHallOfFame,
+          onChanged: (value) => appPreferences.useHallOfFame = value!,
+        ),
+        SizedBox(height: padding),
         _buildStringSelectorTile(
           context,
-          title: 'Hall of fame naming',
+          title: 'Title',
           plainText: appPreferences.textHallOfFameTitle,
         ),
+        SizedBox(height: padding),
+        _buildStringSelectorTile(
+          context,
+          title: 'Viewers names text',
+          plainText: appPreferences.textHallOfFameName,
+        ),
+        SizedBox(height: padding),
+        _buildStringSelectorTile(
+          context,
+          title: 'Today text',
+          plainText: appPreferences.textHallOfFameToday,
+        ),
+        SizedBox(height: padding),
+        _buildStringSelectorTile(
+          context,
+          title: 'All time text',
+          plainText: appPreferences.textHallOfFameAlltime,
+        )
       ],
     );
   }

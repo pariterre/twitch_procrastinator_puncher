@@ -49,10 +49,10 @@ class HallOfFame extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: padding),
               child: Column(
                 children: [
-                  const _FameTile(
-                    name: 'Nom des bleuets',
-                    doneToday: 'Aujourd\'hui',
-                    doneInAll: 'En tout',
+                  _FameTile(
+                    name: preferences.textHallOfFameName.text,
+                    doneToday: preferences.textHallOfFameToday.text,
+                    doneInAll: preferences.textHallOfFameAlltime.text,
                     fontWeight: FontWeight.bold,
                   ),
                   ...allParticipants

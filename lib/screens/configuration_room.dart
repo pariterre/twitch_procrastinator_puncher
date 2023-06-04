@@ -30,9 +30,6 @@ class _ConfigurationRoomState extends State<ConfigurationRoom> {
   @override
   void didChangeDependencies() async {
     super.didChangeDependencies();
-
-    // _twitchManager ??=
-    //     ModalRoute.of(context)!.settings.arguments as TwitchManager;
   }
 
   void _startTimer() {
@@ -62,6 +59,11 @@ class _ConfigurationRoomState extends State<ConfigurationRoom> {
     setState(() {});
   }
 
+  void _connectToTwitch() {
+    Navigator.of(context)
+        .pushReplacementNamed(TwitchAuthenticationScreen.route);
+  }
+
   @override
   Widget build(BuildContext context) {
     final windowHeight = MediaQuery.of(context).size.height;
@@ -76,13 +78,15 @@ class _ConfigurationRoomState extends State<ConfigurationRoom> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             ConfigurationBoard(
-                startTimerCallback: _startTimer,
-                pauseTimerCallback: _pauseTimer,
-                resetTimerCallback: _resetTimer,
-                gainFocusCallback: (hasFocus) => () {
-                      _statusWithFocus = hasFocus;
-                      if (isInitialized) setState(() {});
-                    }),
+              startTimerCallback: _startTimer,
+              pauseTimerCallback: _pauseTimer,
+              resetTimerCallback: _resetTimer,
+              gainFocusCallback: (hasFocus) => () {
+                _statusWithFocus = hasFocus;
+                if (isInitialized) setState(() {});
+              },
+              connectToTwitch: _connectToTwitch,
+            ),
             Column(
               children: [
                 PomodoroTimer(textWithFocus: _statusWithFocus),
