@@ -99,8 +99,8 @@ class PomodoroStatus with ChangeNotifier {
       // Decrement the counter, if it gets to zeros advance the session
       int newTimerValue = _timer.inSeconds - 1;
       if (newTimerValue <= 0) {
-        if (_currentSession == _nbSessions) {
-          // If we got to last session, it is over
+        if (_currentSession + 1 == _nbSessions) {
+          // If next session is the last session, it is over
           _stopWatchStatus = StopWatchStatus.done;
           newTimerValue = 0;
         } else {
