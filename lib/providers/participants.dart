@@ -1,17 +1,51 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:twitch_manager/twitch_manager.dart';
 import 'package:twitch_pomorodo_timer/models/config.dart';
 import 'package:twitch_pomorodo_timer/models/participant.dart';
 
 class Participants extends ChangeNotifier {
+  TwitchManager? _twitchManager;
+  set twitchManager(TwitchManager manager) {
+    _twitchManager = manager;
+    Timer.periodic(
+        const Duration(minutes: 1), (Timer t) => _checkWhoIsConnected());
+  }
+
+  Function(String)? newUserHasConnected;
+
+  void _checkWhoIsConnected() async {
+    final chatters = await _twitchManager!.api.fetchChatters();
+    if (chatters == null) return;
+
+    // Disconnect users that are not connected anymore
+    for (final user in all) {
+      if (!chatters.contains(user.username)) {
+        user.connect();
+      }
+    }
+
+    // Connect new users
+    final allUsernames = all.map((e) => e.username);
+    for (final chatter in chatters) {
+      if (!allUsernames.contains(chatter)) {
+        final newParticipant = Participant(username: chatter);
+        newParticipant.connect();
+        all.add(newParticipant);
+        if (newUserHasConnected != null) newUserHasConnected!(chatter);
+      }
+    }
+  }
+
   final List<Participant> all;
 
   List<Participant> get connected =>
-      all.map((e) => e.connected ? e : null).nonNulls.toList();
+      all.map((e) => e.isConnected ? e : null).nonNulls.toList();
 
   final String _saveDir;
   static const _saveFilename = 'participants.json';
