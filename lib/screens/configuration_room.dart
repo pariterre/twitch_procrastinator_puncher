@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:twitch_manager/twitch_manager.dart';
-import 'package:twitch_pomorodo_timer/common/app_theme.dart';
+import 'package:twitch_pomorodo_timer/models/app_theme.dart';
 import 'package:twitch_pomorodo_timer/providers/app_preferences.dart';
 import 'package:twitch_pomorodo_timer/providers/pomodoro_status.dart';
 import 'package:twitch_pomorodo_timer/screens/widgets/configuration_board.dart';

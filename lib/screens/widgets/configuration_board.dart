@@ -4,12 +4,14 @@ import 'package:arrow_pad/arrow_pad.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
-import 'package:twitch_pomorodo_timer/common/app_theme.dart';
+import 'package:twitch_pomorodo_timer/models/app_theme.dart';
+import 'package:twitch_pomorodo_timer/models/text_on_pomodoro.dart';
 import 'package:twitch_pomorodo_timer/providers/app_preferences.dart';
 import 'package:twitch_pomorodo_timer/providers/pomodoro_status.dart';
 import 'package:twitch_pomorodo_timer/screens/widgets/file_selector_tile.dart';
 import 'package:twitch_pomorodo_timer/screens/widgets/int_selector_tile.dart';
 import 'package:twitch_pomorodo_timer/screens/widgets/string_selector_tile.dart';
+import 'package:twitch_pomorodo_timer/widgets/plus_or_minus.dart';
 
 class ConfigurationBoard extends StatelessWidget {
   const ConfigurationBoard({
@@ -84,10 +86,10 @@ class ConfigurationBoard extends StatelessWidget {
               ),
             ),
             ElevatedButton(
-              onPressed: startTimerCallback,
+              onPressed: resetTimerCallback,
               style: ThemeButton.elevated,
               child: const Text(
-                'Stop timer',
+                'Reset timer',
                 style: TextStyle(color: Colors.black),
               ),
             ),
@@ -205,37 +207,35 @@ class ConfigurationBoard extends StatelessWidget {
           ),
         ]),
         SizedBox(height: padding),
-        StringSelectorTile(
-          title: 'Text during initialization',
-          initialValue: appPreferences.textDuringInitialization.text,
-          onValidChange: (String value) =>
-              appPreferences.textDuringInitialization.text = value,
-          onMoveText: (direction) {
-            _moveText(context,
-                appPreferences.textDuringInitialization.addToOffset, direction);
-          },
-        ),
-        StringSelectorTile(
-          title: 'Text during focus sessions',
-          initialValue: appPreferences.textDuringActiveSession.text,
-          onValidChange: (String value) =>
-              appPreferences.textDuringActiveSession.text = value,
-          onMoveText: (direction) {
-            _moveText(context,
-                appPreferences.textDuringActiveSession.addToOffset, direction);
-          },
-        ),
-        StringSelectorTile(
-          title: 'Text during pause sessions',
-          initialValue: appPreferences.textDuringPauseSession.text,
-          onValidChange: (String value) =>
-              appPreferences.textDuringPauseSession.text = value,
-          onMoveText: (direction) {
-            _moveText(context,
-                appPreferences.textDuringPauseSession.addToOffset, direction);
-          },
-        ),
+        _buildStringSelectorTile(context,
+            title: 'Text during initialization',
+            textOnPomodoro: appPreferences.textDuringInitialization),
+        _buildStringSelectorTile(context,
+            title: 'Text during focus sessions',
+            textOnPomodoro: appPreferences.textDuringActiveSession),
+        _buildStringSelectorTile(context,
+            title: 'Text during pause sessions',
+            textOnPomodoro: appPreferences.textDuringPauseSession),
+        _buildStringSelectorTile(context,
+            title: 'Text during pauses',
+            textOnPomodoro: appPreferences.textDuringPause),
+        _buildStringSelectorTile(context,
+            title: 'Text when done', textOnPomodoro: appPreferences.textDone),
       ],
+    );
+  }
+
+  StringSelectorTile _buildStringSelectorTile(context,
+      {required String title, required TextOnPomodoro textOnPomodoro}) {
+    return StringSelectorTile(
+      title: title,
+      initialValue: textOnPomodoro.text,
+      onTextChanged: (String value) => textOnPomodoro.text = value,
+      onSizeChanged: (direction) => textOnPomodoro
+          .increaseSize(direction == PlusOrMinusSelection.plus ? 0.01 : -0.01),
+      onMoveText: (direction) {
+        _moveText(context, textOnPomodoro.addToOffset, direction);
+      },
     );
   }
 

@@ -4,14 +4,17 @@ import 'package:twitch_pomorodo_timer/providers/pomodoro_status.dart';
 class TextOnPomodoro {
   String _text;
   Offset _offset;
+  double _size;
   Function()? saveCallback;
 
   TextOnPomodoro({
     required String text,
     required Offset offset,
+    required double size,
     this.saveCallback,
   })  : _text = text,
-        _offset = offset;
+        _offset = offset,
+        _size = size;
 
   // Foreground text during active session
   String get text => _text;
@@ -30,10 +33,16 @@ class TextOnPomodoro {
     if (saveCallback != null) saveCallback!();
   }
 
-  // Foreground text during active session
+  // Offset of the text on the screen
   Offset get offset => _offset;
   void addToOffset(Offset offset) {
     _offset += offset;
+    if (saveCallback != null) saveCallback!();
+  }
+
+  double get size => _size;
+  void increaseSize(double value) {
+    _size += value;
     if (saveCallback != null) saveCallback!();
   }
 
@@ -43,11 +52,14 @@ class TextOnPomodoro {
   }) {
     final text = map?['text'] ?? defaultText;
     final offset = map?['offset'] ?? [0.0, 0.0];
-    return TextOnPomodoro(text: text, offset: Offset(offset[0], offset[1]));
+    final size = map?['size'] ?? 1.0;
+    return TextOnPomodoro(
+        text: text, offset: Offset(offset[0], offset[1]), size: size);
   }
 
   Map<String, dynamic> serialize() => {
         'text': _text,
-        'offset': [_offset.dx, _offset.dy]
+        'offset': [_offset.dx, _offset.dy],
+        'size': _size,
       };
 }

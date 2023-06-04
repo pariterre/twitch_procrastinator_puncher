@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:twitch_pomorodo_timer/common/app_theme.dart';
-import 'package:twitch_pomorodo_timer/common/text_on_pomodoro.dart';
+import 'package:twitch_pomorodo_timer/models/app_theme.dart';
+import 'package:twitch_pomorodo_timer/models/text_on_pomodoro.dart';
 import 'package:twitch_pomorodo_timer/providers/app_preferences.dart';
 import 'package:twitch_pomorodo_timer/providers/pomodoro_status.dart';
 
@@ -30,10 +30,10 @@ class PomodoroTimer extends StatelessWidget {
         textOnPomodoro = appPreferences.textDuringPauseSession;
         break;
       case StopWatchStatus.paused:
-        textOnPomodoro = appPreferences.textDuringPauseSession;
+        textOnPomodoro = appPreferences.textDuringPause;
         break;
       case StopWatchStatus.done:
-        textOnPomodoro = appPreferences.textDuringActiveSession;
+        textOnPomodoro = appPreferences.textDone;
         break;
     }
 
@@ -42,7 +42,8 @@ class PomodoroTimer extends StatelessWidget {
       top: textOnPomodoro.offset.dy,
       child: Text(textOnPomodoro.formattedText(context),
           textAlign: TextAlign.center,
-          style: textStyle.copyWith(fontSize: windowHeight * 0.11)),
+          style: textStyle.copyWith(
+              fontSize: windowHeight * 0.11 * textOnPomodoro.size)),
     );
   }
 

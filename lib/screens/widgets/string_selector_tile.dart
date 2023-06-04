@@ -1,18 +1,21 @@
 import 'package:arrow_pad/arrow_pad.dart';
 import 'package:flutter/material.dart';
+import 'package:twitch_pomorodo_timer/widgets/plus_or_minus.dart';
 
 class StringSelectorTile extends StatefulWidget {
   const StringSelectorTile({
     super.key,
     required this.title,
     required this.initialValue,
-    required this.onValidChange,
+    required this.onTextChanged,
+    required this.onSizeChanged,
     required this.onMoveText,
   });
 
   final String title;
   final String initialValue;
-  final Function(String value) onValidChange;
+  final Function(String value) onTextChanged;
+  final Function(PlusOrMinusSelection selection) onSizeChanged;
   final Function(PressDirection direction) onMoveText;
 
   @override
@@ -44,11 +47,13 @@ class _StringSelectorTileState extends State<StringSelectorTile> {
             child: TextFormField(
               controller: _controller,
               decoration: InputDecoration(labelText: widget.title),
-              onChanged: (value) => widget.onValidChange(value),
+              onChanged: (value) => widget.onTextChanged(value),
               maxLines: 2,
               minLines: 2,
             ),
           ),
+          SizedBox(width: windowHeight * 0.01),
+          PlusOrMinus(onTap: widget.onSizeChanged),
           ArrowPad(
             height: windowHeight * 0.10,
             width: windowHeight * 0.10,

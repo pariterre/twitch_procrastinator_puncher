@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:twitch_pomorodo_timer/common/config.dart';
-import 'package:twitch_pomorodo_timer/common/text_on_pomodoro.dart';
+import 'package:twitch_pomorodo_timer/models/config.dart';
+import 'package:twitch_pomorodo_timer/models/text_on_pomodoro.dart';
 
 String _path(Directory directory, String filename) =>
     '${directory.path}/$filename';
@@ -78,6 +78,8 @@ class AppPreferences with ChangeNotifier {
   TextOnPomodoro textDuringInitialization;
   TextOnPomodoro textDuringActiveSession;
   TextOnPomodoro textDuringPauseSession;
+  TextOnPomodoro textDuringPause;
+  TextOnPomodoro textDone;
 
   ///
   /// Save the current preferences to a file
@@ -129,9 +131,13 @@ class AppPreferences with ChangeNotifier {
         textDuringPauseSession: TextOnPomodoro.deserialize(
             previousPreferences?['textDuringPauseSession'],
             defaultText: r'Pause\n{timer}!'),
-        lastVisitedDirectory: Directory(
-            previousPreferences?['lastVisitedDirectory'] ??
-                documentDirectory.path));
+        textDuringPause: TextOnPomodoro.deserialize(
+            previousPreferences?['textDuringPause'],
+            defaultText: r'Pause!'),
+        textDone: TextOnPomodoro.deserialize(previousPreferences?['textDone'],
+            defaultText: r'Bravo!'),
+        lastVisitedDirectory:
+            Directory(previousPreferences?['lastVisitedDirectory'] ?? documentDirectory.path));
   }
 
   AppPreferences._({
@@ -144,6 +150,8 @@ class AppPreferences with ChangeNotifier {
     required this.textDuringInitialization,
     required this.textDuringActiveSession,
     required this.textDuringPauseSession,
+    required this.textDuringPause,
+    required this.textDone,
     required Directory lastVisitedDirectory,
   })  : _nbSessions = nbSessions,
         _sessionDuration = sessionDuration,
@@ -155,6 +163,8 @@ class AppPreferences with ChangeNotifier {
     textDuringInitialization.saveCallback = _save;
     textDuringActiveSession.saveCallback = _save;
     textDuringPauseSession.saveCallback = _save;
+    textDuringPause.saveCallback = _save;
+    textDone.saveCallback = _save;
   }
 
   // INTERNAL METHODS
@@ -181,6 +191,8 @@ class AppPreferences with ChangeNotifier {
         'textDuringInitialization': textDuringInitialization.serialize(),
         'textDuringActiveSession': textDuringActiveSession.serialize(),
         'textDuringPauseSession': textDuringPauseSession.serialize(),
+        'textDuringPause': textDuringPause.serialize(),
+        'textDone': textDone.serialize(),
         'lastVisitedDirectory': _lastVisitedDirectory.path,
       };
 }
