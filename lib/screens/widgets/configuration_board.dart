@@ -107,8 +107,10 @@ class ConfigurationBoard extends StatelessWidget {
         IntSelectorTile(
           title: 'Number of sessions',
           initialValue: AppPreferences.of(context, listen: false).nbSessions,
-          onValidChange: (value) =>
-              AppPreferences.of(context, listen: false).nbSessions = value,
+          onValidChange: (value) {
+            AppPreferences.of(context, listen: false).nbSessions = value;
+            PomodoroStatus.of(context, listen: false).nbSessions = value;
+          },
         ),
         SizedBox(height: padding),
         IntSelectorTile(
@@ -116,16 +118,25 @@ class ConfigurationBoard extends StatelessWidget {
           initialValue: AppPreferences.of(context, listen: false)
               .sessionDuration
               .inMinutes,
-          onValidChange: (value) => AppPreferences.of(context, listen: false)
-              .sessionDuration = Duration(minutes: value),
+          onValidChange: (value) {
+            final duration = Duration(minutes: value);
+            AppPreferences.of(context, listen: false).sessionDuration =
+                duration;
+            PomodoroStatus.of(context, listen: false).focusSessionDuration =
+                duration;
+          },
         ),
         SizedBox(height: padding),
         IntSelectorTile(
           title: 'Pause duration (min)',
           initialValue:
               AppPreferences.of(context, listen: false).pauseDuration.inMinutes,
-          onValidChange: (value) => AppPreferences.of(context, listen: false)
-              .pauseDuration = Duration(minutes: value),
+          onValidChange: (value) {
+            final duration = Duration(minutes: value);
+            AppPreferences.of(context, listen: false).pauseDuration = duration;
+            PomodoroStatus.of(context, listen: false).focusSessionDuration =
+                duration;
+          },
         ),
       ],
     );
@@ -199,6 +210,8 @@ class ConfigurationBoard extends StatelessWidget {
                 '{currentSession} is the current session\n'
                 '{maxSessions} is the max sessions\n'
                 '{timer} is the timer\n'
+                '{sessionDuration} is the time of the focus sessions\n'
+                '{pauseDuration} is the time of the pauses\n'
                 '\\n is a linebreak',
             child: Icon(
               Icons.info,

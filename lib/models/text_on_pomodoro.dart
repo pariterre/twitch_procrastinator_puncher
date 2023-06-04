@@ -21,11 +21,15 @@ class TextOnPomodoro {
   String formattedText(BuildContext context) {
     final pomodoro = PomodoroStatus.of(context, listen: false);
     return text
-        .replaceAll('{timer}', durationAsString(pomodoro.timer))
-        .replaceAll(r'\n', '\n')
         .replaceAll(
             '{currentSession}', (pomodoro.currentSession + 1).toString())
-        .replaceAll('{maxSessions}', pomodoro.nbSessions.toString());
+        .replaceAll('{maxSessions}', pomodoro.nbSessions.toString())
+        .replaceAll('{timer}', durationAsString(pomodoro.timer))
+        .replaceAll('{sessionDuration}',
+            durationAsString(pomodoro.focusSessionDuration))
+        .replaceAll(
+            '{pauseDuration}', durationAsString(pomodoro.pauseSessionDuration))
+        .replaceAll(r'\n', '\n');
   }
 
   set text(String value) {

@@ -19,10 +19,26 @@ String durationAsString(Duration duration) {
 class PomodoroStatus with ChangeNotifier {
   int _nbSessions = 0;
   int get nbSessions => _nbSessions;
+  set nbSessions(int value) {
+    _nbSessions = value;
+    notifyListeners();
+  }
+
   int _currentSession = 0;
   int get currentSession => _currentSession;
   Duration _focusSessionDuration = const Duration();
+  Duration get focusSessionDuration => _focusSessionDuration;
+  set focusSessionDuration(Duration duration) {
+    _focusSessionDuration = duration;
+    notifyListeners();
+  }
+
   Duration _pauseSessionDuration = const Duration();
+  Duration get pauseSessionDuration => _pauseSessionDuration;
+  set pauseSessionDuration(Duration duration) {
+    _pauseSessionDuration = duration;
+    notifyListeners();
+  }
 
   Duration _timer = const Duration();
   StopWatchStatus _stopWatchStatus = StopWatchStatus.initialized;
