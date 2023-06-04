@@ -1,10 +1,10 @@
 class Participant {
   String username;
-  int doneToday;
   int doneInAll;
+  int doneToday = 0;
+  bool connected = false;
 
-  Participant(
-      {required this.username, this.doneToday = 0, required this.doneInAll});
+  Participant({required this.username, required this.doneInAll});
 
   static Participant deserialize(map) =>
       Participant(username: map['username'], doneInAll: map['sessionDone']);

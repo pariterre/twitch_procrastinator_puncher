@@ -3,13 +3,17 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:twitch_pomorodo_timer/models/config.dart';
 import 'package:twitch_pomorodo_timer/models/participant.dart';
 
 class Participants extends ChangeNotifier {
   final List<Participant> all;
 
-  String _saveDir;
+  List<Participant> get connected =>
+      all.map((e) => e.connected ? e : null).nonNulls.toList();
+
+  final String _saveDir;
   static const _saveFilename = 'participants.json';
   String get _savePath => '$_saveDir/$_saveFilename';
 
@@ -39,6 +43,9 @@ class Participants extends ChangeNotifier {
             [],
         saveDir: saveDir.path);
   }
+
+  static Participants of(BuildContext context, {listen = true}) =>
+      Provider.of<Participants>(context, listen: listen);
 
   Participants._({required this.all, required String saveDir})
       : _saveDir = saveDir;

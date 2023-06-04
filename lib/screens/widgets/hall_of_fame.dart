@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:twitch_pomorodo_timer/models/app_theme.dart';
-import 'package:twitch_pomorodo_timer/models/participant.dart';
 import 'package:twitch_pomorodo_timer/providers/app_preferences.dart';
+import 'package:twitch_pomorodo_timer/providers/participants.dart';
 
 class HallOfFame extends StatelessWidget {
   const HallOfFame({super.key});
@@ -11,15 +11,9 @@ class HallOfFame extends StatelessWidget {
     final windowHeight = MediaQuery.of(context).size.height;
     final preferences = AppPreferences.of(context);
     final padding = ThemePadding.normal(context);
+    final participants = Participants.of(context).all.map((e) => e).toList();
 
-    final allParticipants = [
-      Participant(username: 'Coucou', doneToday: 10, doneInAll: 100),
-      Participant(username: 'Coucou5', doneToday: 5, doneInAll: 14),
-      Participant(username: 'Coucou4', doneToday: 1, doneInAll: 50),
-      Participant(username: 'Coucou3', doneToday: 13, doneInAll: 10),
-      Participant(username: 'Coucou2', doneToday: 50, doneInAll: 200),
-    ];
-    allParticipants.sort((a, b) => b.doneInAll - a.doneInAll);
+    participants.sort((a, b) => b.doneInAll - a.doneInAll);
 
     return Container(
       height: windowHeight * 0.3,
@@ -55,7 +49,7 @@ class HallOfFame extends StatelessWidget {
                     doneInAll: preferences.textHallOfFameAlltime.text,
                     fontWeight: FontWeight.bold,
                   ),
-                  ...allParticipants
+                  ...participants
                       .map<Widget>((e) => _FameTile(
                             name: e.username,
                             doneToday: e.doneToday.toString(),
