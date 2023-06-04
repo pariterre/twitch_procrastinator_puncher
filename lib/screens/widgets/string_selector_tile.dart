@@ -45,8 +45,8 @@ class _StringSelectorTileState extends State<StringSelectorTile> {
               controller: _controller,
               decoration: InputDecoration(labelText: widget.title),
               onChanged: (value) => widget.onValidChange(value),
-              maxLines: 3,
-              minLines: 1,
+              maxLines: 2,
+              minLines: 2,
             ),
           ),
           ArrowPad(

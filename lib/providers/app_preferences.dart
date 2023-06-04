@@ -77,6 +77,7 @@ class AppPreferences with ChangeNotifier {
   // Foreground texts
   TextOnPomodoro textDuringInitialization;
   TextOnPomodoro textDuringActiveSession;
+  TextOnPomodoro textDuringPauseSession;
 
   ///
   /// Save the current preferences to a file
@@ -125,6 +126,9 @@ class AppPreferences with ChangeNotifier {
         textDuringActiveSession: TextOnPomodoro.deserialize(
             previousPreferences?['textDuringActiveSession'],
             defaultText: r'Session {currentSession}/{maxSessions}\n{timer}!'),
+        textDuringPauseSession: TextOnPomodoro.deserialize(
+            previousPreferences?['textDuringPauseSession'],
+            defaultText: r'Pause\n{timer}!'),
         lastVisitedDirectory: Directory(
             previousPreferences?['lastVisitedDirectory'] ??
                 documentDirectory.path));
@@ -139,6 +143,7 @@ class AppPreferences with ChangeNotifier {
     required String? pauseBackgroundImageFilename,
     required this.textDuringInitialization,
     required this.textDuringActiveSession,
+    required this.textDuringPauseSession,
     required Directory lastVisitedDirectory,
   })  : _nbSessions = nbSessions,
         _sessionDuration = sessionDuration,
@@ -149,6 +154,7 @@ class AppPreferences with ChangeNotifier {
         _lastVisitedDirectory = lastVisitedDirectory {
     textDuringInitialization.saveCallback = _save;
     textDuringActiveSession.saveCallback = _save;
+    textDuringPauseSession.saveCallback = _save;
   }
 
   // INTERNAL METHODS
@@ -174,6 +180,7 @@ class AppPreferences with ChangeNotifier {
         'pauseBackgroundImageFilename': _pauseBackgroundImageFilename,
         'textDuringInitialization': textDuringInitialization.serialize(),
         'textDuringActiveSession': textDuringActiveSession.serialize(),
+        'textDuringPauseSession': textDuringPauseSession.serialize(),
         'lastVisitedDirectory': _lastVisitedDirectory.path,
       };
 }

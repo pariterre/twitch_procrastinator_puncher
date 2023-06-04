@@ -26,8 +26,11 @@ class PomodoroTimer extends StatelessWidget {
       case StopWatchStatus.inSession:
         textOnPomodoro = appPreferences.textDuringActiveSession;
         break;
+      case StopWatchStatus.inPauseSession:
+        textOnPomodoro = appPreferences.textDuringPauseSession;
+        break;
       case StopWatchStatus.paused:
-        textOnPomodoro = appPreferences.textDuringActiveSession;
+        textOnPomodoro = appPreferences.textDuringPauseSession;
         break;
       case StopWatchStatus.done:
         textOnPomodoro = appPreferences.textDuringActiveSession;
@@ -54,6 +57,7 @@ class PomodoroTimer extends StatelessWidget {
 
     return SizedBox(
       height: windowHeight * 0.75,
+      width: windowHeight * 0.75,
       child: Stack(
         alignment: Alignment.center,
         children: [background, _buildText(context)],

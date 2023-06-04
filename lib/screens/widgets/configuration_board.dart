@@ -6,14 +6,22 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:twitch_pomorodo_timer/common/app_theme.dart';
 import 'package:twitch_pomorodo_timer/providers/app_preferences.dart';
+import 'package:twitch_pomorodo_timer/providers/pomodoro_status.dart';
 import 'package:twitch_pomorodo_timer/screens/widgets/file_selector_tile.dart';
 import 'package:twitch_pomorodo_timer/screens/widgets/int_selector_tile.dart';
 import 'package:twitch_pomorodo_timer/screens/widgets/string_selector_tile.dart';
 
 class ConfigurationBoard extends StatelessWidget {
-  const ConfigurationBoard({super.key, required this.startTimerCallback});
+  const ConfigurationBoard({
+    super.key,
+    required this.startTimerCallback,
+    required this.pauseTimerCallback,
+    required this.resetTimerCallback,
+  });
 
   final Function() startTimerCallback;
+  final Function() pauseTimerCallback;
+  final Function() resetTimerCallback;
 
   @override
   Widget build(BuildContext context) {
@@ -22,29 +30,33 @@ class ConfigurationBoard extends StatelessWidget {
 
     return Container(
       width: windowHeight * 0.5,
+      height: windowHeight * 0.7,
       decoration: const BoxDecoration(color: ThemeColor.main),
       padding: EdgeInsets.only(bottom: padding),
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: padding, vertical: padding),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildController(context),
-            const Divider(),
-            _buildTimerConfiguration(context),
-            const Divider(),
-            _buildImageSelectors(context),
-            const Divider(),
-            _buildTextSelectors(context),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildController(context),
+              const Divider(),
+              _buildTimerConfiguration(context),
+              const Divider(),
+              _buildImageSelectors(context),
+              const Divider(),
+              _buildTextSelectors(context),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildController(context) {
+    final pomodoro = PomodoroStatus.of(context, listen: false);
     final padding = ThemePadding.normal(context);
 
     return Column(
@@ -54,15 +66,32 @@ class ConfigurationBoard extends StatelessWidget {
             style:
                 TextStyle(color: ThemeColor.text, fontWeight: FontWeight.bold)),
         SizedBox(height: padding),
-        Center(
-          child: ElevatedButton(
-            onPressed: startTimerCallback,
-            style: ThemeButton.elevated,
-            child: const Text(
-              'Start timer',
-              style: TextStyle(color: Colors.black),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            ElevatedButton(
+              onPressed: pomodoro.stopWatchStatus == StopWatchStatus.inSession
+                  ? pauseTimerCallback
+                  : startTimerCallback,
+              style: ThemeButton.elevated,
+              child: Text(
+                pomodoro.stopWatchStatus == StopWatchStatus.initialized
+                    ? 'Start timer'
+                    : pomodoro.stopWatchStatus == StopWatchStatus.paused
+                        ? 'Resume timer'
+                        : 'Pause timer',
+                style: const TextStyle(color: Colors.black),
+              ),
             ),
-          ),
+            ElevatedButton(
+              onPressed: startTimerCallback,
+              style: ThemeButton.elevated,
+              child: const Text(
+                'Stop timer',
+                style: TextStyle(color: Colors.black),
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -187,7 +216,7 @@ class ConfigurationBoard extends StatelessWidget {
           },
         ),
         StringSelectorTile(
-          title: 'Text during session',
+          title: 'Text during focus sessions',
           initialValue: appPreferences.textDuringActiveSession.text,
           onValidChange: (String value) =>
               appPreferences.textDuringActiveSession.text = value,
@@ -197,13 +226,13 @@ class ConfigurationBoard extends StatelessWidget {
           },
         ),
         StringSelectorTile(
-          title: 'Text during pause',
-          initialValue: appPreferences.textDuringActiveSession.text,
+          title: 'Text during pause sessions',
+          initialValue: appPreferences.textDuringPauseSession.text,
           onValidChange: (String value) =>
-              appPreferences.textDuringActiveSession.text = value,
+              appPreferences.textDuringPauseSession.text = value,
           onMoveText: (direction) {
             _moveText(context,
-                appPreferences.textDuringActiveSession.addToOffset, direction);
+                appPreferences.textDuringPauseSession.addToOffset, direction);
           },
         ),
       ],

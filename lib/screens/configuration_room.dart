@@ -19,6 +19,12 @@ class _ConfigurationRoomState extends State<ConfigurationRoom> {
   TwitchManager? _twitchManager;
 
   @override
+  void initState() {
+    super.initState();
+    _resetTimer(preventFromNotifying: true);
+  }
+
+  @override
   void didChangeDependencies() async {
     super.didChangeDependencies();
 
@@ -28,16 +34,28 @@ class _ConfigurationRoomState extends State<ConfigurationRoom> {
 
   void _startTimer() {
     final pomodoro = PomodoroStatus.of(context, listen: false);
-    final appPreferences = AppPreferences.of(context, listen: false);
-    pomodoro.timer =
-        Duration(seconds: appPreferences.sessionDuration.inSeconds);
-    pomodoro.reset(
-        nbSession: appPreferences.nbSessions,
-        focusSessionDuration:
-            Duration(seconds: appPreferences.sessionDuration.inSeconds),
-        pauseSessionDuration:
-            Duration(seconds: appPreferences.pauseDuration.inSeconds));
     pomodoro.start();
+    setState(() {});
+  }
+
+  void _pauseTimer() {
+    final pomodoro = PomodoroStatus.of(context, listen: false);
+    pomodoro.pause();
+    setState(() {});
+  }
+
+  void _resetTimer({bool preventFromNotifying = false}) {
+    final pomodoro = PomodoroStatus.of(context, listen: false);
+    final appPreferences = AppPreferences.of(context, listen: false);
+    pomodoro.reset(
+      nbSession: appPreferences.nbSessions,
+      focusSessionDuration:
+          Duration(seconds: appPreferences.sessionDuration.inSeconds),
+      pauseSessionDuration:
+          Duration(seconds: appPreferences.pauseDuration.inSeconds),
+      notify: !preventFromNotifying,
+    );
+    setState(() {});
   }
 
   @override
@@ -51,7 +69,11 @@ class _ConfigurationRoomState extends State<ConfigurationRoom> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            ConfigurationBoard(startTimerCallback: _startTimer),
+            ConfigurationBoard(
+              startTimerCallback: _startTimer,
+              pauseTimerCallback: _pauseTimer,
+              resetTimerCallback: _resetTimer,
+            ),
             const PomodoroTimer(),
           ],
         ),

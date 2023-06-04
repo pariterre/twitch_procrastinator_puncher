@@ -20,7 +20,8 @@ class TextOnPomodoro {
     return text
         .replaceAll('{timer}', durationAsString(pomodoro.timer))
         .replaceAll(r'\n', '\n')
-        .replaceAll('{currentSession}', pomodoro.currentSession.toString())
+        .replaceAll(
+            '{currentSession}', (pomodoro.currentSession + 1).toString())
         .replaceAll('{maxSessions}', pomodoro.nbSessions.toString());
   }
 
