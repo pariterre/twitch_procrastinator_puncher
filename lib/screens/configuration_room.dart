@@ -4,6 +4,7 @@ import 'package:twitch_pomorodo_timer/models/app_theme.dart';
 import 'package:twitch_pomorodo_timer/providers/app_preferences.dart';
 import 'package:twitch_pomorodo_timer/providers/pomodoro_status.dart';
 import 'package:twitch_pomorodo_timer/screens/widgets/configuration_board.dart';
+import 'package:twitch_pomorodo_timer/screens/widgets/hall_of_fame.dart';
 import 'package:twitch_pomorodo_timer/screens/widgets/pomodoro_timer.dart';
 
 class ConfigurationRoom extends StatefulWidget {
@@ -64,6 +65,8 @@ class _ConfigurationRoomState extends State<ConfigurationRoom> {
   @override
   Widget build(BuildContext context) {
     final windowHeight = MediaQuery.of(context).size.height;
+    final preferences = AppPreferences.of(context);
+    final padding = ThemePadding.normal(context);
 
     final widget = Scaffold(
       body: Container(
@@ -80,7 +83,13 @@ class _ConfigurationRoomState extends State<ConfigurationRoom> {
                       _statusWithFocus = hasFocus;
                       if (isInitialized) setState(() {});
                     }),
-            PomodoroTimer(textWithFocus: _statusWithFocus),
+            Column(
+              children: [
+                PomodoroTimer(textWithFocus: _statusWithFocus),
+                SizedBox(height: padding),
+                if (preferences.useHallOfFame) const HallOfFame(),
+              ],
+            ),
           ],
         ),
       ),

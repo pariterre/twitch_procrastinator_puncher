@@ -66,8 +66,8 @@ class PomodoroTimer extends StatelessWidget {
         : Image.file(File(appPreferences.activeBackgroundImagePath!));
 
     return SizedBox(
-      height: windowHeight * 0.75,
-      width: windowHeight * 0.75,
+      height: windowHeight * 0.6,
+      width: windowHeight * 0.6,
       child: Stack(
         alignment: Alignment.center,
         children: [background, _buildText(context)],

@@ -2,23 +2,43 @@ import 'package:flutter/material.dart';
 import 'package:twitch_pomorodo_timer/models/helpers.dart';
 import 'package:twitch_pomorodo_timer/providers/pomodoro_status.dart';
 
-class TextOnPomodoro {
+class PlainText {
   String _text;
+  Function()? saveCallback;
+
+  String get text => _text;
+  set text(String value) {
+    _text = value;
+    if (saveCallback != null) saveCallback!();
+  }
+
+  PlainText({required String text, this.saveCallback}) : _text = text;
+
+  static PlainText deserialize(
+    Map<String, dynamic>? map, {
+    required String defaultText,
+  }) {
+    final text = map?['text'] ?? defaultText;
+    return PlainText(text: text);
+  }
+
+  Map<String, dynamic> serialize() => {'text': _text};
+}
+
+class TextOnPomodoro extends PlainText {
   Offset _offset;
   double _size;
-  Function()? saveCallback;
 
   TextOnPomodoro({
     required String text,
     required Offset offset,
     required double size,
-    this.saveCallback,
-  })  : _text = text,
-        _offset = offset,
-        _size = size;
+    super.saveCallback,
+  })  : _offset = offset,
+        _size = size,
+        super(text: text);
 
   // Foreground text during active session
-  String get text => _text;
   String formattedText(BuildContext context) {
     final pomodoro = PomodoroStatus.of(context, listen: false);
     return text
@@ -31,11 +51,6 @@ class TextOnPomodoro {
         .replaceAll(
             '{pauseDuration}', durationAsString(pomodoro.pauseSessionDuration))
         .replaceAll(r'\n', '\n');
-  }
-
-  set text(String value) {
-    _text = value;
-    if (saveCallback != null) saveCallback!();
   }
 
   // Offset of the text on the screen
@@ -62,9 +77,10 @@ class TextOnPomodoro {
         text: text, offset: Offset(offset[0], offset[1]), size: size);
   }
 
-  Map<String, dynamic> serialize() => {
-        'text': _text,
-        'offset': [_offset.dx, _offset.dy],
-        'size': _size,
-      };
+  @override
+  Map<String, dynamic> serialize() => super.serialize()
+    ..addAll({
+      'offset': [_offset.dx, _offset.dy],
+      'size': _size,
+    });
 }

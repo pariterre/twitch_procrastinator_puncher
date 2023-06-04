@@ -52,7 +52,9 @@ class ConfigurationBoard extends StatelessWidget {
               const Divider(),
               _buildImageSelectors(context),
               const Divider(),
-              _buildTextSelectors(context),
+              _buildTextOnImage(context),
+              const Divider(),
+              _buildHallOfFame(context),
             ],
           ),
         ),
@@ -192,7 +194,7 @@ class ConfigurationBoard extends StatelessWidget {
     }
   }
 
-  Widget _buildTextSelectors(BuildContext context) {
+  Widget _buildTextOnImage(BuildContext context) {
     final appPreferences = AppPreferences.of(context);
     final padding = ThemePadding.normal(context);
 
@@ -223,58 +225,86 @@ class ConfigurationBoard extends StatelessWidget {
         _buildStringSelectorTile(
           context,
           title: 'Text during initialization',
-          textOnPomodoro: appPreferences.textDuringInitialization,
+          plainText: appPreferences.textDuringInitialization,
           focus: StopWatchStatus.initializing,
         ),
         _buildStringSelectorTile(
           context,
           title: 'Text during focus sessions',
-          textOnPomodoro: appPreferences.textDuringActiveSession,
+          plainText: appPreferences.textDuringActiveSession,
           focus: StopWatchStatus.inSession,
         ),
         _buildStringSelectorTile(
           context,
           title: 'Text during pause sessions',
-          textOnPomodoro: appPreferences.textDuringPauseSession,
+          plainText: appPreferences.textDuringPauseSession,
           focus: StopWatchStatus.inPauseSession,
         ),
         _buildStringSelectorTile(
           context,
           title: 'Text during pauses',
-          textOnPomodoro: appPreferences.textDuringPause,
+          plainText: appPreferences.textDuringPause,
           focus: StopWatchStatus.paused,
         ),
         _buildStringSelectorTile(
           context,
           title: 'Text when done',
-          textOnPomodoro: appPreferences.textDone,
+          plainText: appPreferences.textDone,
           focus: StopWatchStatus.done,
         ),
       ],
     );
   }
 
-  StringSelectorTile _buildStringSelectorTile(context,
-      {required String title,
-      required TextOnPomodoro textOnPomodoro,
-      required StopWatchStatus focus}) {
+  Widget _buildHallOfFame(BuildContext context) {
+    final appPreferences = AppPreferences.of(context);
+    final padding = ThemePadding.normal(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Hall of fame',
+          style: TextStyle(color: ThemeColor.text, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: padding),
+        _buildStringSelectorTile(
+          context,
+          title: 'Hall of fame naming',
+          plainText: appPreferences.textHallOfFameTitle,
+        ),
+      ],
+    );
+  }
+
+  StringSelectorTile _buildStringSelectorTile(
+    context, {
+    required String title,
+    required PlainText plainText,
+    StopWatchStatus? focus,
+  }) {
     return StringSelectorTile(
       title: title,
-      initialValue: textOnPomodoro.text,
-      onGainedFocus: gainFocusCallback(focus),
+      initialValue: plainText.text,
+      onGainedFocus: focus == null ? null : gainFocusCallback(focus),
       onTextChanged: (String value) {
-        textOnPomodoro.text = value;
-        gainFocusCallback(focus);
+        plainText.text = value;
+        if (focus != null) gainFocusCallback(focus);
       },
-      onSizeChanged: (direction) {
-        textOnPomodoro.increaseSize(
-            direction == PlusOrMinusSelection.plus ? 0.01 : -0.01);
-        gainFocusCallback(focus);
-      },
-      onMoveText: (direction) {
-        _moveText(context, textOnPomodoro.addToOffset, direction);
-        gainFocusCallback(focus);
-      },
+      onSizeChanged: plainText.runtimeType == TextOnPomodoro
+          ? (direction) {
+              (plainText as TextOnPomodoro).increaseSize(
+                  direction == PlusOrMinusSelection.plus ? 0.01 : -0.01);
+              if (focus != null) gainFocusCallback(focus);
+            }
+          : null,
+      onMoveText: plainText.runtimeType == TextOnPomodoro
+          ? (direction) {
+              _moveText(context, (plainText as TextOnPomodoro).addToOffset,
+                  direction);
+              if (focus != null) gainFocusCallback(focus);
+            }
+          : null,
     );
   }
 

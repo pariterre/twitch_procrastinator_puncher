@@ -8,17 +8,17 @@ class StringSelectorTile extends StatefulWidget {
     required this.title,
     required this.initialValue,
     required this.onTextChanged,
-    required this.onSizeChanged,
-    required this.onMoveText,
-    required this.onGainedFocus,
+    this.onSizeChanged,
+    this.onMoveText,
+    this.onGainedFocus,
   });
 
   final String title;
   final String initialValue;
   final Function(String value) onTextChanged;
-  final Function(PlusOrMinusSelection selection) onSizeChanged;
-  final Function(PressDirection direction) onMoveText;
-  final Function() onGainedFocus;
+  final Function(PlusOrMinusSelection selection)? onSizeChanged;
+  final Function(PressDirection direction)? onMoveText;
+  final Function()? onGainedFocus;
 
   @override
   State<StringSelectorTile> createState() => _StringSelectorTileState();
@@ -48,7 +48,9 @@ class _StringSelectorTileState extends State<StringSelectorTile> {
           Expanded(
             child: Focus(
               onFocusChange: (value) {
-                if (value) widget.onGainedFocus();
+                if (value && widget.onGainedFocus != null) {
+                  widget.onGainedFocus!();
+                }
               },
               child: TextFormField(
                 controller: _controller,
@@ -59,16 +61,19 @@ class _StringSelectorTileState extends State<StringSelectorTile> {
               ),
             ),
           ),
-          SizedBox(width: windowHeight * 0.01),
-          PlusOrMinus(onTap: widget.onSizeChanged),
-          ArrowPad(
-            height: windowHeight * 0.10,
-            width: windowHeight * 0.10,
-            innerColor: Colors.blue,
-            arrowPadIconStyle: ArrowPadIconStyle.chevron,
-            clickTrigger: ClickTrigger.onTapUp,
-            onPressed: widget.onMoveText,
-          ),
+          if (widget.onSizeChanged != null)
+            SizedBox(width: windowHeight * 0.01),
+          if (widget.onSizeChanged != null)
+            PlusOrMinus(onTap: widget.onSizeChanged!),
+          if (widget.onMoveText != null)
+            ArrowPad(
+              height: windowHeight * 0.10,
+              width: windowHeight * 0.10,
+              innerColor: Colors.blue,
+              arrowPadIconStyle: ArrowPadIconStyle.chevron,
+              clickTrigger: ClickTrigger.onTapUp,
+              onPressed: widget.onMoveText!,
+            ),
         ],
       ),
     );

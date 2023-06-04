@@ -81,6 +81,9 @@ class AppPreferences with ChangeNotifier {
   TextOnPomodoro textDuringPause;
   TextOnPomodoro textDone;
 
+  bool useHallOfFame;
+  PlainText textHallOfFameTitle;
+
   ///
   /// Save the current preferences to a file
   void _save() async {
@@ -131,13 +134,14 @@ class AppPreferences with ChangeNotifier {
         textDuringPauseSession: TextOnPomodoro.deserialize(
             previousPreferences?['textDuringPauseSession'],
             defaultText: r'Pause\n{timer}!'),
-        textDuringPause: TextOnPomodoro.deserialize(
-            previousPreferences?['textDuringPause'],
+        textDuringPause: TextOnPomodoro.deserialize(previousPreferences?['textDuringPause'],
             defaultText: r'Pause!'),
         textDone: TextOnPomodoro.deserialize(previousPreferences?['textDone'],
             defaultText: r'Bravo!'),
-        lastVisitedDirectory:
-            Directory(previousPreferences?['lastVisitedDirectory'] ?? documentDirectory.path));
+        useHallOfFame: previousPreferences?['useHallOfFame'] ?? true,
+        textHallOfFameTitle: PlainText.deserialize(previousPreferences?['textHallOfFameTitle'],
+            defaultText: r'Hall of fame'),
+        lastVisitedDirectory: Directory(previousPreferences?['lastVisitedDirectory'] ?? documentDirectory.path));
   }
 
   AppPreferences._({
@@ -152,6 +156,8 @@ class AppPreferences with ChangeNotifier {
     required this.textDuringPauseSession,
     required this.textDuringPause,
     required this.textDone,
+    required this.useHallOfFame,
+    required this.textHallOfFameTitle,
     required Directory lastVisitedDirectory,
   })  : _nbSessions = nbSessions,
         _sessionDuration = sessionDuration,
@@ -165,6 +171,7 @@ class AppPreferences with ChangeNotifier {
     textDuringPauseSession.saveCallback = _save;
     textDuringPause.saveCallback = _save;
     textDone.saveCallback = _save;
+    textHallOfFameTitle.saveCallback = _save;
   }
 
   // INTERNAL METHODS
@@ -193,6 +200,8 @@ class AppPreferences with ChangeNotifier {
         'textDuringPauseSession': textDuringPauseSession.serialize(),
         'textDuringPause': textDuringPause.serialize(),
         'textDone': textDone.serialize(),
+        'useHallOfFame': useHallOfFame,
+        'textHallOfFameTitle': textHallOfFameTitle.serialize(),
         'lastVisitedDirectory': _lastVisitedDirectory.path,
       };
 }
