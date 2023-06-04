@@ -30,6 +30,9 @@ class PomodoroStatus with ChangeNotifier {
   Duration get focusSessionDuration => _focusSessionDuration;
   set focusSessionDuration(Duration duration) {
     _focusSessionDuration = duration;
+    if (_stopWatchStatus == StopWatchStatus.initialized) {
+      _timer = duration;
+    }
     notifyListeners();
   }
 

@@ -134,7 +134,7 @@ class ConfigurationBoard extends StatelessWidget {
           onValidChange: (value) {
             final duration = Duration(minutes: value);
             AppPreferences.of(context, listen: false).pauseDuration = duration;
-            PomodoroStatus.of(context, listen: false).focusSessionDuration =
+            PomodoroStatus.of(context, listen: false).pauseSessionDuration =
                 duration;
           },
         ),
