@@ -320,7 +320,7 @@ class ConfigurationBoard extends StatelessWidget {
         SizedBox(height: padding),
         _buildStringSelectorTile(
           context,
-          title: 'Blacklist users (semicolon separated without space)',
+          title: 'Blacklist users (semicolon separated)',
           plainText: appPreferences.textBlacklist,
           onTextComplete: () =>
               participants.blacklist = appPreferences.textBlacklist.text,

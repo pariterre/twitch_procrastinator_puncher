@@ -22,6 +22,18 @@ class Participants extends ChangeNotifier {
   List<String> _blacklist = [];
   set blacklist(String value) {
     _blacklist = value.split(';');
+
+    // Remove trailling spaces
+    for (var i = 0; i < _blacklist.length; i++) {
+      _blacklist[i] = _blacklist[i].trim();
+    }
+
+    // Remove from the list all blacklisted users
+    for (final username in _blacklist) {
+      all.removeWhere((e) => e.username == username);
+    }
+
+    notifyListeners();
   }
 
   void _checkWhoIsConnected() async {
