@@ -25,6 +25,22 @@ class PlainText {
   Map<String, dynamic> serialize() => {'text': _text};
 }
 
+class TextToChat extends PlainText {
+  TextToChat({required super.text});
+
+  String formattedText(BuildContext context, String username) {
+    return text.replaceAll('{username}', username).replaceAll(r'\n', '\n');
+  }
+
+  static TextToChat deserialize(
+    Map<String, dynamic>? map, {
+    required String defaultText,
+  }) {
+    final text = map?['text'] ?? defaultText;
+    return TextToChat(text: text);
+  }
+}
+
 class TextOnPomodoro extends PlainText {
   Offset _offset;
   double _size;

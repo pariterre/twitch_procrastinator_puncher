@@ -88,6 +88,8 @@ class AppPreferences with ChangeNotifier {
     _save();
   }
 
+  TextToChat textNewcomersGreetings;
+  PlainText textBlacklist;
   PlainText textHallOfFameTitle;
   PlainText textHallOfFameName;
   PlainText textHallOfFameToday;
@@ -152,8 +154,10 @@ class AppPreferences with ChangeNotifier {
         textDone: TextOnPomodoro.deserialize(previousPreferences?['textDone'],
             defaultText: r'Bravo!'),
         useHallOfFame: previousPreferences?['useHallOfFame'] ?? true,
-        textHallOfFameTitle: PlainText.deserialize(previousPreferences?['textHallOfFameTitle'],
-            defaultText: r'Hall of fame'),
+        textNewcomersGreetings: TextToChat.deserialize(previousPreferences?['textNewcomersGreetings'],
+            defaultText: r'Welcome to {username} who has joined us!'),
+        textBlacklist: PlainText.deserialize(previousPreferences?['textBlacklist'], defaultText: r''),
+        textHallOfFameTitle: PlainText.deserialize(previousPreferences?['textHallOfFameTitle'], defaultText: r'Hall of fame'),
         textHallOfFameName: PlainText.deserialize(previousPreferences?['textHallOfFameName'], defaultText: r'Name of the viewers'),
         textHallOfFameToday: PlainText.deserialize(previousPreferences?['textHallOfFameToday'], defaultText: r'Today'),
         textHallOfFameAlltime: PlainText.deserialize(previousPreferences?['textHallOfFameAlltime'], defaultText: r'All time'),
@@ -173,6 +177,8 @@ class AppPreferences with ChangeNotifier {
     required this.textDuringPause,
     required this.textDone,
     required bool useHallOfFame,
+    required this.textNewcomersGreetings,
+    required this.textBlacklist,
     required this.textHallOfFameTitle,
     required this.textHallOfFameName,
     required this.textHallOfFameToday,
@@ -191,6 +197,8 @@ class AppPreferences with ChangeNotifier {
     textDuringPauseSession.saveCallback = _save;
     textDuringPause.saveCallback = _save;
     textDone.saveCallback = _save;
+    textNewcomersGreetings.saveCallback = _save;
+    textBlacklist.saveCallback = _save;
     textHallOfFameTitle.saveCallback = _save;
     textHallOfFameName.saveCallback = _save;
     textHallOfFameToday.saveCallback = _save;
@@ -224,6 +232,8 @@ class AppPreferences with ChangeNotifier {
         'textDuringPause': textDuringPause.serialize(),
         'textDone': textDone.serialize(),
         'useHallOfFame': useHallOfFame,
+        'textNewcomersGreetings': textNewcomersGreetings.serialize(),
+        'textBlacklist': textBlacklist.serialize(),
         'textHallOfFameTitle': textHallOfFameTitle.serialize(),
         'textHallOfFameName': textHallOfFameName.serialize(),
         'textHallOfFameToday': textHallOfFameToday.serialize(),

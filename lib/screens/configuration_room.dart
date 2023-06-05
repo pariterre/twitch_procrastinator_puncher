@@ -3,6 +3,7 @@ import 'package:twitch_manager/twitch_manager.dart';
 import 'package:twitch_pomorodo_timer/models/app_theme.dart';
 import 'package:twitch_pomorodo_timer/models/config.dart';
 import 'package:twitch_pomorodo_timer/providers/app_preferences.dart';
+import 'package:twitch_pomorodo_timer/providers/participants.dart';
 import 'package:twitch_pomorodo_timer/providers/pomodoro_status.dart';
 import 'package:twitch_pomorodo_timer/screens/widgets/configuration_board.dart';
 import 'package:twitch_pomorodo_timer/screens/widgets/hall_of_fame.dart';
@@ -45,6 +46,13 @@ class _ConfigurationRoomState extends State<ConfigurationRoom> {
     setState(() {});
   }
 
+  void _greetNewComers(String username) {
+    final preferences = AppPreferences.of(context, listen: false);
+    _twitchManager!.irc!.send(
+        preferences.textNewcomersGreetings.formattedText(context, username));
+    setState(() {});
+  }
+
   void _resetTimer({bool preventFromNotifying = false}) {
     final pomodoro = PomodoroStatus.of(context, listen: false);
     final appPreferences = AppPreferences.of(context, listen: false);
@@ -61,6 +69,8 @@ class _ConfigurationRoomState extends State<ConfigurationRoom> {
   }
 
   void _connectToTwitch() async {
+    final participants = Participants.of(context, listen: false);
+
     _twitchManager = await showDialog<TwitchManager>(
       context: context,
       builder: (context) => Dialog(
@@ -68,10 +78,16 @@ class _ConfigurationRoomState extends State<ConfigurationRoom> {
         onFinishedConnexion: (manager) => Navigator.pop(context, manager),
         appId: twitchAppId,
         scope: twitchScope,
-        withModerator: true,
+        withChatbot: false,
         forceNewAuthentication: false,
       )),
     );
+
+    // Connect everything related to participants
+    participants.twitchManager = _twitchManager!;
+    participants.newUserHasConnected = _greetNewComers;
+
+    setState(() {});
   }
 
   @override

@@ -19,8 +19,15 @@ class Participants extends ChangeNotifier {
 
   Function(String)? newUserHasConnected;
 
+  List<String> _blacklist = [];
+  set blacklist(String value) {
+    _blacklist = value.split(';');
+  }
+
   void _checkWhoIsConnected() async {
-    final chatters = await _twitchManager!.api.fetchChatters();
+    final chatters =
+        await _twitchManager!.api.fetchChatters(blacklist: _blacklist);
+    debugPrint(chatters?.toString());
     if (chatters == null) return;
 
     // Disconnect users that are not connected anymore

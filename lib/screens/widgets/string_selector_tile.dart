@@ -10,7 +10,7 @@ class StringSelectorTile extends StatefulWidget {
     required this.onTextChanged,
     this.onSizeChanged,
     this.onMoveText,
-    this.onGainedFocus,
+    this.onFocusChanged,
   });
 
   final String title;
@@ -18,7 +18,7 @@ class StringSelectorTile extends StatefulWidget {
   final Function(String value) onTextChanged;
   final Function(PlusOrMinusSelection selection)? onSizeChanged;
   final Function(PressDirection direction)? onMoveText;
-  final Function()? onGainedFocus;
+  final Function(bool gainedFocus)? onFocusChanged;
 
   @override
   State<StringSelectorTile> createState() => _StringSelectorTileState();
@@ -48,8 +48,8 @@ class _StringSelectorTileState extends State<StringSelectorTile> {
           Expanded(
             child: Focus(
               onFocusChange: (value) {
-                if (value && widget.onGainedFocus != null) {
-                  widget.onGainedFocus!();
+                if (widget.onFocusChanged != null) {
+                  widget.onFocusChanged!(value);
                 }
               },
               child: TextFormField(

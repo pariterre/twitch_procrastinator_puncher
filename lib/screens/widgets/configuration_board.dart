@@ -7,6 +7,7 @@ import 'package:path/path.dart';
 import 'package:twitch_pomorodo_timer/models/app_theme.dart';
 import 'package:twitch_pomorodo_timer/models/text_on_pomodoro.dart';
 import 'package:twitch_pomorodo_timer/providers/app_preferences.dart';
+import 'package:twitch_pomorodo_timer/providers/participants.dart';
 import 'package:twitch_pomorodo_timer/providers/pomodoro_status.dart';
 import 'package:twitch_pomorodo_timer/screens/widgets/file_selector_tile.dart';
 import 'package:twitch_pomorodo_timer/screens/widgets/int_selector_tile.dart';
@@ -275,14 +276,30 @@ class ConfigurationBoard extends StatelessWidget {
 
   Widget _buildHallOfFame(BuildContext context) {
     final appPreferences = AppPreferences.of(context);
+    final participants = Participants.of(context);
     final padding = ThemePadding.normal(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Hall of fame',
-          style: TextStyle(color: ThemeColor.text, fontWeight: FontWeight.bold),
+        Row(
+          children: [
+            const Text(
+              'Hall of fame',
+              style: TextStyle(
+                  color: ThemeColor.text, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(width: padding),
+            const Tooltip(
+              message: 'You can use tags that will change automatically\n'
+                  '{username} is the name of a user\n'
+                  '\\n is a linebreak',
+              child: Icon(
+                Icons.info,
+                color: Colors.white,
+              ),
+            ),
+          ],
         ),
         SizedBox(height: padding),
         CheckboxListTile(
@@ -293,6 +310,20 @@ class ConfigurationBoard extends StatelessWidget {
           visualDensity: VisualDensity.compact,
           value: appPreferences.useHallOfFame,
           onChanged: (value) => appPreferences.useHallOfFame = value!,
+        ),
+        SizedBox(height: padding),
+        _buildStringSelectorTile(
+          context,
+          title: 'Newcomer greetings',
+          plainText: appPreferences.textNewcomersGreetings,
+        ),
+        SizedBox(height: padding),
+        _buildStringSelectorTile(
+          context,
+          title: 'Blacklist users (semicolon separated without space)',
+          plainText: appPreferences.textBlacklist,
+          onTextComplete: () =>
+              participants.blacklist = appPreferences.textBlacklist.text,
         ),
         SizedBox(height: padding),
         _buildStringSelectorTile(
@@ -327,11 +358,17 @@ class ConfigurationBoard extends StatelessWidget {
     required String title,
     required PlainText plainText,
     StopWatchStatus? focus,
+    Function()? onTextComplete,
   }) {
     return StringSelectorTile(
       title: title,
       initialValue: plainText.text,
-      onGainedFocus: focus == null ? null : gainFocusCallback(focus),
+      onFocusChanged: focus == null && onTextComplete == null
+          ? null
+          : (gainedFocus) {
+              if (focus != null && gainedFocus) gainFocusCallback(focus);
+              if (onTextComplete != null && !gainedFocus) onTextComplete();
+            },
       onTextChanged: (String value) {
         plainText.text = value;
         if (focus != null) gainFocusCallback(focus);
