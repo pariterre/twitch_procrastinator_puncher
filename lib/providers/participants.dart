@@ -26,7 +26,25 @@ class Participants extends ChangeNotifier {
   /// If the participant must be a follower to be counted
   bool mustFollowForFaming;
 
-  // TODO Whitelist
+  // TODO Whitelist (otherwise the streamer can count their pomodoro)
+
+  void addPomodoroToAllConnected() {
+    for (final user in all) {
+      if (user.isConnected) {
+        user.doneToday += 1;
+        user.doneInAll += 1;
+      }
+    }
+    disconnectAll(); // They will be reconnected automatically
+    _save();
+    notifyListeners();
+  }
+
+  void disconnectAll() {
+    for (final user in all) {
+      user.disconnect();
+    }
+  }
 
   ///
   /// The blacklist removes specific users from the all list (and prevent them
@@ -68,13 +86,26 @@ class Participants extends ChangeNotifier {
     // Connect new users
     final allUsernames = all.map((e) => e.username);
     for (final chatter in chatters) {
+      // If the user is new to the channel
       if (!allUsernames.contains(chatter)) {
         final newParticipant = Participant(username: chatter);
         newParticipant.connect();
         all.add(newParticipant);
+        // TODO Message for newcomers
         if (newUserHasConnected != null) newUserHasConnected!(chatter);
       }
+
+      final participant = all.firstWhere((e) => e.username == chatter);
+      // If the user was not connected, connect them
+      if (!participant.isConnected) {
+        // Greet them if it the first connexion today
+        if (!participant.wasPreviouslyConnected) {
+          if (newUserHasConnected != null) newUserHasConnected!(chatter);
+        }
+        participant.connect();
+      }
     }
+    notifyListeners();
   }
 
   final List<Participant> all;
@@ -137,7 +168,7 @@ class Participants extends ChangeNotifier {
 
   ///
   /// Save the current participants list to a file
-  Future<void> save() async {
+  Future<void> _save() async {
     final file = File(_savePath);
     await file.writeAsString(json.encode(serialize()));
     notifyListeners();

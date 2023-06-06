@@ -85,13 +85,14 @@ class PomodoroStatus with ChangeNotifier {
   }
 
   // CONSTRUCTORS
-  PomodoroStatus() {
+  PomodoroStatus({required this.sessionHasFinishedCallback}) {
     Timer.periodic(const Duration(seconds: 1), (Timer t) => _updateCounter());
   }
   static PomodoroStatus of(BuildContext context, {listen = true}) =>
       Provider.of<PomodoroStatus>(context, listen: listen);
 
   // TIMER CALLBACK
+  Function() sessionHasFinishedCallback;
 
   // This method is automatically called every seconds
   void _updateCounter() {
@@ -99,6 +100,8 @@ class PomodoroStatus with ChangeNotifier {
       // Decrement the counter, if it gets to zeros advance the session
       int newTimerValue = _timer.inSeconds - 1;
       if (newTimerValue <= 0) {
+        if (sessionHasFinishedCallback != null) sessionHasFinishedCallback!();
+
         if (_currentSession + 1 == _nbSessions) {
           // If next session is the last session, it is over
           _stopWatchStatus = StopWatchStatus.done;

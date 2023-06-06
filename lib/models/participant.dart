@@ -4,6 +4,8 @@ class Participant {
   String username;
   int doneInAll;
   int doneToday;
+  bool _wasPreviouslyConnected = false;
+  bool get wasPreviouslyConnected => _wasPreviouslyConnected;
   bool _isConnected = false;
   bool get isConnected => _isConnected;
   TimeOfDay? connectedSince;
@@ -17,6 +19,7 @@ class Participant {
   void connect() {
     _isConnected = true;
     connectedSince = TimeOfDay.now();
+    _wasPreviouslyConnected = true;
   }
 
   void disconnect() {

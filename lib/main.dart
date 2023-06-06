@@ -15,7 +15,10 @@ void main() async {
     providers: [
       ChangeNotifierProvider(create: (context) => appPreferences),
       ChangeNotifierProvider(create: (context) => participants),
-      ChangeNotifierProvider(create: (context) => PomodoroStatus()),
+      ChangeNotifierProvider(
+          create: (context) => PomodoroStatus(
+              sessionHasFinishedCallback:
+                  participants.addPomodoroToAllConnected)),
     ],
     child: MaterialApp(
       initialRoute: ConfigurationRoom.route,
