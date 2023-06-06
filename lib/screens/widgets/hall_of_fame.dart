@@ -49,15 +49,39 @@ class HallOfFame extends StatelessWidget {
                     doneInAll: preferences.textHallOfFameAlltime.text,
                     fontWeight: FontWeight.bold,
                   ),
-                  ...participants
-                      .map<Widget>((e) => _FameTile(
-                            name: e.username,
-                            doneToday: e.doneToday.toString(),
-                            doneInAll: e.doneInAll.toString(),
-                            fontWeight: FontWeight.normal,
-                          ))
-                      .toList(),
+                  SizedBox(
+                    height: windowHeight * 0.135,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: participants
+                            .map<Widget>((e) => _FameTile(
+                                  name: e.username,
+                                  doneToday: e.doneToday.toString(),
+                                  doneInAll: e.doneInAll.toString(),
+                                  fontWeight: FontWeight.normal,
+                                ))
+                            .toList(),
+                      ),
+                    ),
+                  ),
                 ],
+              ),
+            ),
+            Divider(
+              color: Colors.white,
+              thickness: windowHeight * 0.002,
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: padding),
+              child: _FameTile(
+                name: 'Total',
+                doneToday: participants
+                    .fold<int>(0, (prev, e) => prev + e.doneToday)
+                    .toString(),
+                doneInAll: participants
+                    .fold<int>(0, (prev, e) => prev + e.doneInAll)
+                    .toString(),
+                fontWeight: FontWeight.bold,
               ),
             ),
           ],
