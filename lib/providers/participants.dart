@@ -17,9 +17,21 @@ class Participants extends ChangeNotifier {
         const Duration(minutes: 1), (Timer t) => _checkWhoIsConnected());
   }
 
+  ///
+  /// This is the callback that the GUI must register to update itself when
+  /// a new user has connected
   Function(String)? newUserHasConnected;
 
-  List<String> _blacklist = [];
+  ///
+  /// If the participant must be a follower to be counted
+  bool mustFollowForFaming;
+
+  // TODO Whitelist
+
+  ///
+  /// The blacklist removes specific users from the all list (and prevent them
+  /// to connect)
+  List<String> _blacklist;
   set blacklist(String value) {
     _blacklist = value.split(';');
 
@@ -39,13 +51,17 @@ class Participants extends ChangeNotifier {
   void _checkWhoIsConnected() async {
     final chatters =
         await _twitchManager!.api.fetchChatters(blacklist: _blacklist);
-    debugPrint(chatters?.toString());
     if (chatters == null) return;
 
-    // Disconnect users that are not connected anymore
-    for (final user in all) {
-      if (!chatters.contains(user.username)) {
-        user.connect();
+    final followers = await _twitchManager!.api.fetchFollowers();
+    if (followers == null) return;
+
+    // Remove users that are not followers (if must follow) and blacklisted
+    for (var i = chatters.length - 1; i >= 0; i--) {
+      final chatter = chatters[i];
+      if ((mustFollowForFaming && !followers.contains(chatter)) ||
+          _blacklist.contains(chatter)) {
+        chatters.removeWhere((e) => e == chatter);
       }
     }
 
@@ -73,7 +89,10 @@ class Participants extends ChangeNotifier {
   ///
   /// Main constructor of the Participants. [reload] will used previously saved
   /// file
-  static Future<Participants> factory({bool reload = true}) async {
+  static Future<Participants> factory(
+      {bool reload = true,
+      required bool mustFollowForFaming,
+      required String blacklist}) async {
     final documentDirectory = await getApplicationDocumentsDirectory();
     final saveDir = Directory('${documentDirectory.path}/$twitchAppName');
     if (!(await saveDir.exists())) {
@@ -90,18 +109,28 @@ class Participants extends ChangeNotifier {
       }
     }
     return Participants._(
-        all: savedParticipants?['participants']
-                .map<Participant>((map) => Participant.deserialize(map))
-                .toList() ??
-            [],
-        saveDir: saveDir.path);
+      all: savedParticipants?['participants']
+              .map<Participant>((map) => Participant.deserialize(map))
+              .toList() ??
+          [],
+      saveDir: saveDir.path,
+      mustFollowForFaming: mustFollowForFaming,
+      blacklist: blacklist,
+    );
   }
 
   static Participants of(BuildContext context, {listen = true}) =>
       Provider.of<Participants>(context, listen: listen);
 
-  Participants._({required this.all, required String saveDir})
-      : _saveDir = saveDir;
+  Participants._({
+    required this.all,
+    required String saveDir,
+    required this.mustFollowForFaming,
+    required String blacklist,
+  })  : _saveDir = saveDir,
+        _blacklist = [] {
+    this.blacklist = blacklist; // Fill the blacklist
+  }
 
   Map<String, dynamic> serialize() =>
       {'participants': all.map((e) => e.serialize()).toList()};

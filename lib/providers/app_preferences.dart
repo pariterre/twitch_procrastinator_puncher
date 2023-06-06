@@ -87,6 +87,12 @@ class AppPreferences with ChangeNotifier {
     _useHallOfFame = value;
     _save();
   }
+  bool _mustFollowForFaming;
+  bool get mustFollowForFaming => _mustFollowForFaming;
+  set mustFollowForFaming(bool value) {
+    _mustFollowForFaming = value;
+    _save();
+  }
 
   TextToChat textNewcomersGreetings;
   PlainText textBlacklist;
@@ -154,6 +160,7 @@ class AppPreferences with ChangeNotifier {
         textDone: TextOnPomodoro.deserialize(previousPreferences?['textDone'],
             defaultText: r'Bravo!'),
         useHallOfFame: previousPreferences?['useHallOfFame'] ?? true,
+        mustFollowForFaming: previousPreferences?['mustFollowForFaming'] ?? true,
         textNewcomersGreetings: TextToChat.deserialize(previousPreferences?['textNewcomersGreetings'],
             defaultText: r'Welcome to {username} who has joined us!'),
         textBlacklist: PlainText.deserialize(previousPreferences?['textBlacklist'], defaultText: r''),
@@ -177,6 +184,7 @@ class AppPreferences with ChangeNotifier {
     required this.textDuringPause,
     required this.textDone,
     required bool useHallOfFame,
+    required bool mustFollowForFaming,
     required this.textNewcomersGreetings,
     required this.textBlacklist,
     required this.textHallOfFameTitle,
@@ -191,6 +199,7 @@ class AppPreferences with ChangeNotifier {
         _activeBackgroundImageFilename = activeBackgroundImageFilename,
         _pauseBackgroundImageFilename = pauseBackgroundImageFilename,
         _useHallOfFame = useHallOfFame,
+        _mustFollowForFaming = mustFollowForFaming,
         _lastVisitedDirectory = lastVisitedDirectory {
     textDuringInitialization.saveCallback = _save;
     textDuringActiveSession.saveCallback = _save;
@@ -232,6 +241,7 @@ class AppPreferences with ChangeNotifier {
         'textDuringPause': textDuringPause.serialize(),
         'textDone': textDone.serialize(),
         'useHallOfFame': useHallOfFame,
+        'mustFollowForFaming': mustFollowForFaming,
         'textNewcomersGreetings': textNewcomersGreetings.serialize(),
         'textBlacklist': textBlacklist.serialize(),
         'textHallOfFameTitle': textHallOfFameTitle.serialize(),

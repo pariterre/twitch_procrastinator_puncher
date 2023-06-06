@@ -7,7 +7,9 @@ import 'package:twitch_pomorodo_timer/screens/configuration_room.dart';
 
 void main() async {
   final appPreferences = await AppPreferences.factory();
-  final participants = await Participants.factory();
+  final participants = await Participants.factory(
+      mustFollowForFaming: appPreferences.mustFollowForFaming,
+      blacklist: appPreferences.textBlacklist.text);
 
   runApp(MultiProvider(
     providers: [

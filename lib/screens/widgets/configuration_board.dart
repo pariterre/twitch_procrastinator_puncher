@@ -312,6 +312,19 @@ class ConfigurationBoard extends StatelessWidget {
           onChanged: (value) => appPreferences.useHallOfFame = value!,
         ),
         SizedBox(height: padding),
+        CheckboxListTile(
+          title: const Text(
+            'Must follow',
+            style: TextStyle(color: Colors.white),
+          ),
+          visualDensity: VisualDensity.compact,
+          value: appPreferences.mustFollowForFaming,
+          onChanged: (value) {
+            appPreferences.mustFollowForFaming = value!;
+            participants.mustFollowForFaming = value;
+          },
+        ),
+        SizedBox(height: padding),
         _buildStringSelectorTile(
           context,
           title: 'Newcomer greetings',
