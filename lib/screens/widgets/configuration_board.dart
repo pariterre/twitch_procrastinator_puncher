@@ -11,6 +11,7 @@ import 'package:twitch_pomorodo_timer/providers/participants.dart';
 import 'package:twitch_pomorodo_timer/providers/pomodoro_status.dart';
 import 'package:twitch_pomorodo_timer/screens/widgets/file_selector_tile.dart';
 import 'package:twitch_pomorodo_timer/screens/widgets/int_selector_tile.dart';
+import 'package:twitch_pomorodo_timer/screens/widgets/plus_or_minus_list_tile.dart';
 import 'package:twitch_pomorodo_timer/screens/widgets/string_selector_tile.dart';
 import 'package:twitch_pomorodo_timer/screens/widgets/time_selector_tile.dart';
 import 'package:twitch_pomorodo_timer/widgets/plus_or_minus.dart';
@@ -314,7 +315,7 @@ class ConfigurationBoard extends StatelessWidget {
         SizedBox(height: padding),
         CheckboxListTile(
           title: const Text(
-            'Must follow',
+            'Must be a follower to register',
             style: TextStyle(color: Colors.white),
           ),
           visualDensity: VisualDensity.compact,
@@ -323,6 +324,14 @@ class ConfigurationBoard extends StatelessWidget {
             appPreferences.mustFollowForFaming = value!;
             participants.mustFollowForFaming = value;
           },
+        ),
+        PlusOrMinusListTile(
+          title: const Text(
+            'Scroll velocity',
+            style: TextStyle(color: Colors.white),
+          ),
+          onTap: (selection) => appPreferences.hallOfFameScrollVelocity =
+              selection == PlusOrMinusSelection.plus ? -100 : 100,
         ),
         SizedBox(height: padding),
         _buildStringSelectorTile(

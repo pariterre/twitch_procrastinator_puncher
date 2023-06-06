@@ -87,10 +87,19 @@ class AppPreferences with ChangeNotifier {
     _useHallOfFame = value;
     _save();
   }
+
   bool _mustFollowForFaming;
   bool get mustFollowForFaming => _mustFollowForFaming;
   set mustFollowForFaming(bool value) {
     _mustFollowForFaming = value;
+    _save();
+  }
+
+  int _hallOfFameScrollVelocity;
+  int get hallOfFameScrollVelocity => _hallOfFameScrollVelocity;
+  set hallOfFameScrollVelocity(int value) {
+    _hallOfFameScrollVelocity += value;
+    if (_hallOfFameScrollVelocity <= 0) _hallOfFameScrollVelocity = 0;
     _save();
   }
 
@@ -155,14 +164,16 @@ class AppPreferences with ChangeNotifier {
         textDuringPauseSession: TextOnPomodoro.deserialize(
             previousPreferences?['textDuringPauseSession'],
             defaultText: r'Pause\n{timer}!'),
-        textDuringPause: TextOnPomodoro.deserialize(previousPreferences?['textDuringPause'],
+        textDuringPause: TextOnPomodoro.deserialize(
+            previousPreferences?['textDuringPause'],
             defaultText: r'Pause!'),
         textDone: TextOnPomodoro.deserialize(previousPreferences?['textDone'],
             defaultText: r'Bravo!'),
         useHallOfFame: previousPreferences?['useHallOfFame'] ?? true,
-        mustFollowForFaming: previousPreferences?['mustFollowForFaming'] ?? true,
-        textNewcomersGreetings: TextToChat.deserialize(previousPreferences?['textNewcomersGreetings'],
-            defaultText: r'Welcome to {username} who has joined us!'),
+        mustFollowForFaming:
+            previousPreferences?['mustFollowForFaming'] ?? true,
+        hallOfFameScrollVelocity: previousPreferences?['hallOfFameScrollVelocity'] ?? 2000,
+        textNewcomersGreetings: TextToChat.deserialize(previousPreferences?['textNewcomersGreetings'], defaultText: r'Welcome to {username} who has joined us!'),
         textBlacklist: PlainText.deserialize(previousPreferences?['textBlacklist'], defaultText: r''),
         textHallOfFameTitle: PlainText.deserialize(previousPreferences?['textHallOfFameTitle'], defaultText: r'Hall of fame'),
         textHallOfFameName: PlainText.deserialize(previousPreferences?['textHallOfFameName'], defaultText: r'Name of the viewers'),
@@ -185,6 +196,7 @@ class AppPreferences with ChangeNotifier {
     required this.textDone,
     required bool useHallOfFame,
     required bool mustFollowForFaming,
+    required int hallOfFameScrollVelocity,
     required this.textNewcomersGreetings,
     required this.textBlacklist,
     required this.textHallOfFameTitle,
@@ -200,6 +212,7 @@ class AppPreferences with ChangeNotifier {
         _pauseBackgroundImageFilename = pauseBackgroundImageFilename,
         _useHallOfFame = useHallOfFame,
         _mustFollowForFaming = mustFollowForFaming,
+        _hallOfFameScrollVelocity = hallOfFameScrollVelocity,
         _lastVisitedDirectory = lastVisitedDirectory {
     textDuringInitialization.saveCallback = _save;
     textDuringActiveSession.saveCallback = _save;
@@ -240,8 +253,9 @@ class AppPreferences with ChangeNotifier {
         'textDuringPauseSession': textDuringPauseSession.serialize(),
         'textDuringPause': textDuringPause.serialize(),
         'textDone': textDone.serialize(),
-        'useHallOfFame': useHallOfFame,
-        'mustFollowForFaming': mustFollowForFaming,
+        'useHallOfFame': _useHallOfFame,
+        'mustFollowForFaming': _mustFollowForFaming,
+        'hallOfFameScrollVelocity': _hallOfFameScrollVelocity,
         'textNewcomersGreetings': textNewcomersGreetings.serialize(),
         'textBlacklist': textBlacklist.serialize(),
         'textHallOfFameTitle': textHallOfFameTitle.serialize(),

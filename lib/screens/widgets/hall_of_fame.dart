@@ -1,15 +1,62 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:infinite_carousel/infinite_carousel.dart';
 import 'package:twitch_pomorodo_timer/models/app_theme.dart';
 import 'package:twitch_pomorodo_timer/providers/app_preferences.dart';
 import 'package:twitch_pomorodo_timer/providers/participants.dart';
 
-class HallOfFame extends StatelessWidget {
+class HallOfFame extends StatefulWidget {
   const HallOfFame({super.key});
+
+  @override
+  State<HallOfFame> createState() => _HallOfFameState();
+}
+
+class _HallOfFameState extends State<HallOfFame> {
+  int _scrollVelocity = 2000;
+  final _scrollController = InfiniteScrollController();
+  Timer? _timer;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_timer == null) {
+      final preferences = AppPreferences.of(context, listen: false);
+      _scrollVelocity = preferences.hallOfFameScrollVelocity;
+      _timer = Timer.periodic(Duration(milliseconds: _scrollVelocity),
+          (Timer t) => _automaticScroller());
+    }
+  }
+
+  Timer _setupTimer() => Timer.periodic(Duration(milliseconds: _scrollVelocity),
+      (Timer t) => _automaticScroller());
+
+  set scrollVelocity(int value) {
+    _scrollVelocity = value;
+    _timer?.cancel();
+    _timer = _setupTimer();
+  }
+
+  void _automaticScroller() {
+    _scrollController.nextItem(
+        duration: Duration(milliseconds: _scrollVelocity),
+        curve: Curves.linear);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _scrollController.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final windowHeight = MediaQuery.of(context).size.height;
     final preferences = AppPreferences.of(context);
+    scrollVelocity = preferences.hallOfFameScrollVelocity;
+
     final padding = ThemePadding.normal(context);
     final participants = Participants.of(context).all.map((e) => e).toList();
 
@@ -24,6 +71,7 @@ class HallOfFame extends StatelessWidget {
         padding: EdgeInsets.only(left: padding, top: padding, right: padding),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Center(
               child: Text(
@@ -51,17 +99,22 @@ class HallOfFame extends StatelessWidget {
                   ),
                   SizedBox(
                     height: windowHeight * 0.135,
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: participants
-                            .map<Widget>((e) => _FameTile(
-                                  name: e.username,
-                                  doneToday: e.doneToday.toString(),
-                                  doneInAll: e.doneInAll.toString(),
-                                  fontWeight: FontWeight.normal,
-                                ))
-                            .toList(),
-                      ),
+                    child: InfiniteCarousel.builder(
+                      physics:
+                          const ScrollPhysics(), // Do not try to land on a particular item
+                      controller: _scrollController,
+                      axisDirection: Axis.vertical,
+                      itemCount: participants.length,
+                      itemExtent: windowHeight * 0.04,
+                      itemBuilder: (ctx, index, realIndex) {
+                        final participant = participants[index];
+                        return _FameTile(
+                          name: participant.username,
+                          doneToday: participant.doneToday.toString(),
+                          doneInAll: participant.doneInAll.toString(),
+                          fontWeight: FontWeight.normal,
+                        );
+                      },
                     ),
                   ),
                 ],
