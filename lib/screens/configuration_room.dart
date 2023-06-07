@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:twitch_manager/twitch_manager.dart';
 import 'package:twitch_pomorodo_timer/models/app_theme.dart';
 import 'package:twitch_pomorodo_timer/models/config.dart';
+import 'package:twitch_pomorodo_timer/models/participant.dart';
 import 'package:twitch_pomorodo_timer/providers/app_preferences.dart';
 import 'package:twitch_pomorodo_timer/providers/participants.dart';
 import 'package:twitch_pomorodo_timer/providers/pomodoro_status.dart';
@@ -46,10 +47,17 @@ class _ConfigurationRoomState extends State<ConfigurationRoom> {
     setState(() {});
   }
 
-  void _greetNewComers(String username) {
+  void _greetNewComers(Participant participant) {
     final preferences = AppPreferences.of(context, listen: false);
     _twitchManager!.irc!.send(
-        preferences.textNewcomersGreetings.formattedText(context, username));
+        preferences.textNewcomersGreetings.formattedText(context, participant));
+    setState(() {});
+  }
+
+  void _greetUserHasConnected(Participant participant) {
+    final preferences = AppPreferences.of(context, listen: false);
+    _twitchManager!.irc!.send(preferences.textUserHasConnectedGreetings
+        .formattedText(context, participant));
     setState(() {});
   }
 
@@ -85,7 +93,8 @@ class _ConfigurationRoomState extends State<ConfigurationRoom> {
 
     // Connect everything related to participants
     participants.twitchManager = _twitchManager!;
-    participants.newUserHasConnected = _greetNewComers;
+    participants.greetNewcomer = _greetNewComers;
+    participants.greetUserHasConnected = _greetUserHasConnected;
 
     setState(() {});
   }

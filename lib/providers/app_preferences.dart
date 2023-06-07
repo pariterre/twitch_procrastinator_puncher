@@ -104,6 +104,7 @@ class AppPreferences with ChangeNotifier {
   }
 
   TextToChat textNewcomersGreetings;
+  TextToChat textUserHasConnectedGreetings;
   PlainText textWhitelist;
   PlainText textBlacklist;
   PlainText textHallOfFameTitle;
@@ -174,7 +175,8 @@ class AppPreferences with ChangeNotifier {
         mustFollowForFaming:
             previousPreferences?['mustFollowForFaming'] ?? true,
         hallOfFameScrollVelocity: previousPreferences?['hallOfFameScrollVelocity'] ?? 2000,
-        textNewcomersGreetings: TextToChat.deserialize(previousPreferences?['textNewcomersGreetings'], defaultText: r'Welcome to {username} who has joined us!'),
+        textNewcomersGreetings: TextToChat.deserialize(previousPreferences?['textNewcomersGreetings'], defaultText: r'Welcome to {username} who has joined for the first time!'),
+        textUserHasConnectedGreetings: TextToChat.deserialize(previousPreferences?['textUserHasConnectedGreetings'], defaultText: r'Welcome back to {username} who has joined us!'),
         textWhitelist: PlainText.deserialize(previousPreferences?['textWhitelist'], defaultText: r''),
         textBlacklist: PlainText.deserialize(previousPreferences?['textBlacklist'], defaultText: r''),
         textHallOfFameTitle: PlainText.deserialize(previousPreferences?['textHallOfFameTitle'], defaultText: r'Hall of fame'),
@@ -200,6 +202,7 @@ class AppPreferences with ChangeNotifier {
     required bool mustFollowForFaming,
     required int hallOfFameScrollVelocity,
     required this.textNewcomersGreetings,
+    required this.textUserHasConnectedGreetings,
     required this.textWhitelist,
     required this.textBlacklist,
     required this.textHallOfFameTitle,
@@ -223,6 +226,7 @@ class AppPreferences with ChangeNotifier {
     textDuringPause.saveCallback = _save;
     textDone.saveCallback = _save;
     textNewcomersGreetings.saveCallback = _save;
+    textUserHasConnectedGreetings.saveCallback = _save;
     textBlacklist.saveCallback = _save;
     textHallOfFameTitle.saveCallback = _save;
     textHallOfFameName.saveCallback = _save;
@@ -260,6 +264,7 @@ class AppPreferences with ChangeNotifier {
         'mustFollowForFaming': _mustFollowForFaming,
         'hallOfFameScrollVelocity': _hallOfFameScrollVelocity,
         'textNewcomersGreetings': textNewcomersGreetings.serialize(),
+        'textUserHasConnectedGreetings': textUserHasConnectedGreetings.serialize(),
         'textWhitelist': textWhitelist.serialize(),
         'textBlacklist': textBlacklist.serialize(),
         'textHallOfFameTitle': textHallOfFameTitle.serialize(),

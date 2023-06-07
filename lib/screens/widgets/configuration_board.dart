@@ -227,13 +227,15 @@ class ConfigurationBoard extends StatelessWidget {
           ),
           SizedBox(width: padding),
           const Tooltip(
-            message: 'You can use tags that will change automatically\n'
-                '{currentSession} is the current session\n'
-                '{maxSessions} is the max sessions\n'
-                '{timer} is the timer\n'
-                '{sessionDuration} is the time of the focus sessions\n'
-                '{pauseDuration} is the time of the pauses\n'
-                '\\n is a linebreak',
+            message:
+                'The following tag can be used to access some interesting\n'
+                'information to display:\n'
+                '    {currentSession} is the current session\n'
+                '    {maxSessions} is the max sessions\n'
+                '    {timer} is the timer\n'
+                '    {sessionDuration} is the time of the focus sessions\n'
+                '    {pauseDuration} is the time of the pauses\n'
+                '    \\n is a linebreak',
             child: Icon(
               Icons.info,
               color: Colors.white,
@@ -292,9 +294,13 @@ class ConfigurationBoard extends StatelessWidget {
             ),
             SizedBox(width: padding),
             const Tooltip(
-              message: 'You can use tags that will change automatically\n'
-                  '{username} is the name of a user\n'
-                  '\\n is a linebreak',
+              message:
+                  'The Hall of fame necessitate that you connected to Twitch.\n\n'
+                  'To personalize the message that are sent to the chat,\n'
+                  'you can use these tags:\n'
+                  '    {username} is the name of a user\n'
+                  '    {sessions} number of sessions previously done\n'
+                  '    \\n is a linebreak',
               child: Icon(
                 Icons.info,
                 color: Colors.white,
@@ -314,13 +320,32 @@ class ConfigurationBoard extends StatelessWidget {
         ),
         SizedBox(height: padding),
         CheckboxListTile(
-          title: const Tooltip(
-            message: 'Whitelisted users will be added anyway\n'
-                'Blacklisted users won\'t be in any cases',
-            child: Text(
-              'Must be a follower to register',
-              style: TextStyle(color: Colors.white),
-            ),
+          title: Row(
+            children: [
+              const Text(
+                'Must be a follower to register',
+                style: TextStyle(color: Colors.white),
+              ),
+              SizedBox(width: padding),
+              const Tooltip(
+                message:
+                    'If the users must be a follower of your channel to be \n'
+                    'added to the current worker list.\n'
+                    'Warning, setting this to false can result in a lot of\n'
+                    'users being added due to the large amount of bots\n'
+                    'navigating on Twitch.\n\n'
+                    'The white and black list can be used to bypass the\n'
+                    'must follow requirements.\n'
+                    '    Whitelisted users will be added in all cases\n'
+                    '    Blacklisted users won\'t be added even if they are\n'
+                    'followers (typically, you want to add all your chatbots\n'
+                    'to that list).',
+                child: Icon(
+                  Icons.info,
+                  color: Colors.white,
+                ),
+              )
+            ],
           ),
           visualDensity: VisualDensity.compact,
           value: appPreferences.mustFollowForFaming,
@@ -329,19 +354,16 @@ class ConfigurationBoard extends StatelessWidget {
             participants.mustFollowForFaming = value;
           },
         ),
-        PlusOrMinusListTile(
-          title: const Text(
-            'Scroll velocity',
-            style: TextStyle(color: Colors.white),
-          ),
-          onTap: (selection) => appPreferences.hallOfFameScrollVelocity =
-              selection == PlusOrMinusSelection.plus ? -100 : 100,
-        ),
-        SizedBox(height: padding),
         _buildStringSelectorTile(
           context,
           title: 'Newcomer greetings',
           plainText: appPreferences.textNewcomersGreetings,
+        ),
+        SizedBox(height: padding),
+        _buildStringSelectorTile(
+          context,
+          title: 'User has connected',
+          plainText: appPreferences.textUserHasConnectedGreetings,
         ),
         SizedBox(height: padding),
         _buildStringSelectorTile(
@@ -360,27 +382,36 @@ class ConfigurationBoard extends StatelessWidget {
               participants.blacklist = appPreferences.textBlacklist.text,
         ),
         SizedBox(height: padding),
+        PlusOrMinusListTile(
+          title: const Text(
+            'Scroll velocity',
+            style: TextStyle(color: Colors.white),
+          ),
+          onTap: (selection) => appPreferences.hallOfFameScrollVelocity =
+              selection == PlusOrMinusSelection.plus ? -100 : 100,
+        ),
+        SizedBox(height: padding),
         _buildStringSelectorTile(
           context,
-          title: 'Title',
+          title: 'Main title',
           plainText: appPreferences.textHallOfFameTitle,
         ),
         SizedBox(height: padding),
         _buildStringSelectorTile(
           context,
-          title: 'Viewers names text',
+          title: 'Viewers names title',
           plainText: appPreferences.textHallOfFameName,
         ),
         SizedBox(height: padding),
         _buildStringSelectorTile(
           context,
-          title: 'Today text',
+          title: 'Today title',
           plainText: appPreferences.textHallOfFameToday,
         ),
         SizedBox(height: padding),
         _buildStringSelectorTile(
           context,
-          title: 'All time text',
+          title: 'All time title',
           plainText: appPreferences.textHallOfFameAlltime,
         )
       ],

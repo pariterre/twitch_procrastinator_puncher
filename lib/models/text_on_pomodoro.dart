@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:twitch_pomorodo_timer/models/helpers.dart';
+import 'package:twitch_pomorodo_timer/models/participant.dart';
 import 'package:twitch_pomorodo_timer/providers/pomodoro_status.dart';
 
 class PlainText {
@@ -28,8 +29,11 @@ class PlainText {
 class TextToChat extends PlainText {
   TextToChat({required super.text});
 
-  String formattedText(BuildContext context, String username) {
-    return text.replaceAll('{username}', username).replaceAll(r'\n', '\n');
+  String formattedText(BuildContext context, Participant participant) {
+    return text
+        .replaceAll('{username}', participant.username)
+        .replaceAll('{sessions}', participant.doneInAll.toString())
+        .replaceAll(r'\n', '\n');
   }
 
   static TextToChat deserialize(
