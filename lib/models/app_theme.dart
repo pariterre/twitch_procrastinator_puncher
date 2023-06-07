@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
 
 class ThemeColor {
-  static const Color greenScreen = Color.fromARGB(255, 0, 255, 0);
-  static const Color main = Color.fromARGB(255, 45, 74, 168);
-  static const Color text = Colors.white;
-  static const Color conceiled = Color.fromARGB(255, 45, 74, 168);
-  static const Color conceiledContrast = Colors.amber;
-  static const Color revealed = Color.fromARGB(255, 204, 234, 248);
+  static final ThemeColor _instance = ThemeColor._internal();
+
+  ThemeColor._internal();
+  factory ThemeColor() {
+    return _instance;
+  }
+
+  Color background = const Color.fromARGB(255, 0, 255, 0);
+  Color main = const Color.fromARGB(255, 45, 74, 168);
+  Color configurationText = Colors.white;
+  Color pomodoroText = Colors.white;
+  Color conceiled = const Color.fromARGB(255, 45, 74, 168);
+  Color conceiledContrast = Colors.amber;
+  Color revealed = const Color.fromARGB(255, 204, 234, 248);
 }
 
 class ThemeButton {

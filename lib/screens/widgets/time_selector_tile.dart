@@ -65,8 +65,9 @@ class _TimeSelectorTileState extends State<TimeSelectorTile> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(widget.title,
-            style: const TextStyle(
-                color: ThemeColor.text, fontWeight: FontWeight.bold)),
+            style: TextStyle(
+                color: ThemeColor().configurationText,
+                fontWeight: FontWeight.bold)),
         Theme(
           data: ThemeData(
             inputDecorationTheme: const InputDecorationTheme(

@@ -66,7 +66,7 @@ class _HallOfFameState extends State<HallOfFame> {
       height: windowHeight * 0.3,
       width: windowHeight * 0.6,
       decoration: BoxDecoration(
-          color: ThemeColor.main, borderRadius: BorderRadius.circular(10)),
+          color: ThemeColor().main, borderRadius: BorderRadius.circular(10)),
       child: Padding(
         padding: EdgeInsets.only(left: padding, top: padding, right: padding),
         child: Column(
@@ -78,7 +78,7 @@ class _HallOfFameState extends State<HallOfFame> {
                 preferences.textHallOfFameTitle.text,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                    color: ThemeColor.text,
+                    color: ThemeColor().pomodoroText,
                     fontWeight: FontWeight.bold,
                     fontSize: windowHeight * 0.03),
               ),
@@ -161,7 +161,7 @@ class _FameTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final windowHeight = MediaQuery.of(context).size.height;
     final textStyle = TextStyle(
-        color: ThemeColor.text,
+        color: ThemeColor().pomodoroText,
         fontWeight: fontWeight,
         fontSize: windowHeight * 0.02);
 

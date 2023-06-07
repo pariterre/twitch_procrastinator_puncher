@@ -108,7 +108,7 @@ class _MainScreenState extends State<MainScreen> {
     final widget = Scaffold(
       body: Container(
         height: windowHeight,
-        decoration: const BoxDecoration(color: ThemeColor.greenScreen),
+        decoration: BoxDecoration(color: ThemeColor().background),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [

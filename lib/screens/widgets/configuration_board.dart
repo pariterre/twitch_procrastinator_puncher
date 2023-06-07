@@ -9,6 +9,7 @@ import 'package:twitch_pomorodo_timer/models/text_on_pomodoro.dart';
 import 'package:twitch_pomorodo_timer/providers/app_preferences.dart';
 import 'package:twitch_pomorodo_timer/providers/participants.dart';
 import 'package:twitch_pomorodo_timer/providers/pomodoro_status.dart';
+import 'package:twitch_pomorodo_timer/screens/widgets/color_selector_tile.dart';
 import 'package:twitch_pomorodo_timer/screens/widgets/file_selector_tile.dart';
 import 'package:twitch_pomorodo_timer/screens/widgets/int_selector_tile.dart';
 import 'package:twitch_pomorodo_timer/screens/widgets/plus_or_minus_list_tile.dart';
@@ -40,7 +41,7 @@ class ConfigurationBoard extends StatelessWidget {
     return Container(
       width: windowHeight * 0.5,
       height: windowHeight * 0.7,
-      decoration: const BoxDecoration(color: ThemeColor.main),
+      decoration: BoxDecoration(color: ThemeColor().main),
       padding: EdgeInsets.only(bottom: padding),
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: padding, vertical: padding),
@@ -56,6 +57,8 @@ class ConfigurationBoard extends StatelessWidget {
               const Divider(),
               _buildImageSelectors(context),
               const Divider(),
+              _buildColorPickers(context),
+              const Divider(),
               _buildTextOnImage(context),
               const Divider(),
               _buildHallOfFame(context),
@@ -63,6 +66,25 @@ class ConfigurationBoard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildColorPickers(BuildContext context) {
+    final appPreferences = AppPreferences.of(context);
+    final padding = ThemePadding.normal(context);
+
+    return Column(
+      children: [
+        ColorSelectorTile(
+            title: 'Background color',
+            currentColor: ThemeColor().background,
+            onChanged: (color) => appPreferences.backgroundColor = color),
+        SizedBox(height: padding * 0.5),
+        ColorSelectorTile(
+            title: 'Text color on image',
+            currentColor: ThemeColor().pomodoroText,
+            onChanged: (color) => appPreferences.textColorPomodoro = color),
+      ],
     );
   }
 
@@ -74,9 +96,10 @@ class ConfigurationBoard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Pomodoro controller',
-            style:
-                TextStyle(color: ThemeColor.text, fontWeight: FontWeight.bold)),
+        Text('Pomodoro controller',
+            style: TextStyle(
+                color: ThemeColor().configurationText,
+                fontWeight: FontWeight.bold)),
         SizedBox(height: padding),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -220,10 +243,11 @@ class ConfigurationBoard extends StatelessWidget {
     return Column(
       children: [
         Row(children: [
-          const Text(
+          Text(
             'Text to print on the images',
-            style:
-                TextStyle(color: ThemeColor.text, fontWeight: FontWeight.bold),
+            style: TextStyle(
+                color: ThemeColor().configurationText,
+                fontWeight: FontWeight.bold),
           ),
           SizedBox(width: padding),
           const Tooltip(
@@ -287,10 +311,11 @@ class ConfigurationBoard extends StatelessWidget {
       children: [
         Row(
           children: [
-            const Text(
+            Text(
               'Hall of fame',
               style: TextStyle(
-                  color: ThemeColor.text, fontWeight: FontWeight.bold),
+                  color: ThemeColor().configurationText,
+                  fontWeight: FontWeight.bold),
             ),
             SizedBox(width: padding),
             const Tooltip(

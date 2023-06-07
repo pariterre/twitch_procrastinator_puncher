@@ -18,7 +18,7 @@ class PomodoroTimer extends StatelessWidget {
   Widget _buildText(context) {
     final windowHeight = MediaQuery.of(context).size.height;
     final textStyle = TextStyle(
-        color: ThemeColor.text,
+        color: ThemeColor().pomodoroText,
         fontWeight: FontWeight.bold,
         fontSize: windowHeight * 0.11);
     final pomodoro = PomodoroStatus.of(context);

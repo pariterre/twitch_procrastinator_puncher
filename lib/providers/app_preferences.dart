@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:twitch_pomorodo_timer/models/app_theme.dart';
 import 'package:twitch_pomorodo_timer/models/config.dart';
 import 'package:twitch_pomorodo_timer/models/text_on_pomodoro.dart';
 
@@ -74,6 +75,23 @@ class AppPreferences with ChangeNotifier {
     _save();
   }
 
+  // Colors of the app
+  Color _backgroundColor;
+  Color get backgroundColor => _backgroundColor;
+  set backgroundColor(Color value) {
+    _backgroundColor = value;
+    ThemeColor().background = _backgroundColor;
+    _save();
+  }
+
+  Color _textColorPomodoro;
+  Color get textColorPomodoro => _textColorPomodoro;
+  set textColorPomodoro(Color value) {
+    _textColorPomodoro = value;
+    ThemeColor().pomodoroText = _textColorPomodoro;
+    _save();
+  }
+
   // Foreground texts
   TextOnPomodoro textDuringInitialization;
   TextOnPomodoro textDuringActiveSession;
@@ -131,6 +149,7 @@ class AppPreferences with ChangeNotifier {
   /// Main constructor of the AppPreferences. If [reload] is false, then the
   /// previously saved folder is ignored
   static Future<AppPreferences> factory({reload = true}) async {
+    // Read the previously saved preference file if it exists
     final documentDirectory = await getApplicationDocumentsDirectory();
     final directory = Directory('${documentDirectory.path}/$twitchAppName');
     if (!(await directory.exists())) {
@@ -146,6 +165,8 @@ class AppPreferences with ChangeNotifier {
         previousPreferences = null;
       }
     }
+
+    // Call the real constructor
     return AppPreferences._(
         nbSessions: previousPreferences?['nbSessions'] ?? 0,
         sessionDuration:
@@ -157,9 +178,12 @@ class AppPreferences with ChangeNotifier {
             previousPreferences?['activeBackgroundImageFilename'],
         pauseBackgroundImageFilename:
             previousPreferences?['pauseBackgroundImageFilename'],
+        backgroundColor: previousPreferences?['backgroundColor'] ?? 0xFF00FF00,
+        textColorPomodoro:
+            previousPreferences?['textColorPomodoro'] ?? 0xFFFFFFFF,
         textDuringInitialization: TextOnPomodoro.deserialize(
             previousPreferences?['textDuringInitialization'],
-            defaultText: 'Bienvenue!'),
+            defaultText: 'Welcome!'),
         textDuringActiveSession: TextOnPomodoro.deserialize(
             previousPreferences?['textDuringActiveSession'],
             defaultText: r'Session {currentSession}/{maxSessions}\n{timer}!'),
@@ -170,7 +194,7 @@ class AppPreferences with ChangeNotifier {
             previousPreferences?['textDuringPause'],
             defaultText: r'Pause!'),
         textDone: TextOnPomodoro.deserialize(previousPreferences?['textDone'],
-            defaultText: r'Bravo!'),
+            defaultText: r'Congratulation!'),
         useHallOfFame: previousPreferences?['useHallOfFame'] ?? true,
         mustFollowForFaming:
             previousPreferences?['mustFollowForFaming'] ?? true,
@@ -193,6 +217,8 @@ class AppPreferences with ChangeNotifier {
     required Directory directory,
     required String? activeBackgroundImageFilename,
     required String? pauseBackgroundImageFilename,
+    required int backgroundColor,
+    required int textColorPomodoro,
     required this.textDuringInitialization,
     required this.textDuringActiveSession,
     required this.textDuringPauseSession,
@@ -216,10 +242,13 @@ class AppPreferences with ChangeNotifier {
         preferencesDirectory = directory,
         _activeBackgroundImageFilename = activeBackgroundImageFilename,
         _pauseBackgroundImageFilename = pauseBackgroundImageFilename,
+        _backgroundColor = Color(backgroundColor),
+        _textColorPomodoro = Color(textColorPomodoro),
         _useHallOfFame = useHallOfFame,
         _mustFollowForFaming = mustFollowForFaming,
         _hallOfFameScrollVelocity = hallOfFameScrollVelocity,
         _lastVisitedDirectory = lastVisitedDirectory {
+    // Set the necessary callback
     textDuringInitialization.saveCallback = _save;
     textDuringActiveSession.saveCallback = _save;
     textDuringPauseSession.saveCallback = _save;
@@ -232,6 +261,10 @@ class AppPreferences with ChangeNotifier {
     textHallOfFameName.saveCallback = _save;
     textHallOfFameToday.saveCallback = _save;
     textHallOfFameAlltime.saveCallback = _save;
+
+    // Force the repainting of the colors
+    this.backgroundColor = _backgroundColor;
+    this.textColorPomodoro = _textColorPomodoro;
   }
 
   // INTERNAL METHODS
@@ -255,6 +288,8 @@ class AppPreferences with ChangeNotifier {
         'pauseDuration': _pauseDuration.inSeconds,
         'activeBackgroundImageFilename': _activeBackgroundImageFilename,
         'pauseBackgroundImageFilename': _pauseBackgroundImageFilename,
+        'backgroundColor': _backgroundColor.value,
+        'textColorPomodoro': _textColorPomodoro.value,
         'textDuringInitialization': textDuringInitialization.serialize(),
         'textDuringActiveSession': textDuringActiveSession.serialize(),
         'textDuringPauseSession': textDuringPauseSession.serialize(),
@@ -264,7 +299,8 @@ class AppPreferences with ChangeNotifier {
         'mustFollowForFaming': _mustFollowForFaming,
         'hallOfFameScrollVelocity': _hallOfFameScrollVelocity,
         'textNewcomersGreetings': textNewcomersGreetings.serialize(),
-        'textUserHasConnectedGreetings': textUserHasConnectedGreetings.serialize(),
+        'textUserHasConnectedGreetings':
+            textUserHasConnectedGreetings.serialize(),
         'textWhitelist': textWhitelist.serialize(),
         'textBlacklist': textBlacklist.serialize(),
         'textHallOfFameTitle': textHallOfFameTitle.serialize(),

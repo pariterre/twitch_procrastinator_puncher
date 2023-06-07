@@ -28,13 +28,14 @@ class FileSelectorTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(title,
-                  style: const TextStyle(
-                      color: ThemeColor.text, fontWeight: FontWeight.bold)),
+                  style: TextStyle(
+                      color: ThemeColor().configurationText,
+                      fontWeight: FontWeight.bold)),
               Padding(
                 padding: EdgeInsets.only(left: padding),
                 child: Text(
                   path ?? 'None selected',
-                  style: const TextStyle(color: ThemeColor.text),
+                  style: TextStyle(color: ThemeColor().configurationText),
                 ),
               ),
             ],
