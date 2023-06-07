@@ -92,6 +92,14 @@ class AppPreferences with ChangeNotifier {
     _save();
   }
 
+  Color _backgroundColorHallOfFame;
+  Color get backgroundColorHallOfFame => _backgroundColorHallOfFame;
+  set backgroundColorHallOfFame(Color value) {
+    _backgroundColorHallOfFame = value;
+    ThemeColor().hallOfFame = backgroundColorHallOfFame;
+    _save();
+  }
+
   Color _textColorHallOfFame;
   Color get textColorHallOfFame => _textColorHallOfFame;
   set textColorHallOfFame(Color value) {
@@ -189,6 +197,8 @@ class AppPreferences with ChangeNotifier {
         backgroundColor: previousPreferences?['backgroundColor'] ?? 0xFF00FF00,
         textColorPomodoro:
             previousPreferences?['textColorPomodoro'] ?? 0xFFFFFFFF,
+        backgroundColorHallOfFame:
+            previousPreferences?['backgroundColorHallOfFame'] ?? 0xFF2D4AA8,
         textColorHallOfFame:
             previousPreferences?['textColorHallOfFame'] ?? 0xFFFFFFFF,
         textDuringInitialization: TextOnPomodoro.deserialize(
@@ -200,14 +210,12 @@ class AppPreferences with ChangeNotifier {
         textDuringPauseSession: TextOnPomodoro.deserialize(
             previousPreferences?['textDuringPauseSession'],
             defaultText: r'Pause\n{timer}!'),
-        textDuringPause: TextOnPomodoro.deserialize(
-            previousPreferences?['textDuringPause'],
+        textDuringPause: TextOnPomodoro.deserialize(previousPreferences?['textDuringPause'],
             defaultText: r'Pause!'),
         textDone: TextOnPomodoro.deserialize(previousPreferences?['textDone'],
             defaultText: r'Congratulation!'),
         useHallOfFame: previousPreferences?['useHallOfFame'] ?? true,
-        mustFollowForFaming:
-            previousPreferences?['mustFollowForFaming'] ?? true,
+        mustFollowForFaming: previousPreferences?['mustFollowForFaming'] ?? true,
         hallOfFameScrollVelocity: previousPreferences?['hallOfFameScrollVelocity'] ?? 2000,
         textNewcomersGreetings: TextToChat.deserialize(previousPreferences?['textNewcomersGreetings'], defaultText: r'Welcome to {username} who has joined for the first time!'),
         textUserHasConnectedGreetings: TextToChat.deserialize(previousPreferences?['textUserHasConnectedGreetings'], defaultText: r'Welcome back to {username} who has joined us!'),
@@ -229,6 +237,7 @@ class AppPreferences with ChangeNotifier {
     required String? pauseBackgroundImageFilename,
     required int backgroundColor,
     required int textColorPomodoro,
+    required int backgroundColorHallOfFame,
     required int textColorHallOfFame,
     required this.textDuringInitialization,
     required this.textDuringActiveSession,
@@ -255,6 +264,7 @@ class AppPreferences with ChangeNotifier {
         _pauseBackgroundImageFilename = pauseBackgroundImageFilename,
         _backgroundColor = Color(backgroundColor),
         _textColorPomodoro = Color(textColorPomodoro),
+        _backgroundColorHallOfFame = Color(backgroundColorHallOfFame),
         _textColorHallOfFame = Color(textColorHallOfFame),
         _useHallOfFame = useHallOfFame,
         _mustFollowForFaming = mustFollowForFaming,
@@ -277,6 +287,7 @@ class AppPreferences with ChangeNotifier {
     // Force the repainting of the colors
     this.backgroundColor = _backgroundColor;
     this.textColorPomodoro = _textColorPomodoro;
+    this.backgroundColorHallOfFame = _backgroundColorHallOfFame;
     this.textColorHallOfFame = _textColorHallOfFame;
   }
 
@@ -303,6 +314,7 @@ class AppPreferences with ChangeNotifier {
         'pauseBackgroundImageFilename': _pauseBackgroundImageFilename,
         'backgroundColor': _backgroundColor.value,
         'textColorPomodoro': _textColorPomodoro.value,
+        'backgroundColorHallOfFame': _backgroundColorHallOfFame.value,
         'textColorHallOfFame': _textColorHallOfFame.value,
         'textDuringInitialization': textDuringInitialization.serialize(),
         'textDuringActiveSession': textDuringActiveSession.serialize(),

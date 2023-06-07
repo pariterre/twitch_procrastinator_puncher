@@ -41,7 +41,7 @@ class ConfigurationBoard extends StatelessWidget {
     return Container(
       width: windowHeight * 0.5,
       height: windowHeight * 0.7,
-      decoration: BoxDecoration(color: ThemeColor().main),
+      decoration: BoxDecoration(color: ThemeColor().configurationBoard),
       padding: EdgeInsets.only(bottom: padding),
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: padding, vertical: padding),
@@ -86,7 +86,13 @@ class ConfigurationBoard extends StatelessWidget {
             onChanged: (color) => appPreferences.textColorPomodoro = color),
         SizedBox(height: padding * 0.5),
         ColorSelectorTile(
-            title: 'Text color on hall of fame',
+            title: 'Color of the hall of fame',
+            currentColor: ThemeColor().hallOfFame,
+            onChanged: (color) =>
+                appPreferences.backgroundColorHallOfFame = color),
+        SizedBox(height: padding * 0.5),
+        ColorSelectorTile(
+            title: 'Text color on the hall of fame',
             currentColor: ThemeColor().hallOfFameText,
             onChanged: (color) => appPreferences.textColorHallOfFame = color),
       ],

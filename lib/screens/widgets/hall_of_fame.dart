@@ -66,7 +66,8 @@ class _HallOfFameState extends State<HallOfFame> {
       height: windowHeight * 0.3,
       width: windowHeight * 0.6,
       decoration: BoxDecoration(
-          color: ThemeColor().main, borderRadius: BorderRadius.circular(10)),
+          color: ThemeColor().hallOfFame,
+          borderRadius: BorderRadius.circular(10)),
       child: Padding(
         padding: EdgeInsets.only(left: padding, top: padding, right: padding),
         child: Column(
