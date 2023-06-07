@@ -104,6 +104,7 @@ class AppPreferences with ChangeNotifier {
   }
 
   TextToChat textNewcomersGreetings;
+  PlainText textWhitelist;
   PlainText textBlacklist;
   PlainText textHallOfFameTitle;
   PlainText textHallOfFameName;
@@ -174,6 +175,7 @@ class AppPreferences with ChangeNotifier {
             previousPreferences?['mustFollowForFaming'] ?? true,
         hallOfFameScrollVelocity: previousPreferences?['hallOfFameScrollVelocity'] ?? 2000,
         textNewcomersGreetings: TextToChat.deserialize(previousPreferences?['textNewcomersGreetings'], defaultText: r'Welcome to {username} who has joined us!'),
+        textWhitelist: PlainText.deserialize(previousPreferences?['textWhitelist'], defaultText: r''),
         textBlacklist: PlainText.deserialize(previousPreferences?['textBlacklist'], defaultText: r''),
         textHallOfFameTitle: PlainText.deserialize(previousPreferences?['textHallOfFameTitle'], defaultText: r'Hall of fame'),
         textHallOfFameName: PlainText.deserialize(previousPreferences?['textHallOfFameName'], defaultText: r'Name of the viewers'),
@@ -198,6 +200,7 @@ class AppPreferences with ChangeNotifier {
     required bool mustFollowForFaming,
     required int hallOfFameScrollVelocity,
     required this.textNewcomersGreetings,
+    required this.textWhitelist,
     required this.textBlacklist,
     required this.textHallOfFameTitle,
     required this.textHallOfFameName,
@@ -257,6 +260,7 @@ class AppPreferences with ChangeNotifier {
         'mustFollowForFaming': _mustFollowForFaming,
         'hallOfFameScrollVelocity': _hallOfFameScrollVelocity,
         'textNewcomersGreetings': textNewcomersGreetings.serialize(),
+        'textWhitelist': textWhitelist.serialize(),
         'textBlacklist': textBlacklist.serialize(),
         'textHallOfFameTitle': textHallOfFameTitle.serialize(),
         'textHallOfFameName': textHallOfFameName.serialize(),

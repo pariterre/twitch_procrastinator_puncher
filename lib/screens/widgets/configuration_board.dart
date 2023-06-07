@@ -314,9 +314,13 @@ class ConfigurationBoard extends StatelessWidget {
         ),
         SizedBox(height: padding),
         CheckboxListTile(
-          title: const Text(
-            'Must be a follower to register',
-            style: TextStyle(color: Colors.white),
+          title: const Tooltip(
+            message: 'Whitelisted users will be added anyway\n'
+                'Blacklisted users won\'t be in any cases',
+            child: Text(
+              'Must be a follower to register',
+              style: TextStyle(color: Colors.white),
+            ),
           ),
           visualDensity: VisualDensity.compact,
           value: appPreferences.mustFollowForFaming,
@@ -342,7 +346,15 @@ class ConfigurationBoard extends StatelessWidget {
         SizedBox(height: padding),
         _buildStringSelectorTile(
           context,
-          title: 'Blacklist users (semicolon separated)',
+          title: 'Whitelisted users (semicolon separated)',
+          plainText: appPreferences.textWhitelist,
+          onTextComplete: () =>
+              participants.whitelist = appPreferences.textWhitelist.text,
+        ),
+        SizedBox(height: padding),
+        _buildStringSelectorTile(
+          context,
+          title: 'Blacklisted users (semicolon separated)',
           plainText: appPreferences.textBlacklist,
           onTextComplete: () =>
               participants.blacklist = appPreferences.textBlacklist.text,

@@ -9,6 +9,7 @@ void main() async {
   final appPreferences = await AppPreferences.factory();
   final participants = await Participants.factory(
       mustFollowForFaming: appPreferences.mustFollowForFaming,
+      whitelist: appPreferences.textWhitelist.text,
       blacklist: appPreferences.textBlacklist.text);
 
   runApp(MultiProvider(

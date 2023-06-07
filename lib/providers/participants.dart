@@ -9,6 +9,17 @@ import 'package:twitch_manager/twitch_manager.dart';
 import 'package:twitch_pomorodo_timer/models/config.dart';
 import 'package:twitch_pomorodo_timer/models/participant.dart';
 
+List<String> _extractUsersFromString(String value) {
+  final List<String> out = value.split(';');
+
+  // Remove trailling spaces
+  for (var i = 0; i < out.length; i++) {
+    out[i] = out[i].trim();
+  }
+
+  return out;
+}
+
 class Participants extends ChangeNotifier {
   TwitchManager? _twitchManager;
   set twitchManager(TwitchManager manager) {
@@ -25,8 +36,6 @@ class Participants extends ChangeNotifier {
   ///
   /// If the participant must be a follower to be counted
   bool mustFollowForFaming;
-
-  // TODO Whitelist (otherwise the streamer can count their pomodoro)
 
   void addPomodoroToAllConnected() {
     for (final user in all) {
@@ -49,14 +58,19 @@ class Participants extends ChangeNotifier {
   ///
   /// The blacklist removes specific users from the all list (and prevent them
   /// to connect)
+  List<String> _whitelist;
+  set whitelist(String value) {
+    _whitelist = _extractUsersFromString(value);
+
+    notifyListeners();
+  }
+
+  ///
+  /// The blacklist removes specific users from the all list (and prevent them
+  /// to connect)
   List<String> _blacklist;
   set blacklist(String value) {
-    _blacklist = value.split(';');
-
-    // Remove trailling spaces
-    for (var i = 0; i < _blacklist.length; i++) {
-      _blacklist[i] = _blacklist[i].trim();
-    }
+    _blacklist = _extractUsersFromString(value);
 
     // Remove from the list all blacklisted users
     for (final username in _blacklist) {
@@ -77,9 +91,14 @@ class Participants extends ChangeNotifier {
     // Remove users that are not followers (if must follow) and blacklisted
     for (var i = chatters.length - 1; i >= 0; i--) {
       final chatter = chatters[i];
-      if ((mustFollowForFaming && !followers.contains(chatter)) ||
-          _blacklist.contains(chatter)) {
-        chatters.removeWhere((e) => e == chatter);
+
+      // If the chatter is whitelisted, never remove
+      if (!_whitelist.contains(chatter)) {
+        // If the chatter was blacklisted, or should (but does not) follow
+        if (_blacklist.contains(chatter) ||
+            (mustFollowForFaming && !followers.contains(chatter))) {
+          chatters.removeWhere((e) => e == chatter);
+        }
       }
     }
 
@@ -120,10 +139,12 @@ class Participants extends ChangeNotifier {
   ///
   /// Main constructor of the Participants. [reload] will used previously saved
   /// file
-  static Future<Participants> factory(
-      {bool reload = true,
-      required bool mustFollowForFaming,
-      required String blacklist}) async {
+  static Future<Participants> factory({
+    bool reload = true,
+    required bool mustFollowForFaming,
+    required String whitelist,
+    required String blacklist,
+  }) async {
     final documentDirectory = await getApplicationDocumentsDirectory();
     final saveDir = Directory('${documentDirectory.path}/$twitchAppName');
     if (!(await saveDir.exists())) {
@@ -146,6 +167,7 @@ class Participants extends ChangeNotifier {
           [],
       saveDir: saveDir.path,
       mustFollowForFaming: mustFollowForFaming,
+      whitelist: whitelist,
       blacklist: blacklist,
     );
   }
@@ -157,9 +179,12 @@ class Participants extends ChangeNotifier {
     required this.all,
     required String saveDir,
     required this.mustFollowForFaming,
+    required String whitelist,
     required String blacklist,
   })  : _saveDir = saveDir,
+        _whitelist = [],
         _blacklist = [] {
+    this.whitelist = whitelist; // Fill the whitelist
     this.blacklist = blacklist; // Fill the blacklist
   }
 
