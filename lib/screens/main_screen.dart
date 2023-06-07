@@ -10,16 +10,16 @@ import 'package:twitch_pomorodo_timer/screens/widgets/configuration_board.dart';
 import 'package:twitch_pomorodo_timer/screens/widgets/hall_of_fame.dart';
 import 'package:twitch_pomorodo_timer/screens/widgets/pomodoro_timer.dart';
 
-class ConfigurationRoom extends StatefulWidget {
-  const ConfigurationRoom({super.key});
+class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
 
-  static const route = '/configuration-room';
+  static const route = '/main-screen';
 
   @override
-  State<ConfigurationRoom> createState() => _ConfigurationRoomState();
+  State<MainScreen> createState() => _MainScreenState();
 }
 
-class _ConfigurationRoomState extends State<ConfigurationRoom> {
+class _MainScreenState extends State<MainScreen> {
   TwitchManager? _twitchManager;
   StopWatchStatus _statusWithFocus = StopWatchStatus.initializing;
   bool isInitialized = false;

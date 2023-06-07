@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:twitch_pomorodo_timer/providers/app_preferences.dart';
 import 'package:twitch_pomorodo_timer/providers/participants.dart';
 import 'package:twitch_pomorodo_timer/providers/pomodoro_status.dart';
-import 'package:twitch_pomorodo_timer/screens/configuration_room.dart';
+import 'package:twitch_pomorodo_timer/screens/main_screen.dart';
 
 void main() async {
   final appPreferences = await AppPreferences.factory();
@@ -22,9 +22,9 @@ void main() async {
                   participants.addPomodoroToAllConnected)),
     ],
     child: MaterialApp(
-      initialRoute: ConfigurationRoom.route,
+      initialRoute: MainScreen.route,
       routes: {
-        ConfigurationRoom.route: (ctx) => const ConfigurationRoom(),
+        MainScreen.route: (ctx) => const MainScreen(),
       },
     ),
   ));
