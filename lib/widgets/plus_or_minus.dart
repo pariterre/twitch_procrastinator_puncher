@@ -35,8 +35,8 @@ class _Button extends StatelessWidget {
     final windowHeight = MediaQuery.of(context).size.height;
 
     return Container(
-      height: windowHeight * 0.03,
-      width: windowHeight * 0.03,
+      height: windowHeight * 0.025,
+      width: windowHeight * 0.025,
       decoration: BoxDecoration(
           color: Colors.blue, borderRadius: BorderRadius.circular(8)),
       child: InkWell(
