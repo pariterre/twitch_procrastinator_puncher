@@ -92,6 +92,14 @@ class AppPreferences with ChangeNotifier {
     _save();
   }
 
+  Color _textColorHallOfFame;
+  Color get textColorHallOfFame => _textColorHallOfFame;
+  set textColorHallOfFame(Color value) {
+    _textColorHallOfFame = value;
+    ThemeColor().hallOfFameText = textColorHallOfFame;
+    _save();
+  }
+
   // Foreground texts
   TextOnPomodoro textDuringInitialization;
   TextOnPomodoro textDuringActiveSession;
@@ -181,6 +189,8 @@ class AppPreferences with ChangeNotifier {
         backgroundColor: previousPreferences?['backgroundColor'] ?? 0xFF00FF00,
         textColorPomodoro:
             previousPreferences?['textColorPomodoro'] ?? 0xFFFFFFFF,
+        textColorHallOfFame:
+            previousPreferences?['textColorHallOfFame'] ?? 0xFFFFFFFF,
         textDuringInitialization: TextOnPomodoro.deserialize(
             previousPreferences?['textDuringInitialization'],
             defaultText: 'Welcome!'),
@@ -219,6 +229,7 @@ class AppPreferences with ChangeNotifier {
     required String? pauseBackgroundImageFilename,
     required int backgroundColor,
     required int textColorPomodoro,
+    required int textColorHallOfFame,
     required this.textDuringInitialization,
     required this.textDuringActiveSession,
     required this.textDuringPauseSession,
@@ -244,6 +255,7 @@ class AppPreferences with ChangeNotifier {
         _pauseBackgroundImageFilename = pauseBackgroundImageFilename,
         _backgroundColor = Color(backgroundColor),
         _textColorPomodoro = Color(textColorPomodoro),
+        _textColorHallOfFame = Color(textColorHallOfFame),
         _useHallOfFame = useHallOfFame,
         _mustFollowForFaming = mustFollowForFaming,
         _hallOfFameScrollVelocity = hallOfFameScrollVelocity,
@@ -265,6 +277,7 @@ class AppPreferences with ChangeNotifier {
     // Force the repainting of the colors
     this.backgroundColor = _backgroundColor;
     this.textColorPomodoro = _textColorPomodoro;
+    this.textColorHallOfFame = _textColorHallOfFame;
   }
 
   // INTERNAL METHODS
@@ -290,6 +303,7 @@ class AppPreferences with ChangeNotifier {
         'pauseBackgroundImageFilename': _pauseBackgroundImageFilename,
         'backgroundColor': _backgroundColor.value,
         'textColorPomodoro': _textColorPomodoro.value,
+        'textColorHallOfFame': _textColorHallOfFame.value,
         'textDuringInitialization': textDuringInitialization.serialize(),
         'textDuringActiveSession': textDuringActiveSession.serialize(),
         'textDuringPauseSession': textDuringPauseSession.serialize(),

@@ -78,7 +78,7 @@ class _HallOfFameState extends State<HallOfFame> {
                 preferences.textHallOfFameTitle.text,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                    color: ThemeColor().pomodoroText,
+                    color: ThemeColor().hallOfFameText,
                     fontWeight: FontWeight.bold,
                     fontSize: windowHeight * 0.03),
               ),
@@ -161,7 +161,7 @@ class _FameTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final windowHeight = MediaQuery.of(context).size.height;
     final textStyle = TextStyle(
-        color: ThemeColor().pomodoroText,
+        color: ThemeColor().hallOfFameText,
         fontWeight: fontWeight,
         fontSize: windowHeight * 0.02);
 

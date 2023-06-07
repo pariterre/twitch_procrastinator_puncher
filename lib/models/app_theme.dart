@@ -12,6 +12,7 @@ class ThemeColor {
   Color main = const Color.fromARGB(255, 45, 74, 168);
   Color configurationText = Colors.white;
   Color pomodoroText = Colors.white;
+  Color hallOfFameText = Colors.white;
   Color conceiled = const Color.fromARGB(255, 45, 74, 168);
   Color conceiledContrast = Colors.amber;
   Color revealed = const Color.fromARGB(255, 204, 234, 248);

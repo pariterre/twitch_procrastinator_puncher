@@ -84,6 +84,11 @@ class ConfigurationBoard extends StatelessWidget {
             title: 'Text color on image',
             currentColor: ThemeColor().pomodoroText,
             onChanged: (color) => appPreferences.textColorPomodoro = color),
+        SizedBox(height: padding * 0.5),
+        ColorSelectorTile(
+            title: 'Text color on hall of fame',
+            currentColor: ThemeColor().hallOfFameText,
+            onChanged: (color) => appPreferences.textColorHallOfFame = color),
       ],
     );
   }
