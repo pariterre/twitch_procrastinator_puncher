@@ -5,6 +5,7 @@ import 'package:twitch_pomorodo_timer/providers/pomodoro_status.dart';
 
 class PlainText {
   String _text;
+  Color _color;
   Function()? saveCallback;
 
   String get text => _text;
@@ -13,21 +14,36 @@ class PlainText {
     if (saveCallback != null) saveCallback!();
   }
 
-  PlainText({required String text, this.saveCallback}) : _text = text;
+  PlainText({
+    required String text,
+    this.saveCallback,
+    required Color color,
+  })  : _text = text,
+        _color = color;
+
+  Color get color => _color;
+  set color(Color value) {
+    _color = value;
+    if (saveCallback != null) saveCallback!();
+  }
 
   static PlainText deserialize(
     Map<String, dynamic>? map, {
     required String defaultText,
   }) {
     final text = map?['text'] ?? defaultText;
-    return PlainText(text: text);
+    final color = Color(map?['color'] ?? 0xFFFFFFFF);
+    return PlainText(text: text, color: color);
   }
 
-  Map<String, dynamic> serialize() => {'text': _text};
+  Map<String, dynamic> serialize() => {
+        'text': _text,
+        'color': _color.value,
+      };
 }
 
 class TextToChat extends PlainText {
-  TextToChat({required super.text});
+  TextToChat({required super.text}) : super(color: Colors.white);
 
   String formattedText(BuildContext context, Participant participant) {
     return text
@@ -50,13 +66,13 @@ class TextOnPomodoro extends PlainText {
   double _size;
 
   TextOnPomodoro({
-    required String text,
+    required super.text,
     required Offset offset,
     required double size,
+    required super.color,
     super.saveCallback,
   })  : _offset = offset,
-        _size = size,
-        super(text: text);
+        _size = size;
 
   // Foreground text during active session
   String formattedText(BuildContext context) {
@@ -93,8 +109,12 @@ class TextOnPomodoro extends PlainText {
     final text = map?['text'] ?? defaultText;
     final offset = map?['offset'] ?? [0.0, 0.0];
     final size = map?['size'] ?? 1.0;
+    final color = Color(map?['color'] ?? 0xFFFFFFFF);
     return TextOnPomodoro(
-        text: text, offset: Offset(offset[0], offset[1]), size: size);
+        text: text,
+        offset: Offset(offset[0], offset[1]),
+        size: size,
+        color: color);
   }
 
   @override

@@ -68,32 +68,11 @@ class ConfigurationBoard extends StatelessWidget {
 
   Widget _buildColorPickers(BuildContext context) {
     final appPreferences = AppPreferences.of(context);
-    final padding = ThemePadding.normal(context);
 
-    return Column(
-      children: [
-        ColorSelectorTile(
-            title: 'Background color',
-            currentColor: ThemeColor().background,
-            onChanged: (color) => appPreferences.backgroundColor = color),
-        SizedBox(height: padding * 0.5),
-        ColorSelectorTile(
-            title: 'Text color on image',
-            currentColor: ThemeColor().pomodoroText,
-            onChanged: (color) => appPreferences.textColorPomodoro = color),
-        SizedBox(height: padding * 0.5),
-        ColorSelectorTile(
-            title: 'Color of the hall of fame',
-            currentColor: ThemeColor().hallOfFame,
-            onChanged: (color) =>
-                appPreferences.backgroundColorHallOfFame = color),
-        SizedBox(height: padding * 0.5),
-        ColorSelectorTile(
-            title: 'Text color on the hall of fame',
-            currentColor: ThemeColor().hallOfFameText,
-            onChanged: (color) => appPreferences.textColorHallOfFame = color),
-      ],
-    );
+    return ColorSelectorTile(
+        title: 'Background color',
+        currentColor: ThemeColor().background,
+        onChanged: (color) => appPreferences.backgroundColor = color);
   }
 
   Widget _buildController(context) {
@@ -307,30 +286,43 @@ class ConfigurationBoard extends StatelessWidget {
           title: 'Text during initialization',
           plainText: preferences.textDuringInitialization,
           focus: StopWatchStatus.initializing,
+          initialColor: preferences.textDuringInitialization.color,
+          onColorChanged: (color) =>
+              preferences.textDuringInitialization.color = color,
         ),
         _buildStringSelectorTile(
           context,
           title: 'Text during focus sessions',
           plainText: preferences.textDuringActiveSession,
           focus: StopWatchStatus.inSession,
+          initialColor: preferences.textDuringActiveSession.color,
+          onColorChanged: (color) =>
+              preferences.textDuringActiveSession.color = color,
         ),
         _buildStringSelectorTile(
           context,
           title: 'Text during pause sessions',
           plainText: preferences.textDuringPauseSession,
           focus: StopWatchStatus.inPauseSession,
+          initialColor: preferences.textDuringPauseSession.color,
+          onColorChanged: (color) =>
+              preferences.textDuringPauseSession.color = color,
         ),
         _buildStringSelectorTile(
           context,
           title: 'Text during pauses',
           plainText: preferences.textDuringPause,
           focus: StopWatchStatus.paused,
+          initialColor: preferences.textDuringPause.color,
+          onColorChanged: (color) => preferences.textDuringPause.color = color,
         ),
         _buildStringSelectorTile(
           context,
           title: 'Text when done',
           plainText: preferences.textDone,
           focus: StopWatchStatus.done,
+          initialColor: preferences.textDone.color,
+          onColorChanged: (color) => preferences.textDone.color = color,
         ),
       ],
     );
@@ -442,14 +434,11 @@ class ConfigurationBoard extends StatelessWidget {
               participants.blacklist = preferences.textBlacklist.text,
         ),
         SizedBox(height: padding),
-        PlusOrMinusListTile(
-          title: const Text(
-            'Scroll velocity',
-            style: TextStyle(color: Colors.white),
-          ),
-          onTap: (selection) => preferences.hallOfFameScrollVelocity =
-              selection == PlusOrMinusSelection.plus ? -100 : 100,
-        ),
+        ColorSelectorTile(
+            title: 'Color of the hall of fame',
+            currentColor: ThemeColor().hallOfFame,
+            onChanged: (color) =>
+                preferences.backgroundColorHallOfFame = color),
         SizedBox(height: padding),
         DropMenuSelectorTile<AppFonts>(
             title: 'Font',
@@ -468,10 +457,27 @@ class ConfigurationBoard extends StatelessWidget {
                 .toList(),
             onChanged: (value) => preferences.fontHallOfFame = value!),
         SizedBox(height: padding),
+        ColorSelectorTile(
+            title: 'Text color on the hall of fame',
+            currentColor: ThemeColor().hallOfFameText,
+            onChanged: (color) => preferences.textColorHallOfFame = color),
+        SizedBox(height: padding),
+        PlusOrMinusListTile(
+          title: const Text(
+            'Scroll velocity',
+            style: TextStyle(color: Colors.white),
+          ),
+          onTap: (selection) => preferences.hallOfFameScrollVelocity =
+              selection == PlusOrMinusSelection.plus ? -100 : 100,
+        ),
+        SizedBox(height: padding),
         _buildStringSelectorTile(
           context,
           title: 'Main title',
           plainText: preferences.textHallOfFameTitle,
+          initialColor: preferences.textHallOfFameTitle.color,
+          onColorChanged: (color) =>
+              preferences.textHallOfFameTitle.color = color,
         ),
         SizedBox(height: padding),
         _buildStringSelectorTile(
@@ -496,6 +502,9 @@ class ConfigurationBoard extends StatelessWidget {
           context,
           title: 'Total done',
           plainText: preferences.textHallOfFameTotal,
+          initialColor: preferences.textHallOfFameTotal.color,
+          onColorChanged: (color) =>
+              preferences.textHallOfFameTotal.color = color,
         ),
       ],
     );
@@ -507,10 +516,12 @@ class ConfigurationBoard extends StatelessWidget {
     required PlainText plainText,
     StopWatchStatus? focus,
     Function()? onTextComplete,
+    Color? initialColor,
+    Function(Color)? onColorChanged,
   }) {
     return StringSelectorTile(
       title: title,
-      initialValue: plainText.text,
+      initialText: plainText.text,
       onFocusChanged: focus == null && onTextComplete == null
           ? null
           : (gainedFocus) {
@@ -535,6 +546,8 @@ class ConfigurationBoard extends StatelessWidget {
               if (focus != null) gainFocusCallback(focus);
             }
           : null,
+      initialColor: initialColor,
+      onColorChanged: onColorChanged,
     );
   }
 }

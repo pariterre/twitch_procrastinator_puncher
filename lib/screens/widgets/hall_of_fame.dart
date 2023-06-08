@@ -85,7 +85,7 @@ class _HallOfFameState extends State<HallOfFame> {
                   textAlign: TextAlign.center,
                   style: preferences.fontHallOfFame.style(
                     textStyle: TextStyle(
-                        color: ThemeColor().hallOfFameText,
+                        color: preferences.textHallOfFameTitle.color,
                         fontWeight: FontWeight.bold,
                         fontSize: windowHeight * 0.03),
                   )),
@@ -104,6 +104,7 @@ class _HallOfFameState extends State<HallOfFame> {
                     doneToday: preferences.textHallOfFameToday.text,
                     doneInAll: preferences.textHallOfFameAlltime.text,
                     fontWeight: FontWeight.bold,
+                    color: preferences.textColorHallOfFame,
                   ),
                   SizedBox(
                     height: windowHeight * 0.135,
@@ -123,6 +124,7 @@ class _HallOfFameState extends State<HallOfFame> {
                                 doneToday: participant.doneToday.toString(),
                                 doneInAll: participant.doneInAll.toString(),
                                 fontWeight: FontWeight.normal,
+                                color: preferences.textColorHallOfFame,
                               );
                             },
                           ),
@@ -146,6 +148,7 @@ class _HallOfFameState extends State<HallOfFame> {
                     .fold<int>(0, (prev, e) => prev + e.doneInAll)
                     .toString(),
                 fontWeight: FontWeight.bold,
+                color: preferences.textHallOfFameTotal.color,
               ),
             ),
           ],
@@ -161,12 +164,14 @@ class _FameTile extends StatelessWidget {
     required this.doneToday,
     required this.doneInAll,
     required this.fontWeight,
+    required this.color,
   });
 
   final String name;
   final String doneToday;
   final String doneInAll;
   final FontWeight fontWeight;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
@@ -175,7 +180,7 @@ class _FameTile extends StatelessWidget {
 
     final textStyle = preferences.fontHallOfFame.style(
         textStyle: TextStyle(
-            color: ThemeColor().hallOfFameText,
+            color: color,
             fontWeight: fontWeight,
             fontSize: windowHeight * 0.02));
 
@@ -183,7 +188,8 @@ class _FameTile extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         SizedBox(
-            width: windowHeight * 0.3, child: Text(name, style: textStyle)),
+            width: windowHeight * 0.3,
+            child: Text(name, style: textStyle.copyWith())),
         SizedBox(
             width: windowHeight * 0.12,
             child: Text(

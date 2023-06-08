@@ -2,6 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:twitch_pomorodo_timer/models/app_theme.dart';
 
+void pickColorDialog(context,
+    {required Color currentColor,
+    required Function(Color) onColorChanged}) async {
+  await showDialog<Color>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Pick a color!'),
+      content: SingleChildScrollView(
+        child: ColorPicker(
+          pickerColor: currentColor,
+          onColorChanged: onColorChanged,
+        ),
+      ),
+      actions: <Widget>[
+        ElevatedButton(
+          child: const Text('Confirm'),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
+    ),
+  );
+}
+
 class ColorSelectorTile extends StatefulWidget {
   const ColorSelectorTile({
     super.key,
@@ -19,29 +44,6 @@ class ColorSelectorTile extends StatefulWidget {
 }
 
 class _ColorSelectorTileState extends State<ColorSelectorTile> {
-  void _onTap(context) async {
-    await showDialog<Color>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Pick a color!'),
-        content: SingleChildScrollView(
-          child: ColorPicker(
-            pickerColor: widget.currentColor,
-            onColorChanged: (color) => setState(() => widget.onChanged(color)),
-          ),
-        ),
-        actions: <Widget>[
-          ElevatedButton(
-            child: const Text('Confirm'),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final windowHeight = MediaQuery.of(context).size.height;
@@ -61,7 +63,10 @@ class _ColorSelectorTileState extends State<ColorSelectorTile> {
                     fontWeight: FontWeight.bold)),
           ),
           InkWell(
-            onTap: () => _onTap(context),
+            onTap: () => pickColorDialog(context,
+                currentColor: widget.currentColor,
+                onColorChanged: (color) =>
+                    setState(() => widget.onChanged(color))),
             child: Container(
               decoration: BoxDecoration(color: widget.currentColor),
               width: windowHeight * 0.05,

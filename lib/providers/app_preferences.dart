@@ -138,27 +138,11 @@ class AppPreferences with ChangeNotifier {
     _save();
   }
 
-  Color _textColorPomodoro;
-  Color get textColorPomodoro => _textColorPomodoro;
-  set textColorPomodoro(Color value) {
-    _textColorPomodoro = value;
-    ThemeColor().pomodoroText = _textColorPomodoro;
-    _save();
-  }
-
   Color _backgroundColorHallOfFame;
   Color get backgroundColorHallOfFame => _backgroundColorHallOfFame;
   set backgroundColorHallOfFame(Color value) {
     _backgroundColorHallOfFame = value;
     ThemeColor().hallOfFame = backgroundColorHallOfFame;
-    _save();
-  }
-
-  Color _textColorHallOfFame;
-  Color get textColorHallOfFame => _textColorHallOfFame;
-  set textColorHallOfFame(Color value) {
-    _textColorHallOfFame = value;
-    ThemeColor().hallOfFameText = textColorHallOfFame;
     _save();
   }
 
@@ -198,6 +182,14 @@ class AppPreferences with ChangeNotifier {
   AppFonts get fontHallOfFame => _fontHallOfFame;
   set fontHallOfFame(AppFonts value) {
     _fontHallOfFame = value;
+    _save();
+  }
+
+  Color _textColorHallOfFame;
+  Color get textColorHallOfFame => _textColorHallOfFame;
+  set textColorHallOfFame(Color value) {
+    _textColorHallOfFame = value;
+    ThemeColor().hallOfFameText = textColorHallOfFame;
     _save();
   }
 
@@ -265,8 +257,6 @@ class AppPreferences with ChangeNotifier {
             previousPreferences?['endWorkingSoundFilename'],
         backgroundColor: previousPreferences?['backgroundColor'] ?? 0xFF00FF00,
         fontPomodoro: previousPreferences?['fontPomodoro'] ?? 0,
-        textColorPomodoro:
-            previousPreferences?['textColorPomodoro'] ?? 0xFFFFFFFF,
         backgroundColorHallOfFame:
             previousPreferences?['backgroundColorHallOfFame'] ?? 0xFF2D4AA8,
         textColorHallOfFame:
@@ -312,7 +302,6 @@ class AppPreferences with ChangeNotifier {
     required String? endWorkingSoundFilename,
     required int backgroundColor,
     required int fontPomodoro,
-    required int textColorPomodoro,
     required int backgroundColorHallOfFame,
     required int textColorHallOfFame,
     required this.textDuringInitialization,
@@ -345,7 +334,6 @@ class AppPreferences with ChangeNotifier {
         _endWorkingSoundFilename = endWorkingSoundFilename,
         _backgroundColor = Color(backgroundColor),
         _fontPomodoro = AppFonts.values[fontPomodoro],
-        _textColorPomodoro = Color(textColorPomodoro),
         _backgroundColorHallOfFame = Color(backgroundColorHallOfFame),
         _textColorHallOfFame = Color(textColorHallOfFame),
         _useHallOfFame = useHallOfFame,
@@ -370,7 +358,6 @@ class AppPreferences with ChangeNotifier {
 
     // Force the repainting of the colors
     this.backgroundColor = _backgroundColor;
-    this.textColorPomodoro = _textColorPomodoro;
     this.backgroundColorHallOfFame = _backgroundColorHallOfFame;
     this.textColorHallOfFame = _textColorHallOfFame;
   }

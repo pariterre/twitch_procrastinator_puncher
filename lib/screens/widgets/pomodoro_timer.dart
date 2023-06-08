@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:twitch_pomorodo_timer/models/app_theme.dart';
 import 'package:twitch_pomorodo_timer/models/text_on_pomodoro.dart';
 import 'package:twitch_pomorodo_timer/providers/app_preferences.dart';
 import 'package:twitch_pomorodo_timer/providers/pomodoro_status.dart';
@@ -43,7 +42,7 @@ class PomodoroTimer extends StatelessWidget {
     }
     final textStyle = appPreferences.fontPomodoro.style(
         textStyle: TextStyle(
-            color: ThemeColor().pomodoroText,
+            color: textOnPomodoro.color,
             fontWeight: FontWeight.bold,
             fontSize: windowHeight * 0.11 * textOnPomodoro.size));
 
