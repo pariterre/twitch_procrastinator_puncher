@@ -93,8 +93,8 @@ class _MainScreenState extends State<MainScreen> {
 
     // Connect everything related to participants
     participants.twitchManager = _twitchManager!;
-    participants.greetNewcomer = _greetNewComers;
-    participants.greetUserHasConnected = _greetUserHasConnected;
+    participants.greetNewcomerCallback = _greetNewComers;
+    participants.greetUserHasConnectedCallback = _greetUserHasConnected;
 
     setState(() {});
   }

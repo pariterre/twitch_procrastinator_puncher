@@ -32,12 +32,12 @@ class Participants extends ChangeNotifier {
   ///
   /// This is the callback that the GUI must register to update itself when
   /// a new user connected for the first time
-  Function(Participant)? greetNewcomer;
+  Function(Participant)? greetNewcomerCallback;
 
   ///
   /// This is the callback that the GUI must register to update itself when
   /// a user has connected
-  Function(Participant)? greetUserHasConnected;
+  Function(Participant)? greetUserHasConnectedCallback;
 
   ///
   /// If the participant must be a follower to be counted
@@ -116,7 +116,8 @@ class Participants extends ChangeNotifier {
         final newParticipant = Participant(username: chatter);
         newParticipant.connect();
         all.add(newParticipant);
-        if (greetNewcomer != null) greetNewcomer!(newParticipant);
+        if (greetNewcomerCallback != null)
+          greetNewcomerCallback!(newParticipant);
       }
 
       final participant = all.firstWhere((e) => e.username == chatter);
@@ -124,8 +125,8 @@ class Participants extends ChangeNotifier {
       if (!participant.isConnected) {
         // Greet them if it the first connexion today but is not a newcomer
         if (!participant.wasPreviouslyConnected && participant.doneInAll > 0) {
-          if (greetUserHasConnected != null) {
-            greetUserHasConnected!(participant);
+          if (greetUserHasConnectedCallback != null) {
+            greetUserHasConnectedCallback!(participant);
           }
         }
         participant.connect();
