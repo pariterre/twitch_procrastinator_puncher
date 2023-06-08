@@ -116,7 +116,7 @@ class _MainScreenState extends State<MainScreen> {
               startTimerCallback: _startTimer,
               pauseTimerCallback: _pauseTimer,
               resetTimerCallback: _resetTimer,
-              gainFocusCallback: (hasFocus) => () {
+              gainFocusCallback: (hasFocus) {
                 _statusWithFocus = hasFocus;
                 if (isInitialized) setState(() {});
               },

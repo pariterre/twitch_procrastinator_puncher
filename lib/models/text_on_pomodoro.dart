@@ -32,7 +32,7 @@ class TextToChat extends PlainText {
   String formattedText(BuildContext context, Participant participant) {
     return text
         .replaceAll('{username}', participant.username)
-        .replaceAll('{sessions}', participant.doneInAll.toString())
+        .replaceAll('{total}', participant.doneInAll.toString())
         .replaceAll(r'\n', '\n');
   }
 

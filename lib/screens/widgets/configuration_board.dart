@@ -335,7 +335,7 @@ class ConfigurationBoard extends StatelessWidget {
                   'To personalize the message that are sent to the chat,\n'
                   'you can use these tags:\n'
                   '    {username} is the name of a user\n'
-                  '    {sessions} number of sessions previously done\n'
+                  '    {total} number of sessions previously done\n'
                   '    \\n is a linebreak',
               child: Icon(
                 Icons.info,
