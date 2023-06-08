@@ -207,6 +207,7 @@ class AppPreferences with ChangeNotifier {
   PlainText textHallOfFameName;
   PlainText textHallOfFameToday;
   PlainText textHallOfFameAlltime;
+  PlainText textHallOfFameTotal;
 
   ///
   /// Save the current preferences to a file
@@ -295,6 +296,7 @@ class AppPreferences with ChangeNotifier {
         textHallOfFameName: PlainText.deserialize(previousPreferences?['textHallOfFameName'], defaultText: r'Name of the viewers'),
         textHallOfFameToday: PlainText.deserialize(previousPreferences?['textHallOfFameToday'], defaultText: r'Today'),
         textHallOfFameAlltime: PlainText.deserialize(previousPreferences?['textHallOfFameAlltime'], defaultText: r'All time'),
+        textHallOfFameTotal: PlainText.deserialize(previousPreferences?['textHallOfFameTotal'], defaultText: r'Total'),
         lastVisitedDirectory: Directory(previousPreferences?['lastVisitedDirectory'] ?? documentDirectory.path));
   }
 
@@ -330,6 +332,7 @@ class AppPreferences with ChangeNotifier {
     required this.textHallOfFameName,
     required this.textHallOfFameToday,
     required this.textHallOfFameAlltime,
+    required this.textHallOfFameTotal,
     required Directory lastVisitedDirectory,
   })  : _nbSessions = nbSessions,
         _sessionDuration = sessionDuration,
@@ -363,6 +366,7 @@ class AppPreferences with ChangeNotifier {
     textHallOfFameName.saveCallback = _save;
     textHallOfFameToday.saveCallback = _save;
     textHallOfFameAlltime.saveCallback = _save;
+    textHallOfFameTotal.saveCallback = _save;
 
     // Force the repainting of the colors
     this.backgroundColor = _backgroundColor;
@@ -417,6 +421,7 @@ class AppPreferences with ChangeNotifier {
         'textHallOfFameName': textHallOfFameName.serialize(),
         'textHallOfFameToday': textHallOfFameToday.serialize(),
         'textHallOfFameAlltime': textHallOfFameAlltime.serialize(),
+        'textHallOfFameTotal': textHallOfFameTotal.serialize(),
         'lastVisitedDirectory': _lastVisitedDirectory.path,
       };
 }

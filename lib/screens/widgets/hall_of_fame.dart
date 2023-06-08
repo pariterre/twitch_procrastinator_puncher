@@ -138,7 +138,7 @@ class _HallOfFameState extends State<HallOfFame> {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: padding),
               child: _FameTile(
-                name: 'Total',
+                name: preferences.textHallOfFameTotal.text,
                 doneToday: participants
                     .fold<int>(0, (prev, e) => prev + e.doneToday)
                     .toString(),

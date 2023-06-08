@@ -490,7 +490,13 @@ class ConfigurationBoard extends StatelessWidget {
           context,
           title: 'All time title',
           plainText: preferences.textHallOfFameAlltime,
-        )
+        ),
+        SizedBox(height: padding),
+        _buildStringSelectorTile(
+          context,
+          title: 'Total done',
+          plainText: preferences.textHallOfFameTotal,
+        ),
       ],
     );
   }
