@@ -47,8 +47,10 @@ class PomodoroTimer extends StatelessWidget {
     }
 
     return Positioned(
-      left: textOnPomodoro.offset.dx,
-      top: textOnPomodoro.offset.dy,
+      left: textOnPomodoro.offset.dx * windowHeight * 0.001,
+      right: 0,
+      top: textOnPomodoro.offset.dy * windowHeight * 0.001,
+      bottom: 0,
       child: Text(textOnPomodoro.formattedText(context),
           textAlign: TextAlign.center,
           style: textStyle.copyWith(
