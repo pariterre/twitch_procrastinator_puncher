@@ -87,6 +87,7 @@ class _HallOfFameState extends State<HallOfFame> {
             Divider(
               color: Colors.white,
               thickness: windowHeight * 0.002,
+              height: windowHeight * 0.02,
             ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: padding),
@@ -124,6 +125,7 @@ class _HallOfFameState extends State<HallOfFame> {
             Divider(
               color: Colors.white,
               thickness: windowHeight * 0.002,
+              height: windowHeight * 0.02,
             ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: padding),
