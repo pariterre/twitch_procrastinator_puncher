@@ -75,6 +75,50 @@ class AppPreferences with ChangeNotifier {
     _save();
   }
 
+  // Sound at end of sessions
+  String? _endActiveSessionSoundFilename;
+  String? get endActiveSessionSoundFilePath =>
+      _endActiveSessionSoundFilename == null
+          ? null
+          : _path(preferencesDirectory, _endActiveSessionSoundFilename!);
+  Future<void> setEndActiveSessionSoundFilePath(String? value) async {
+    if (value == null) {
+      _endActiveSessionSoundFilename = null;
+    } else {
+      _endActiveSessionSoundFilename = await _copyFile(original: value);
+    }
+    _save();
+  }
+
+  // Sound at end of pause
+  String? _endPauseSessionSoundFilename;
+  String? get endPauseSessionSoundFilePath =>
+      _endPauseSessionSoundFilename == null
+          ? null
+          : _path(preferencesDirectory, _endPauseSessionSoundFilename!);
+  Future<void> setEndPauseSessionSoundFilePath(String? value) async {
+    if (value == null) {
+      _endPauseSessionSoundFilename = null;
+    } else {
+      _endPauseSessionSoundFilename = await _copyFile(original: value);
+    }
+    _save();
+  }
+
+  // Sound at end of pause
+  String? _endWorkingSoundFilename;
+  String? get endWorkingSoundFilePath => _endWorkingSoundFilename == null
+      ? null
+      : _path(preferencesDirectory, _endWorkingSoundFilename!);
+  Future<void> setWorkingSoundFilePath(String? value) async {
+    if (value == null) {
+      _endWorkingSoundFilename = null;
+    } else {
+      _endWorkingSoundFilename = await _copyFile(original: value);
+    }
+    _save();
+  }
+
   // Colors of the app
   Color _backgroundColor;
   Color get backgroundColor => _backgroundColor;
@@ -194,6 +238,12 @@ class AppPreferences with ChangeNotifier {
             previousPreferences?['activeBackgroundImageFilename'],
         pauseBackgroundImageFilename:
             previousPreferences?['pauseBackgroundImageFilename'],
+        endActiveSessionSoundFilename:
+            previousPreferences?['endActiveSessionSoundFilename'],
+        endPauseSessionSoundFilename:
+            previousPreferences?['endPauseSessionSoundFilename'],
+        endWorkingSoundFilename:
+            previousPreferences?['endWorkingSoundFilename'],
         backgroundColor: previousPreferences?['backgroundColor'] ?? 0xFF00FF00,
         textColorPomodoro:
             previousPreferences?['textColorPomodoro'] ?? 0xFFFFFFFF,
@@ -235,6 +285,9 @@ class AppPreferences with ChangeNotifier {
     required Directory directory,
     required String? activeBackgroundImageFilename,
     required String? pauseBackgroundImageFilename,
+    required String? endActiveSessionSoundFilename,
+    required String? endPauseSessionSoundFilename,
+    required String? endWorkingSoundFilename,
     required int backgroundColor,
     required int textColorPomodoro,
     required int backgroundColorHallOfFame,
@@ -262,6 +315,9 @@ class AppPreferences with ChangeNotifier {
         preferencesDirectory = directory,
         _activeBackgroundImageFilename = activeBackgroundImageFilename,
         _pauseBackgroundImageFilename = pauseBackgroundImageFilename,
+        _endActiveSessionSoundFilename = endActiveSessionSoundFilename,
+        _endPauseSessionSoundFilename = endPauseSessionSoundFilename,
+        _endWorkingSoundFilename = endWorkingSoundFilename,
         _backgroundColor = Color(backgroundColor),
         _textColorPomodoro = Color(textColorPomodoro),
         _backgroundColorHallOfFame = Color(backgroundColorHallOfFame),
@@ -312,6 +368,9 @@ class AppPreferences with ChangeNotifier {
         'pauseDuration': _pauseDuration.inSeconds,
         'activeBackgroundImageFilename': _activeBackgroundImageFilename,
         'pauseBackgroundImageFilename': _pauseBackgroundImageFilename,
+        'endActiveSessionSoundFilename': _endActiveSessionSoundFilename,
+        'endPauseSessionSoundFilename': _endPauseSessionSoundFilename,
+        'endWorkingSoundFilename': _endWorkingSoundFilename,
         'backgroundColor': _backgroundColor.value,
         'textColorPomodoro': _textColorPomodoro.value,
         'backgroundColorHallOfFame': _backgroundColorHallOfFame.value,

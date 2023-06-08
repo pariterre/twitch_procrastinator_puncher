@@ -1,7 +1,4 @@
-import 'dart:io';
-
 import 'package:arrow_pad/arrow_pad.dart';
-import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:twitch_pomorodo_timer/models/app_theme.dart';
 import 'package:twitch_pomorodo_timer/models/text_on_pomodoro.dart';
@@ -205,20 +202,37 @@ class ConfigurationBoard extends StatelessWidget {
         FileSelectorTile(
             title: 'Active image',
             path: appPreferences.activeBackgroundImagePath,
-            selectFileCallback: () async {
-              final filename = await _pickFile(context);
-              if (filename == null) return;
-              await appPreferences.setActiveBackgroundImagePath(filename);
-            }),
+            isImage: true,
+            selectFileCallback: (filename) async =>
+                await appPreferences.setActiveBackgroundImagePath(filename)),
         SizedBox(height: padding * 0.5),
         FileSelectorTile(
             title: 'Paused image',
             path: appPreferences.pauseBackgroundImagePath,
-            selectFileCallback: () async {
-              final filename = await _pickFile(context);
-              if (filename == null) return;
-              await appPreferences.setPauseBackgroundImagePath(filename);
-            }),
+            isImage: true,
+            selectFileCallback: (filename) async =>
+                await appPreferences.setPauseBackgroundImagePath(filename)),
+        SizedBox(height: padding * 0.5),
+        FileSelectorTile(
+            title: 'Alarm end of active session',
+            path: appPreferences.endActiveSessionSoundFilePath,
+            isSound: true,
+            selectFileCallback: (filename) async => await appPreferences
+                .setEndActiveSessionSoundFilePath(filename)),
+        SizedBox(height: padding * 0.5),
+        FileSelectorTile(
+            title: 'Alarm end of pause',
+            path: appPreferences.endPauseSessionSoundFilePath,
+            isSound: true,
+            selectFileCallback: (filename) async =>
+                await appPreferences.setEndPauseSessionSoundFilePath(filename)),
+        SizedBox(height: padding * 0.5),
+        FileSelectorTile(
+            title: 'Alarm end of working',
+            path: appPreferences.endWorkingSoundFilePath,
+            isSound: true,
+            selectFileCallback: (filename) async =>
+                await appPreferences.setWorkingSoundFilePath(filename)),
       ],
     );
   }
@@ -484,20 +498,5 @@ class ConfigurationBoard extends StatelessWidget {
             }
           : null,
     );
-  }
-
-  Future<String?> _pickFile(context) async {
-    final appPreferences = AppPreferences.of(context, listen: false);
-    final path = await FilesystemPicker.open(
-      title: 'Open file',
-      context: context,
-      directory: appPreferences.lastVisitedDirectory,
-      rootDirectory: Directory(rootPath),
-      rootName: rootPath,
-      fsType: FilesystemType.file,
-      allowedExtensions: ['.jpg', '.png', '.jpeg'],
-      fileTileSelectMode: FileTileSelectMode.wholeTile,
-    );
-    return path;
   }
 }
