@@ -124,6 +124,7 @@ class _MainScreenState extends State<MainScreen> {
             ),
             Column(
               children: [
+                SizedBox(height: padding),
                 PomodoroTimer(textWithFocus: _statusWithFocus),
                 SizedBox(height: padding),
                 if (preferences.useHallOfFame) const HallOfFame(),

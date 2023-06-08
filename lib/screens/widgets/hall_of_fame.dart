@@ -6,6 +6,12 @@ import 'package:twitch_pomorodo_timer/models/app_theme.dart';
 import 'package:twitch_pomorodo_timer/providers/app_preferences.dart';
 import 'package:twitch_pomorodo_timer/providers/participants.dart';
 
+enum _InitializationStatus {
+  notInitiatialized,
+  timerInitialized,
+  scrollerAttached
+}
+
 class HallOfFame extends StatefulWidget {
   const HallOfFame({super.key});
 
@@ -16,33 +22,31 @@ class HallOfFame extends StatefulWidget {
 class _HallOfFameState extends State<HallOfFame> {
   int _scrollVelocity = 2000;
   final _scrollController = InfiniteScrollController();
-  Timer? _timer;
+  _InitializationStatus _status = _InitializationStatus.notInitiatialized;
+  int _currentItem = -1;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    if (_timer == null) {
+    if (_status == _InitializationStatus.notInitiatialized) {
       final preferences = AppPreferences.of(context, listen: false);
       _scrollVelocity = preferences.hallOfFameScrollVelocity;
-      _timer = Timer.periodic(Duration(milliseconds: _scrollVelocity),
-          (Timer t) => _automaticScroller());
+
+      // Set the timer that advance the scroller
+      Timer.periodic(const Duration(milliseconds: 1), (timer) {
+        if (_status == _InitializationStatus.scrollerAttached &&
+            _currentItem != _scrollController.selectedItem) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _scrollController.nextItem(
+                duration: Duration(milliseconds: _scrollVelocity),
+                curve: Curves.linear);
+            _currentItem = _scrollController.selectedItem;
+          });
+        }
+      });
+      _status = _InitializationStatus.timerInitialized;
     }
-  }
-
-  Timer _setupTimer() => Timer.periodic(Duration(milliseconds: _scrollVelocity),
-      (Timer t) => _automaticScroller());
-
-  set scrollVelocity(int value) {
-    _scrollVelocity = value;
-    _timer?.cancel();
-    _timer = _setupTimer();
-  }
-
-  void _automaticScroller() {
-    _scrollController.nextItem(
-        duration: Duration(milliseconds: _scrollVelocity),
-        curve: Curves.linear);
   }
 
   @override
@@ -55,12 +59,14 @@ class _HallOfFameState extends State<HallOfFame> {
   Widget build(BuildContext context) {
     final windowHeight = MediaQuery.of(context).size.height;
     final preferences = AppPreferences.of(context);
-    scrollVelocity = preferences.hallOfFameScrollVelocity;
+    _scrollVelocity = preferences.hallOfFameScrollVelocity;
 
     final padding = ThemePadding.normal(context);
     final participants = Participants.of(context).all.map((e) => e).toList();
 
     participants.sort((a, b) => b.doneInAll - a.doneInAll);
+    _status =
+        participants.isEmpty ? _status : _InitializationStatus.scrollerAttached;
 
     return Container(
       height: windowHeight * 0.3,
@@ -101,23 +107,25 @@ class _HallOfFameState extends State<HallOfFame> {
                   ),
                   SizedBox(
                     height: windowHeight * 0.135,
-                    child: InfiniteCarousel.builder(
-                      physics:
-                          const ScrollPhysics(), // Do not try to land on a particular item
-                      controller: _scrollController,
-                      axisDirection: Axis.vertical,
-                      itemCount: participants.length,
-                      itemExtent: windowHeight * 0.04,
-                      itemBuilder: (ctx, index, realIndex) {
-                        final participant = participants[index];
-                        return _FameTile(
-                          name: participant.username,
-                          doneToday: participant.doneToday.toString(),
-                          doneInAll: participant.doneInAll.toString(),
-                          fontWeight: FontWeight.normal,
-                        );
-                      },
-                    ),
+                    child: participants.isEmpty
+                        ? null
+                        : InfiniteCarousel.builder(
+                            physics:
+                                const ScrollPhysics(), // Do not try to land on a particular item
+                            controller: _scrollController,
+                            axisDirection: Axis.vertical,
+                            itemCount: participants.length,
+                            itemExtent: windowHeight * 0.035,
+                            itemBuilder: (ctx, index, realIndex) {
+                              final participant = participants[index];
+                              return _FameTile(
+                                name: participant.username,
+                                doneToday: participant.doneToday.toString(),
+                                doneInAll: participant.doneInAll.toString(),
+                                fontWeight: FontWeight.normal,
+                              );
+                            },
+                          ),
                   ),
                 ],
               ),

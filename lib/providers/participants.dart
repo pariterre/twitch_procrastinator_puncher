@@ -24,6 +24,7 @@ class Participants extends ChangeNotifier {
   TwitchManager? _twitchManager;
   set twitchManager(TwitchManager manager) {
     _twitchManager = manager;
+    _checkWhoIsConnected();
     Timer.periodic(
         const Duration(minutes: 1), (Timer t) => _checkWhoIsConnected());
   }

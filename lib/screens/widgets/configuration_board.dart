@@ -346,11 +346,9 @@ class ConfigurationBoard extends StatelessWidget {
         ),
         SizedBox(height: padding),
         CheckboxListTile(
-          title: const Flexible(
-            child: Text(
-              'Use hall of fame',
-              style: TextStyle(color: Colors.white),
-            ),
+          title: const Text(
+            'Use hall of fame',
+            style: TextStyle(color: Colors.white),
           ),
           visualDensity: VisualDensity.compact,
           value: appPreferences.useHallOfFame,
@@ -360,11 +358,9 @@ class ConfigurationBoard extends StatelessWidget {
         CheckboxListTile(
           title: Row(
             children: [
-              const Flexible(
-                child: Text(
-                  'Must be a follower to register',
-                  style: TextStyle(color: Colors.white),
-                ),
+              const Text(
+                'Must be a follower to register',
+                style: TextStyle(color: Colors.white),
               ),
               SizedBox(width: padding),
               const Tooltip(
