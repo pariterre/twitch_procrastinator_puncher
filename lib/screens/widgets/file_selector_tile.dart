@@ -20,9 +20,9 @@ class FileSelectorTile extends StatelessWidget {
   final String? path;
   final bool isImage;
   final bool isSound;
-  final Function(String) selectFileCallback;
+  final Function(String?) selectFileCallback;
 
-  Future<String?> _pickFile(context) async {
+  Future<void> _pickFile(context) async {
     final List<String> extensions = [];
     if (isImage) {
       extensions.addAll(['.jpg', '.png', '.jpeg']);
@@ -42,7 +42,9 @@ class FileSelectorTile extends StatelessWidget {
       allowedExtensions: extensions,
       fileTileSelectMode: FileTileSelectMode.wholeTile,
     );
-    return path;
+
+    if (path == null) return;
+    selectFileCallback(path);
   }
 
   void _playSound() async {
@@ -60,7 +62,7 @@ class FileSelectorTile extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         SizedBox(
-          width: windowHeight * 0.3,
+          width: windowHeight * 0.25,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -78,32 +80,50 @@ class FileSelectorTile extends StatelessWidget {
             ],
           ),
         ),
-        if (isImage && path != null)
-          // Show a thumbnail
-          SizedBox(
-              height: windowHeight * 0.04,
-              width: windowHeight * 0.04,
-              child: Image.file(File(path!))),
-        if (isSound && path != null)
-          SizedBox(
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (isImage && path != null)
+              // Show a thumbnail
+              SizedBox(
+                  height: windowHeight * 0.045,
+                  width: windowHeight * 0.045,
+                  child: Image.file(File(path!))),
+            if (isSound && path != null)
+              SizedBox(
+                  height: windowHeight * 0.045,
+                  width: windowHeight * 0.045,
+                  child: InkWell(
+                    onTap: _playSound,
+                    child: const Icon(
+                      Icons.play_circle_outline,
+                      color: Colors.green,
+                    ),
+                  )),
+            SizedBox(
               height: windowHeight * 0.045,
               width: windowHeight * 0.045,
               child: InkWell(
-                onTap: _playSound,
+                onTap: () => _pickFile(context),
                 child: const Icon(
-                  Icons.play_circle_outline,
-                  color: Colors.green,
+                  Icons.file_download,
+                  color: Colors.amber,
                 ),
-              )),
-        ElevatedButton(
-          onPressed: () async {
-            final filename = await _pickFile(context);
-            if (filename == null) return;
-            selectFileCallback(filename);
-          },
-          style: ThemeButton.elevated,
-          child: const Text('Select', style: TextStyle(color: Colors.black)),
-        ),
+              ),
+            ),
+            SizedBox(
+              height: windowHeight * 0.045,
+              width: windowHeight * 0.045,
+              child: InkWell(
+                onTap: () => selectFileCallback(null),
+                child: const Icon(
+                  Icons.delete,
+                  color: Colors.red,
+                ),
+              ),
+            ),
+          ],
+        )
       ],
     );
   }
