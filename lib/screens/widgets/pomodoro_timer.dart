@@ -17,10 +17,6 @@ class PomodoroTimer extends StatelessWidget {
 
   Widget _buildText(context) {
     final windowHeight = MediaQuery.of(context).size.height;
-    final textStyle = TextStyle(
-        color: ThemeColor().pomodoroText,
-        fontWeight: FontWeight.bold,
-        fontSize: windowHeight * 0.11);
     final pomodoro = PomodoroStatus.of(context);
     final appPreferences = AppPreferences.of(context);
 
@@ -45,6 +41,11 @@ class PomodoroTimer extends StatelessWidget {
         textOnPomodoro = appPreferences.textDone;
         break;
     }
+    final textStyle = appPreferences.fontPomodoro.style(
+        textStyle: TextStyle(
+            color: ThemeColor().pomodoroText,
+            fontWeight: FontWeight.bold,
+            fontSize: windowHeight * 0.11 * textOnPomodoro.size));
 
     return Positioned(
       left: textOnPomodoro.offset.dx * windowHeight * 0.001,
@@ -52,9 +53,7 @@ class PomodoroTimer extends StatelessWidget {
       top: textOnPomodoro.offset.dy * windowHeight * 0.001,
       bottom: 0,
       child: Text(textOnPomodoro.formattedText(context),
-          textAlign: TextAlign.center,
-          style: textStyle.copyWith(
-              fontSize: windowHeight * 0.11 * textOnPomodoro.size)),
+          textAlign: TextAlign.center, style: textStyle),
     );
   }
 

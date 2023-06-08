@@ -6,6 +6,7 @@ import 'package:twitch_pomorodo_timer/providers/app_preferences.dart';
 import 'package:twitch_pomorodo_timer/providers/participants.dart';
 import 'package:twitch_pomorodo_timer/providers/pomodoro_status.dart';
 import 'package:twitch_pomorodo_timer/screens/widgets/color_selector_tile.dart';
+import 'package:twitch_pomorodo_timer/screens/widgets/dropmenu_selector_tile.dart';
 import 'package:twitch_pomorodo_timer/screens/widgets/file_selector_tile.dart';
 import 'package:twitch_pomorodo_timer/screens/widgets/int_selector_tile.dart';
 import 'package:twitch_pomorodo_timer/screens/widgets/plus_or_minus_list_tile.dart';
@@ -257,7 +258,7 @@ class ConfigurationBoard extends StatelessWidget {
   }
 
   Widget _buildTextOnImage(BuildContext context) {
-    final appPreferences = AppPreferences.of(context);
+    final preferences = AppPreferences.of(context);
     final padding = ThemePadding.normal(context);
 
     return Column(
@@ -287,34 +288,48 @@ class ConfigurationBoard extends StatelessWidget {
           ),
         ]),
         SizedBox(height: padding),
+        DropMenuSelectorTile<AppFonts>(
+            title: 'Font',
+            value: preferences.fontPomodoro,
+            items: AppFonts.values
+                .map<DropdownMenuItem<AppFonts>>(
+                    (e) => DropdownMenuItem<AppFonts>(
+                        value: e,
+                        child: Padding(
+                          padding: EdgeInsets.only(left: padding),
+                          child: Text(e.name, style: e.style()),
+                        )))
+                .toList(),
+            onChanged: (value) => preferences.fontPomodoro = value!),
+        SizedBox(height: padding),
         _buildStringSelectorTile(
           context,
           title: 'Text during initialization',
-          plainText: appPreferences.textDuringInitialization,
+          plainText: preferences.textDuringInitialization,
           focus: StopWatchStatus.initializing,
         ),
         _buildStringSelectorTile(
           context,
           title: 'Text during focus sessions',
-          plainText: appPreferences.textDuringActiveSession,
+          plainText: preferences.textDuringActiveSession,
           focus: StopWatchStatus.inSession,
         ),
         _buildStringSelectorTile(
           context,
           title: 'Text during pause sessions',
-          plainText: appPreferences.textDuringPauseSession,
+          plainText: preferences.textDuringPauseSession,
           focus: StopWatchStatus.inPauseSession,
         ),
         _buildStringSelectorTile(
           context,
           title: 'Text during pauses',
-          plainText: appPreferences.textDuringPause,
+          plainText: preferences.textDuringPause,
           focus: StopWatchStatus.paused,
         ),
         _buildStringSelectorTile(
           context,
           title: 'Text when done',
-          plainText: appPreferences.textDone,
+          plainText: preferences.textDone,
           focus: StopWatchStatus.done,
         ),
       ],
@@ -322,7 +337,7 @@ class ConfigurationBoard extends StatelessWidget {
   }
 
   Widget _buildHallOfFame(BuildContext context) {
-    final appPreferences = AppPreferences.of(context);
+    final preferences = AppPreferences.of(context);
     final participants = Participants.of(context);
     final padding = ThemePadding.normal(context);
 
@@ -360,8 +375,8 @@ class ConfigurationBoard extends StatelessWidget {
             style: TextStyle(color: Colors.white),
           ),
           visualDensity: VisualDensity.compact,
-          value: appPreferences.useHallOfFame,
-          onChanged: (value) => appPreferences.useHallOfFame = value!,
+          value: preferences.useHallOfFame,
+          onChanged: (value) => preferences.useHallOfFame = value!,
         ),
         SizedBox(height: padding),
         CheckboxListTile(
@@ -393,38 +408,38 @@ class ConfigurationBoard extends StatelessWidget {
             ],
           ),
           visualDensity: VisualDensity.compact,
-          value: appPreferences.mustFollowForFaming,
+          value: preferences.mustFollowForFaming,
           onChanged: (value) {
-            appPreferences.mustFollowForFaming = value!;
+            preferences.mustFollowForFaming = value!;
             participants.mustFollowForFaming = value;
           },
         ),
         _buildStringSelectorTile(
           context,
           title: 'Newcomer greetings',
-          plainText: appPreferences.textNewcomersGreetings,
+          plainText: preferences.textNewcomersGreetings,
         ),
         SizedBox(height: padding),
         _buildStringSelectorTile(
           context,
           title: 'User has connected',
-          plainText: appPreferences.textUserHasConnectedGreetings,
+          plainText: preferences.textUserHasConnectedGreetings,
         ),
         SizedBox(height: padding),
         _buildStringSelectorTile(
           context,
           title: 'Whitelisted users (semicolon separated)',
-          plainText: appPreferences.textWhitelist,
+          plainText: preferences.textWhitelist,
           onTextComplete: () =>
-              participants.whitelist = appPreferences.textWhitelist.text,
+              participants.whitelist = preferences.textWhitelist.text,
         ),
         SizedBox(height: padding),
         _buildStringSelectorTile(
           context,
           title: 'Blacklisted users (semicolon separated)',
-          plainText: appPreferences.textBlacklist,
+          plainText: preferences.textBlacklist,
           onTextComplete: () =>
-              participants.blacklist = appPreferences.textBlacklist.text,
+              participants.blacklist = preferences.textBlacklist.text,
         ),
         SizedBox(height: padding),
         PlusOrMinusListTile(
@@ -432,32 +447,49 @@ class ConfigurationBoard extends StatelessWidget {
             'Scroll velocity',
             style: TextStyle(color: Colors.white),
           ),
-          onTap: (selection) => appPreferences.hallOfFameScrollVelocity =
+          onTap: (selection) => preferences.hallOfFameScrollVelocity =
               selection == PlusOrMinusSelection.plus ? -100 : 100,
         ),
+        SizedBox(height: padding),
+        DropMenuSelectorTile<AppFonts>(
+            title: 'Font',
+            value: preferences.fontHallOfFame,
+            items: AppFonts.values
+                .map<DropdownMenuItem<AppFonts>>(
+                    (e) => DropdownMenuItem<AppFonts>(
+                        value: e,
+                        child: Padding(
+                          padding: EdgeInsets.only(left: padding),
+                          child: Text(
+                            e.name,
+                            style: e.style(),
+                          ),
+                        )))
+                .toList(),
+            onChanged: (value) => preferences.fontHallOfFame = value!),
         SizedBox(height: padding),
         _buildStringSelectorTile(
           context,
           title: 'Main title',
-          plainText: appPreferences.textHallOfFameTitle,
+          plainText: preferences.textHallOfFameTitle,
         ),
         SizedBox(height: padding),
         _buildStringSelectorTile(
           context,
           title: 'Viewers names title',
-          plainText: appPreferences.textHallOfFameName,
+          plainText: preferences.textHallOfFameName,
         ),
         SizedBox(height: padding),
         _buildStringSelectorTile(
           context,
           title: 'Today title',
-          plainText: appPreferences.textHallOfFameToday,
+          plainText: preferences.textHallOfFameToday,
         ),
         SizedBox(height: padding),
         _buildStringSelectorTile(
           context,
           title: 'All time title',
-          plainText: appPreferences.textHallOfFameAlltime,
+          plainText: preferences.textHallOfFameAlltime,
         )
       ],
     );

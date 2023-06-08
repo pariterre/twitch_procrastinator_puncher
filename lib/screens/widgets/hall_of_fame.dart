@@ -81,14 +81,14 @@ class _HallOfFameState extends State<HallOfFame> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Center(
-              child: Text(
-                preferences.textHallOfFameTitle.text,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    color: ThemeColor().hallOfFameText,
-                    fontWeight: FontWeight.bold,
-                    fontSize: windowHeight * 0.03),
-              ),
+              child: Text(preferences.textHallOfFameTitle.text,
+                  textAlign: TextAlign.center,
+                  style: preferences.fontHallOfFame.style(
+                    textStyle: TextStyle(
+                        color: ThemeColor().hallOfFameText,
+                        fontWeight: FontWeight.bold,
+                        fontSize: windowHeight * 0.03),
+                  )),
             ),
             Divider(
               color: Colors.white,
@@ -171,10 +171,13 @@ class _FameTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final windowHeight = MediaQuery.of(context).size.height;
-    final textStyle = TextStyle(
-        color: ThemeColor().hallOfFameText,
-        fontWeight: fontWeight,
-        fontSize: windowHeight * 0.02);
+    final preferences = AppPreferences.of(context);
+
+    final textStyle = preferences.fontHallOfFame.style(
+        textStyle: TextStyle(
+            color: ThemeColor().hallOfFameText,
+            fontWeight: fontWeight,
+            fontSize: windowHeight * 0.02));
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
