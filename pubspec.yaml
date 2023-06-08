@@ -16,6 +16,7 @@ dependencies:
   arrow_pad: ^0.2.0
   infinite_carousel: ^1.0.3
   flutter_colorpicker: ^1.0.3
+  audioplayers: ^4.1.0
   twitch_manager:
     path: ./plugins/twitch_manager
 

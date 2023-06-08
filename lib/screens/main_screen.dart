@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:twitch_manager/twitch_manager.dart';
 import 'package:twitch_pomorodo_timer/models/app_theme.dart';
@@ -28,11 +29,12 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
     _resetTimer(preventFromNotifying: true);
-  }
 
-  @override
-  void didChangeDependencies() async {
-    super.didChangeDependencies();
+    // Connect the callback of the timer
+    final pomodoro = PomodoroStatus.of(context, listen: false);
+    pomodoro.activeSessionHasFinishedGuiCallback = _activeSessionDone;
+    pomodoro.pauseHasFinishedGuiCallback = _pauseSessionDone;
+    pomodoro.finishedWorkingGuiCallback = _workingDone;
   }
 
   void _startTimer() {
@@ -44,20 +46,6 @@ class _MainScreenState extends State<MainScreen> {
   void _pauseTimer() {
     final pomodoro = PomodoroStatus.of(context, listen: false);
     pomodoro.pause();
-    setState(() {});
-  }
-
-  void _greetNewComers(Participant participant) {
-    final preferences = AppPreferences.of(context, listen: false);
-    _twitchManager!.irc!.send(
-        preferences.textNewcomersGreetings.formattedText(context, participant));
-    setState(() {});
-  }
-
-  void _greetUserHasConnected(Participant participant) {
-    final preferences = AppPreferences.of(context, listen: false);
-    _twitchManager!.irc!.send(preferences.textUserHasConnectedGreetings
-        .formattedText(context, participant));
     setState(() {});
   }
 
@@ -73,6 +61,31 @@ class _MainScreenState extends State<MainScreen> {
       notify: !preventFromNotifying,
     );
     _statusWithFocus = StopWatchStatus.initializing;
+    setState(() {});
+  }
+
+  Future<void> _activeSessionDone() async {
+    final preferences = AppPreferences.of(context, listen: false);
+    final player = AudioPlayer();
+    await player.play(DeviceFileSource(
+        '${preferences.preferencesDirectory.path}/Sonnerie.mp3'));
+  }
+
+  Future<void> _pauseSessionDone() async {}
+
+  Future<void> _workingDone() async {}
+
+  void _greetNewComers(Participant participant) {
+    final preferences = AppPreferences.of(context, listen: false);
+    _twitchManager!.irc!.send(
+        preferences.textNewcomersGreetings.formattedText(context, participant));
+    setState(() {});
+  }
+
+  void _greetUserHasConnected(Participant participant) {
+    final preferences = AppPreferences.of(context, listen: false);
+    _twitchManager!.irc!.send(preferences.textUserHasConnectedGreetings
+        .formattedText(context, participant));
     setState(() {});
   }
 

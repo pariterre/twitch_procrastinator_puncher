@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:arrow_pad/arrow_pad.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
 import 'package:twitch_pomorodo_timer/models/app_theme.dart';
 import 'package:twitch_pomorodo_timer/models/text_on_pomodoro.dart';
 import 'package:twitch_pomorodo_timer/providers/app_preferences.dart';
@@ -205,9 +204,7 @@ class ConfigurationBoard extends StatelessWidget {
       children: [
         FileSelectorTile(
             title: 'Active image',
-            path: appPreferences.activeBackgroundImagePath == null
-                ? null
-                : basename(appPreferences.activeBackgroundImagePath!),
+            path: appPreferences.activeBackgroundImagePath,
             selectFileCallback: () async {
               final filename = await _pickFile(context);
               if (filename == null) return;
@@ -216,9 +213,7 @@ class ConfigurationBoard extends StatelessWidget {
         SizedBox(height: padding * 0.5),
         FileSelectorTile(
             title: 'Paused image',
-            path: appPreferences.pauseBackgroundImagePath == null
-                ? null
-                : basename(appPreferences.pauseBackgroundImagePath!),
+            path: appPreferences.pauseBackgroundImagePath,
             selectFileCallback: () async {
               final filename = await _pickFile(context);
               if (filename == null) return;

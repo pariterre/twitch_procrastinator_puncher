@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:path/path.dart';
 import 'package:twitch_pomorodo_timer/models/app_theme.dart';
 
 class FileSelectorTile extends StatelessWidget {
@@ -34,13 +37,18 @@ class FileSelectorTile extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.only(left: padding),
                 child: Text(
-                  path ?? 'None selected',
+                  path != null ? basename(path!) : 'None selected',
                   style: TextStyle(color: ThemeColor().configurationText),
                 ),
               ),
             ],
           ),
         ),
+        if (path != null)
+          SizedBox(
+              height: windowHeight * 0.04,
+              width: windowHeight * 0.04,
+              child: Image.file(File(path!))),
         ElevatedButton(
           onPressed: selectFileCallback,
           style: ThemeButton.elevated,

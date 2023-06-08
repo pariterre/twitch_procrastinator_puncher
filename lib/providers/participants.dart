@@ -116,8 +116,9 @@ class Participants extends ChangeNotifier {
         final newParticipant = Participant(username: chatter);
         newParticipant.connect();
         all.add(newParticipant);
-        if (greetNewcomerCallback != null)
+        if (greetNewcomerCallback != null) {
           greetNewcomerCallback!(newParticipant);
+        }
       }
 
       final participant = all.firstWhere((e) => e.username == chatter);

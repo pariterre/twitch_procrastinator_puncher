@@ -44,6 +44,18 @@ class PomodoroStatus with ChangeNotifier {
   }
 
   ///
+  /// Callback that announces that an active session has finished
+  Future<void> Function()? activeSessionHasFinishedGuiCallback;
+
+  ///
+  /// Callback that announces that a pause session has finished
+  Future<void> Function()? pauseHasFinishedGuiCallback;
+
+  ///
+  /// Callback that announces that we arrived at the end
+  Future<void> Function()? finishedWorkingGuiCallback;
+
+  ///
   /// Start the counter if it is not done
   void start() {
     if (_stopWatchStatus == StopWatchStatus.done) return;
@@ -103,11 +115,17 @@ class PomodoroStatus with ChangeNotifier {
         sessionHasFinishedCallback();
 
         if (_currentSession + 1 == _nbSessions) {
+          if (finishedWorkingGuiCallback != null) {
+            finishedWorkingGuiCallback!();
+          }
           // If next session is the last session, it is over
           _stopWatchStatus = StopWatchStatus.done;
           newTimerValue = 0;
         } else {
           // Otherwise start the pause
+          if (activeSessionHasFinishedGuiCallback != null) {
+            activeSessionHasFinishedGuiCallback!();
+          }
           _stopWatchStatus = StopWatchStatus.inPauseSession;
           newTimerValue = _pauseSessionDuration.inSeconds;
         }
@@ -118,6 +136,9 @@ class PomodoroStatus with ChangeNotifier {
       int newTimerValue = _timer.inSeconds - 1;
       if (newTimerValue <= 0) {
         // Start the next session
+        if (pauseHasFinishedGuiCallback != null) {
+          pauseHasFinishedGuiCallback!();
+        }
         _currentSession++;
         _stopWatchStatus = StopWatchStatus.inSession;
         newTimerValue = _focusSessionDuration.inSeconds;

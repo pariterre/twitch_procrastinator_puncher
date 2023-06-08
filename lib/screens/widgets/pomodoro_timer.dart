@@ -61,11 +61,16 @@ class PomodoroTimer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final windowHeight = MediaQuery.of(context).size.height;
-    final appPreferences = AppPreferences.of(context);
+    final preferences = AppPreferences.of(context);
+    final pomodoro = PomodoroStatus.of(context);
 
-    final background = (appPreferences.activeBackgroundImagePath == null)
-        ? Container()
-        : Image.file(File(appPreferences.activeBackgroundImagePath!));
+    Widget background = Container();
+    if (pomodoro.stopWatchStatus == StopWatchStatus.inPauseSession &&
+        preferences.pauseBackgroundImagePath != null) {
+      background = Image.file(File(preferences.pauseBackgroundImagePath!));
+    } else if (preferences.activeBackgroundImagePath != null) {
+      background = Image.file(File(preferences.activeBackgroundImagePath!));
+    }
 
     return SizedBox(
       height: windowHeight * 0.6,
