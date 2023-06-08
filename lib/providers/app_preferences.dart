@@ -19,9 +19,8 @@ String get rootPath => Platform.isWindows ? r'C:\' : '/';
 
 class AppPreferences with ChangeNotifier {
   // Path to save data folder and file
-  final Directory preferencesDirectory;
-  String get _preferencesPath =>
-      _path(preferencesDirectory, preferencesFilename);
+  final Directory saveDirectory;
+  String get _savePath => _path(saveDirectory, preferencesFilename);
   Directory _lastVisitedDirectory = Directory('');
   Directory get lastVisitedDirectory => _lastVisitedDirectory;
 
@@ -54,7 +53,7 @@ class AppPreferences with ChangeNotifier {
   String? get activeBackgroundImagePath =>
       _activeBackgroundImageFilename == null
           ? null
-          : _path(preferencesDirectory, _activeBackgroundImageFilename!);
+          : _path(saveDirectory, _activeBackgroundImageFilename!);
   Future<void> setActiveBackgroundImagePath(String? value) async {
     if (value == null) {
       _activeBackgroundImageFilename = null;
@@ -68,7 +67,7 @@ class AppPreferences with ChangeNotifier {
   String? _pauseBackgroundImageFilename;
   String? get pauseBackgroundImagePath => _pauseBackgroundImageFilename == null
       ? null
-      : _path(preferencesDirectory, _pauseBackgroundImageFilename!);
+      : _path(saveDirectory, _pauseBackgroundImageFilename!);
   Future<void> setPauseBackgroundImagePath(String? value) async {
     if (value == null) {
       _pauseBackgroundImageFilename = null;
@@ -83,7 +82,7 @@ class AppPreferences with ChangeNotifier {
   String? get endActiveSessionSoundFilePath =>
       _endActiveSessionSoundFilename == null
           ? null
-          : _path(preferencesDirectory, _endActiveSessionSoundFilename!);
+          : _path(saveDirectory, _endActiveSessionSoundFilename!);
   Future<void> setEndActiveSessionSoundFilePath(String? value) async {
     if (value == null) {
       _endActiveSessionSoundFilename = null;
@@ -98,7 +97,7 @@ class AppPreferences with ChangeNotifier {
   String? get endPauseSessionSoundFilePath =>
       _endPauseSessionSoundFilename == null
           ? null
-          : _path(preferencesDirectory, _endPauseSessionSoundFilename!);
+          : _path(saveDirectory, _endPauseSessionSoundFilename!);
   Future<void> setEndPauseSessionSoundFilePath(String? value) async {
     if (value == null) {
       _endPauseSessionSoundFilename = null;
@@ -112,7 +111,7 @@ class AppPreferences with ChangeNotifier {
   String? _endWorkingSoundFilename;
   String? get endWorkingSoundFilePath => _endWorkingSoundFilename == null
       ? null
-      : _path(preferencesDirectory, _endWorkingSoundFilename!);
+      : _path(saveDirectory, _endWorkingSoundFilename!);
   Future<void> setWorkingSoundFilePath(String? value) async {
     if (value == null) {
       _endWorkingSoundFilename = null;
@@ -152,6 +151,13 @@ class AppPreferences with ChangeNotifier {
   TextOnPomodoro textDuringPauseSession;
   TextOnPomodoro textDuringPause;
   TextOnPomodoro textDone;
+
+  bool _saveToTextFile;
+  bool get saveToTextFile => _saveToTextFile;
+  set saveToTextFile(bool value) {
+    _saveToTextFile = value;
+    _save();
+  }
 
   bool _useHallOfFame;
   bool get useHallOfFame => _useHallOfFame;
@@ -204,7 +210,7 @@ class AppPreferences with ChangeNotifier {
   ///
   /// Save the current preferences to a file
   void _save() async {
-    final file = File(_preferencesPath);
+    final file = File(_savePath);
     await file.writeAsString(json.encode(_serializePreferences));
     notifyListeners();
   }
@@ -274,6 +280,7 @@ class AppPreferences with ChangeNotifier {
             defaultText: r'Pause!'),
         textDone: TextOnPomodoro.deserialize(previousPreferences?['textDone'],
             defaultText: r'Congratulation!'),
+        saveToTextFile: previousPreferences?['saveToTextFile'] ?? false,
         useHallOfFame: previousPreferences?['useHallOfFame'] ?? true,
         mustFollowForFaming: previousPreferences?['mustFollowForFaming'] ?? true,
         hallOfFameScrollVelocity: previousPreferences?['hallOfFameScrollVelocity'] ?? 2000,
@@ -309,6 +316,7 @@ class AppPreferences with ChangeNotifier {
     required this.textDuringPauseSession,
     required this.textDuringPause,
     required this.textDone,
+    required bool saveToTextFile,
     required bool useHallOfFame,
     required bool mustFollowForFaming,
     required int hallOfFameScrollVelocity,
@@ -326,7 +334,7 @@ class AppPreferences with ChangeNotifier {
   })  : _nbSessions = nbSessions,
         _sessionDuration = sessionDuration,
         _pauseDuration = pauseDuration,
-        preferencesDirectory = directory,
+        saveDirectory = directory,
         _activeBackgroundImageFilename = activeBackgroundImageFilename,
         _pauseBackgroundImageFilename = pauseBackgroundImageFilename,
         _endActiveSessionSoundFilename = endActiveSessionSoundFilename,
@@ -336,6 +344,7 @@ class AppPreferences with ChangeNotifier {
         _fontPomodoro = AppFonts.values[fontPomodoro],
         _backgroundColorHallOfFame = Color(backgroundColorHallOfFame),
         _textColorHallOfFame = Color(textColorHallOfFame),
+        _saveToTextFile = saveToTextFile,
         _useHallOfFame = useHallOfFame,
         _mustFollowForFaming = mustFollowForFaming,
         _hallOfFameScrollVelocity = hallOfFameScrollVelocity,
@@ -368,8 +377,7 @@ class AppPreferences with ChangeNotifier {
   /// Copy a file and return the name of the new file
   Future<String> _copyFile({required String original}) async {
     final file = File(original);
-    final newFile =
-        await file.copy(_path(preferencesDirectory, basename(file.path)));
+    final newFile = await file.copy(_path(saveDirectory, basename(file.path)));
 
     _lastVisitedDirectory = file.parent;
     return basename(newFile.path);
@@ -395,6 +403,7 @@ class AppPreferences with ChangeNotifier {
         'textDuringPauseSession': textDuringPauseSession.serialize(),
         'textDuringPause': textDuringPause.serialize(),
         'textDone': textDone.serialize(),
+        'saveToTextFile': _saveToTextFile,
         'useHallOfFame': _useHallOfFame,
         'mustFollowForFaming': _mustFollowForFaming,
         'hallOfFameScrollVelocity': _hallOfFameScrollVelocity,

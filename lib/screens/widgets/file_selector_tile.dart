@@ -8,16 +8,19 @@ import 'package:twitch_pomorodo_timer/models/app_theme.dart';
 import 'package:twitch_pomorodo_timer/providers/app_preferences.dart';
 
 class FileSelectorTile extends StatelessWidget {
-  const FileSelectorTile(
-      {super.key,
-      required this.title,
-      required this.path,
-      required this.selectFileCallback,
-      this.isImage = false,
-      this.isSound = false});
+  const FileSelectorTile({
+    super.key,
+    required this.title,
+    required this.path,
+    required this.selectFileCallback,
+    this.tooltipText,
+    this.isImage = false,
+    this.isSound = false,
+  });
 
   final String title;
   final String? path;
+  final String? tooltipText;
   final bool isImage;
   final bool isSound;
   final Function(String?) selectFileCallback;
@@ -66,10 +69,23 @@ class FileSelectorTile extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title,
-                  style: TextStyle(
-                      color: ThemeColor().configurationText,
-                      fontWeight: FontWeight.bold)),
+              Row(
+                children: [
+                  Text(title,
+                      style: TextStyle(
+                          color: ThemeColor().configurationText,
+                          fontWeight: FontWeight.bold)),
+                  if (tooltipText != null) SizedBox(width: padding),
+                  if (tooltipText != null)
+                    Tooltip(
+                      message: tooltipText,
+                      child: const Icon(
+                        Icons.info,
+                        color: Colors.white,
+                      ),
+                    ),
+                ],
+              ),
               Padding(
                 padding: EdgeInsets.only(left: padding),
                 child: Text(

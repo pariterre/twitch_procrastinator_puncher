@@ -1,6 +1,7 @@
 import 'package:arrow_pad/arrow_pad.dart';
 import 'package:flutter/material.dart';
 import 'package:twitch_pomorodo_timer/models/app_theme.dart';
+import 'package:twitch_pomorodo_timer/models/config.dart';
 import 'package:twitch_pomorodo_timer/models/text_on_pomodoro.dart';
 import 'package:twitch_pomorodo_timer/providers/app_preferences.dart';
 import 'package:twitch_pomorodo_timer/providers/participants.dart';
@@ -323,6 +324,35 @@ class ConfigurationBoard extends StatelessWidget {
           focus: StopWatchStatus.done,
           initialColor: preferences.textDone.color,
           onColorChanged: (color) => preferences.textDone.color = color,
+        ),
+        SizedBox(height: padding),
+        CheckboxListTile(
+          title: Row(
+            children: [
+              const Text(
+                'Export to a file',
+                style: TextStyle(color: Colors.white),
+              ),
+              SizedBox(width: padding),
+              Tooltip(
+                message:
+                    'If this is ticked, then a file with the printed message\n'
+                    'on the imsage is updated too.\n'
+                    'This allows to access the current state of the timer outside\n'
+                    'of this software. The file is in:\n'
+                    '${preferences.saveDirectory.path}/$textExportFilename',
+                child: const Icon(
+                  Icons.info,
+                  color: Colors.white,
+                ),
+              )
+            ],
+          ),
+          visualDensity: VisualDensity.compact,
+          value: preferences.saveToTextFile,
+          onChanged: (value) {
+            preferences.saveToTextFile = value!;
+          },
         ),
       ],
     );

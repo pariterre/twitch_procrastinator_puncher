@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:twitch_pomorodo_timer/models/config.dart';
 import 'package:twitch_pomorodo_timer/models/text_on_pomodoro.dart';
 import 'package:twitch_pomorodo_timer/providers/app_preferences.dart';
 import 'package:twitch_pomorodo_timer/providers/pomodoro_status.dart';
@@ -45,6 +46,13 @@ class PomodoroTimer extends StatelessWidget {
             color: textOnPomodoro.color,
             fontWeight: FontWeight.bold,
             fontSize: windowHeight * 0.11 * textOnPomodoro.size));
+
+    final preferences = AppPreferences.of(context, listen: false);
+    if (preferences.saveToTextFile) {
+      final file =
+          File('${preferences.saveDirectory.path}/$textExportFilename');
+      file.writeAsString(textOnPomodoro.formattedText(context));
+    }
 
     return Positioned(
       left: textOnPomodoro.offset.dx * windowHeight * 0.001,
