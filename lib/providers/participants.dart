@@ -87,6 +87,8 @@ class Participants extends ChangeNotifier {
   }
 
   void _checkWhoIsConnected() async {
+    if (!_twitchManager!.isConnected) return;
+
     final chatters =
         await _twitchManager!.api.fetchChatters(blacklist: _blacklist);
     if (chatters == null) return;
