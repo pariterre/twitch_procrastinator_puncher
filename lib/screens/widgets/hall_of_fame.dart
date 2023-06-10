@@ -35,6 +35,12 @@ class _HallOfFameState extends State<HallOfFame> {
 
       // Set the timer that advance the scroller
       Timer.periodic(const Duration(milliseconds: 1), (timer) {
+        if (!preferences.useHallOfFame) {
+          // Stop the timer if there is no hall of fame
+          timer.cancel();
+          return;
+        }
+
         if (_status == _InitializationStatus.scrollerAttached &&
             _currentItem != _scrollController.selectedItem) {
           WidgetsBinding.instance.addPostFrameCallback((_) {

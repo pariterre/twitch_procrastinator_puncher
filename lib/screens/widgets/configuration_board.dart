@@ -80,7 +80,6 @@ class ConfigurationBoard extends StatelessWidget {
   }
 
   Widget _buildController(context) {
-    final preferences = AppPreferences.of(context);
     final pomodoro = PomodoroStatus.of(context, listen: false);
     final padding = ThemePadding.normal(context);
 
@@ -122,8 +121,7 @@ class ConfigurationBoard extends StatelessWidget {
           ],
         ),
         if (twitchStatus != TwitchStatus.initializing &&
-            connectToTwitch != null &&
-            preferences.useHallOfFame)
+            connectToTwitch != null)
           Center(
             child: Padding(
               padding: EdgeInsets.only(top: padding),
