@@ -1,5 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:twitch_manager/twitch_app_info.dart';
 import 'package:twitch_manager/twitch_manager.dart';
 import 'package:twitch_pomorodo_timer/models/app_theme.dart';
 import 'package:twitch_pomorodo_timer/models/config.dart';
@@ -22,6 +23,14 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   TwitchManager? _twitchManager;
+  late Future<TwitchManager> managerFactory =
+      TwitchManager.factory(appInfo: twitchAppInfo);
+  final twitchAppInfo = TwitchAppInfo(
+    appName: twitchAppName,
+    twitchAppId: twitchAppId,
+    redirectAddress: twitchRedirect,
+    scope: twitchScope,
+  );
   StopWatchStatus _statusWithFocus = StopWatchStatus.initializing;
   bool isInitialized = false;
 
@@ -96,39 +105,42 @@ class _MainScreenState extends State<MainScreen> {
 
   void _greetNewComers(Participant participant) {
     final preferences = AppPreferences.of(context, listen: false);
-    _twitchManager!.irc!.send(
+    _twitchManager!.irc.send(
         preferences.textNewcomersGreetings.formattedText(context, participant));
     setState(() {});
   }
 
   void _greetUserHasConnected(Participant participant) {
     final preferences = AppPreferences.of(context, listen: false);
-    _twitchManager!.irc!.send(preferences.textUserHasConnectedGreetings
+    _twitchManager!.irc.send(preferences.textUserHasConnectedGreetings
         .formattedText(context, participant));
     setState(() {});
   }
 
   void _connectToTwitch() async {
-    final participants = Participants.of(context, listen: false);
-
-    _twitchManager = await showDialog<TwitchManager>(
+    _setTwitchManager(await showDialog<TwitchManager>(
       context: context,
       builder: (context) => Dialog(
           child: TwitchAuthenticationScreen(
         onFinishedConnexion: (manager) => Navigator.pop(context, manager),
-        appId: twitchAppId,
-        scope: twitchScope,
-        withChatbot: false,
-        forceNewAuthentication: false,
+        appInfo: twitchAppInfo,
+        loadPreviousSession: false,
       )),
-    );
+    ));
+
+    setState(() {});
+  }
+
+  void _setTwitchManager(TwitchManager? manager) {
+    if (manager == null) return;
+
+    _twitchManager = manager;
 
     // Connect everything related to participants
+    final participants = Participants.of(context, listen: false);
     participants.twitchManager = _twitchManager!;
     participants.greetNewcomerCallback = _greetNewComers;
     participants.greetUserHasConnectedCallback = _greetUserHasConnected;
-
-    setState(() {});
   }
 
   @override
@@ -144,16 +156,25 @@ class _MainScreenState extends State<MainScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            ConfigurationBoard(
-              startTimerCallback: _startTimer,
-              pauseTimerCallback: _pauseTimer,
-              resetTimerCallback: _resetTimer,
-              gainFocusCallback: (hasFocus) {
-                _statusWithFocus = hasFocus;
-                if (isInitialized) setState(() {});
-              },
-              connectToTwitch: _twitchManager == null ? _connectToTwitch : null,
-            ),
+            FutureBuilder(
+                future: managerFactory,
+                builder: (context, snapshot) {
+                  if (_twitchManager == null && snapshot.hasData) {
+                    _setTwitchManager(snapshot.data);
+                  }
+
+                  return ConfigurationBoard(
+                    startTimerCallback: _startTimer,
+                    pauseTimerCallback: _pauseTimer,
+                    resetTimerCallback: _resetTimer,
+                    gainFocusCallback: (hasFocus) {
+                      _statusWithFocus = hasFocus;
+                      if (isInitialized) setState(() {});
+                    },
+                    connectToTwitch: _connectToTwitch,
+                    isConnectedToTwitch: _twitchManager?.isInitialized ?? false,
+                  );
+                }),
             Column(
               children: [
                 SizedBox(height: padding),

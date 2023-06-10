@@ -23,6 +23,7 @@ class ConfigurationBoard extends StatelessWidget {
     required this.resetTimerCallback,
     required this.gainFocusCallback,
     required this.connectToTwitch,
+    required this.isConnectedToTwitch,
   });
 
   final Function() startTimerCallback;
@@ -30,6 +31,7 @@ class ConfigurationBoard extends StatelessWidget {
   final Function() resetTimerCallback;
   final Function(StopWatchStatus hasFocus) gainFocusCallback;
   final Function()? connectToTwitch;
+  final bool isConnectedToTwitch;
 
   @override
   Widget build(BuildContext context) {
@@ -125,10 +127,11 @@ class ConfigurationBoard extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: connectToTwitch,
                 style: ThemeButton.elevated,
-                child: const Text(
-                  'Connect to Twitch',
-                  style: TextStyle(color: Colors.black),
-                ),
+                child: Text(
+                    isConnectedToTwitch
+                        ? 'Reconnect to Twitch'
+                        : 'Connect to Twitch',
+                    style: const TextStyle(color: Colors.black)),
               ),
             ),
           )
