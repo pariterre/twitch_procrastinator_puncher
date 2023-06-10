@@ -5,6 +5,7 @@ import 'package:twitch_manager/twitch_manager.dart';
 import 'package:twitch_pomorodo_timer/models/app_theme.dart';
 import 'package:twitch_pomorodo_timer/models/config.dart';
 import 'package:twitch_pomorodo_timer/models/participant.dart';
+import 'package:twitch_pomorodo_timer/models/twitch_status.dart';
 import 'package:twitch_pomorodo_timer/providers/app_preferences.dart';
 import 'package:twitch_pomorodo_timer/providers/participants.dart';
 import 'package:twitch_pomorodo_timer/providers/pomodoro_status.dart';
@@ -172,7 +173,11 @@ class _MainScreenState extends State<MainScreen> {
                       if (isInitialized) setState(() {});
                     },
                     connectToTwitch: _connectToTwitch,
-                    isConnectedToTwitch: _twitchManager?.isInitialized ?? false,
+                    twitchStatus: !snapshot.hasData
+                        ? TwitchStatus.initializing
+                        : _twitchManager != null && _twitchManager!.isConnected
+                            ? TwitchStatus.connected
+                            : TwitchStatus.notConnected,
                   );
                 }),
             Column(

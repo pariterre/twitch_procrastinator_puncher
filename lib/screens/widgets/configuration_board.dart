@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:twitch_pomorodo_timer/models/app_theme.dart';
 import 'package:twitch_pomorodo_timer/models/config.dart';
 import 'package:twitch_pomorodo_timer/models/text_on_pomodoro.dart';
+import 'package:twitch_pomorodo_timer/models/twitch_status.dart';
 import 'package:twitch_pomorodo_timer/providers/app_preferences.dart';
 import 'package:twitch_pomorodo_timer/providers/participants.dart';
 import 'package:twitch_pomorodo_timer/providers/pomodoro_status.dart';
@@ -23,7 +24,7 @@ class ConfigurationBoard extends StatelessWidget {
     required this.resetTimerCallback,
     required this.gainFocusCallback,
     required this.connectToTwitch,
-    required this.isConnectedToTwitch,
+    required this.twitchStatus,
   });
 
   final Function() startTimerCallback;
@@ -31,7 +32,7 @@ class ConfigurationBoard extends StatelessWidget {
   final Function() resetTimerCallback;
   final Function(StopWatchStatus hasFocus) gainFocusCallback;
   final Function()? connectToTwitch;
-  final bool isConnectedToTwitch;
+  final TwitchStatus twitchStatus;
 
   @override
   Widget build(BuildContext context) {
@@ -120,7 +121,9 @@ class ConfigurationBoard extends StatelessWidget {
             ),
           ],
         ),
-        if (connectToTwitch != null && preferences.useHallOfFame)
+        if (twitchStatus != TwitchStatus.initializing &&
+            connectToTwitch != null &&
+            preferences.useHallOfFame)
           Center(
             child: Padding(
               padding: EdgeInsets.only(top: padding),
@@ -128,7 +131,7 @@ class ConfigurationBoard extends StatelessWidget {
                 onPressed: connectToTwitch,
                 style: ThemeButton.elevated,
                 child: Text(
-                    isConnectedToTwitch
+                    twitchStatus == TwitchStatus.connected
                         ? 'Reconnect to Twitch'
                         : 'Connect to Twitch',
                     style: const TextStyle(color: Colors.black)),
