@@ -15,16 +15,21 @@ class PomodoroTimer extends StatelessWidget {
   // This is so during initialization phase, one can see what they are modifying
   final StopWatchStatus textWithFocus;
 
+  StopWatchStatus _statusToShow(context) {
+    final pomodoro = PomodoroStatus.of(context);
+
+    return pomodoro.stopWatchStatus == StopWatchStatus.initializing
+        ? textWithFocus
+        : pomodoro.stopWatchStatus;
+  }
+
   Widget _buildText(context) {
     final windowHeight = MediaQuery.of(context).size.height;
-    final pomodoro = PomodoroStatus.of(context);
     final appPreferences = AppPreferences.of(context);
 
     late TextOnPomodoro textOnPomodoro;
     // If we are on initializing phase, show the text with the focus
-    switch (pomodoro.stopWatchStatus == StopWatchStatus.initializing
-        ? textWithFocus
-        : pomodoro.stopWatchStatus) {
+    switch (_statusToShow(context)) {
       case StopWatchStatus.initializing:
         textOnPomodoro = appPreferences.textDuringInitialization;
         break;
@@ -64,15 +69,15 @@ class PomodoroTimer extends StatelessWidget {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildImage(context) {
     final windowHeight = MediaQuery.of(context).size.height;
     final preferences = AppPreferences.of(context);
-    final pomodoro = PomodoroStatus.of(context);
 
     Widget background = Container();
     double imageSize = 1;
-    if (pomodoro.stopWatchStatus == StopWatchStatus.inPauseSession &&
+    final status = _statusToShow(context);
+    if ((status == StopWatchStatus.inPauseSession ||
+            status == StopWatchStatus.paused) &&
         preferences.pauseBackgroundImagePath != null) {
       background = Image.file(File(preferences.pauseBackgroundImagePath!));
       imageSize = preferences.pauseBackgroundSize;
@@ -81,15 +86,19 @@ class PomodoroTimer extends StatelessWidget {
       imageSize = preferences.activeBackgroundSize;
     }
 
+    return SizedBox(width: windowHeight * 0.6 * imageSize, child: background);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final windowHeight = MediaQuery.of(context).size.height;
+
     return SizedBox(
       width: windowHeight * 0.6,
       height: windowHeight * 0.6,
       child: Stack(
         alignment: Alignment.center,
-        children: [
-          SizedBox(width: windowHeight * 0.6 * imageSize, child: background),
-          _buildText(context)
-        ],
+        children: [_buildImage(context), _buildText(context)],
       ),
     );
   }

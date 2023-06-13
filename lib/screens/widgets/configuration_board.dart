@@ -207,9 +207,9 @@ class ConfigurationBoard extends StatelessWidget {
               await appPreferences.setPauseBackgroundImagePath(filename),
           onSizeChanged: (direction) {
             if (direction == PlusOrMinusSelection.plus) {
-              appPreferences.pauseBackgroundSize += 0.1;
+              appPreferences.pauseBackgroundSize += 0.05;
             } else {
-              appPreferences.pauseBackgroundSize -= 0.1;
+              appPreferences.pauseBackgroundSize -= 0.05;
             }
           },
         ),
