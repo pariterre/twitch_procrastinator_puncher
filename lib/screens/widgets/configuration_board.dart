@@ -185,18 +185,34 @@ class ConfigurationBoard extends StatelessWidget {
     return Column(
       children: [
         FileSelectorTile(
-            title: 'Active image',
-            path: appPreferences.activeBackgroundImagePath,
-            isImage: true,
-            selectFileCallback: (filename) async =>
-                await appPreferences.setActiveBackgroundImagePath(filename)),
+          title: 'Active image',
+          path: appPreferences.activeBackgroundImagePath,
+          isImage: true,
+          selectFileCallback: (filename) async =>
+              await appPreferences.setActiveBackgroundImagePath(filename),
+          onSizeChanged: (direction) {
+            if (direction == PlusOrMinusSelection.plus) {
+              appPreferences.activeBackgroundSize += 0.1;
+            } else {
+              appPreferences.activeBackgroundSize -= 0.1;
+            }
+          },
+        ),
         SizedBox(height: padding * 0.5),
         FileSelectorTile(
-            title: 'Paused image',
-            path: appPreferences.pauseBackgroundImagePath,
-            isImage: true,
-            selectFileCallback: (filename) async =>
-                await appPreferences.setPauseBackgroundImagePath(filename)),
+          title: 'Paused image',
+          path: appPreferences.pauseBackgroundImagePath,
+          isImage: true,
+          selectFileCallback: (filename) async =>
+              await appPreferences.setPauseBackgroundImagePath(filename),
+          onSizeChanged: (direction) {
+            if (direction == PlusOrMinusSelection.plus) {
+              appPreferences.pauseBackgroundSize += 0.1;
+            } else {
+              appPreferences.pauseBackgroundSize -= 0.1;
+            }
+          },
+        ),
         SizedBox(height: padding * 0.5),
         FileSelectorTile(
             title: 'Alarm end of active session',

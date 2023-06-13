@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:twitch_pomorodo_timer/models/app_theme.dart';
 import 'package:twitch_pomorodo_timer/providers/app_preferences.dart';
+import 'package:twitch_pomorodo_timer/widgets/plus_or_minus.dart';
 
 class FileSelectorTile extends StatelessWidget {
   const FileSelectorTile({
@@ -16,6 +17,7 @@ class FileSelectorTile extends StatelessWidget {
     this.tooltipText,
     this.isImage = false,
     this.isSound = false,
+    this.onSizeChanged,
   });
 
   final String title;
@@ -24,6 +26,7 @@ class FileSelectorTile extends StatelessWidget {
   final bool isImage;
   final bool isSound;
   final Function(String?) selectFileCallback;
+  final Function(PlusOrMinusSelection)? onSizeChanged;
 
   Future<void> _pickFile(context) async {
     final List<String> extensions = [];
@@ -105,6 +108,13 @@ class FileSelectorTile extends StatelessWidget {
                   height: windowHeight * 0.045,
                   width: windowHeight * 0.045,
                   child: Image.file(File(path!))),
+            if (isImage && path != null && onSizeChanged != null)
+              // Show a thumbnail
+              SizedBox(
+                  width: windowHeight * 0.04,
+                  child: PlusOrMinus(
+                    onTap: onSizeChanged!,
+                  )),
             if (isSound && path != null)
               SizedBox(
                   height: windowHeight * 0.045,
@@ -122,22 +132,23 @@ class FileSelectorTile extends StatelessWidget {
               child: InkWell(
                 onTap: () => _pickFile(context),
                 child: const Icon(
-                  Icons.file_download,
+                  Icons.file_open,
                   color: Colors.amber,
                 ),
               ),
             ),
-            SizedBox(
-              height: windowHeight * 0.045,
-              width: windowHeight * 0.045,
-              child: InkWell(
-                onTap: () => selectFileCallback(null),
-                child: const Icon(
-                  Icons.delete,
-                  color: Colors.red,
+            if (path != null)
+              SizedBox(
+                height: windowHeight * 0.045,
+                width: windowHeight * 0.045,
+                child: InkWell(
+                  onTap: () => selectFileCallback(null),
+                  child: const Icon(
+                    Icons.delete,
+                    color: Colors.red,
+                  ),
                 ),
               ),
-            ),
           ],
         )
       ],

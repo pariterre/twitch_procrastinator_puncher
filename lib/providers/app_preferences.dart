@@ -63,6 +63,13 @@ class AppPreferences with ChangeNotifier {
     _save();
   }
 
+  double _activeBackgroundSize;
+  double get activeBackgroundSize => _activeBackgroundSize;
+  set activeBackgroundSize(double value) {
+    _activeBackgroundSize = value;
+    _save();
+  }
+
   // Background image during the pause
   String? _pauseBackgroundImageFilename;
   String? get pauseBackgroundImagePath => _pauseBackgroundImageFilename == null
@@ -74,6 +81,13 @@ class AppPreferences with ChangeNotifier {
     } else {
       _pauseBackgroundImageFilename = await _copyFile(original: value);
     }
+    _save();
+  }
+
+  double _pauseBackgroundSize;
+  double get pauseBackgroundSize => _pauseBackgroundSize;
+  set pauseBackgroundSize(double value) {
+    _pauseBackgroundSize = value;
     _save();
   }
 
@@ -253,8 +267,10 @@ class AppPreferences with ChangeNotifier {
         directory: directory,
         activeBackgroundImageFilename:
             previousPreferences?['activeBackgroundImageFilename'],
+        activeBackgroundSize: previousPreferences?['activeBackgroundSize'] ?? 1,
         pauseBackgroundImageFilename:
             previousPreferences?['pauseBackgroundImageFilename'],
+        pauseBackgroundSize: previousPreferences?['pauseBackgroundSize'] ?? 1,
         endActiveSessionSoundFilename:
             previousPreferences?['endActiveSessionSoundFilename'],
         endPauseSessionSoundFilename:
@@ -303,7 +319,9 @@ class AppPreferences with ChangeNotifier {
     required Duration pauseDuration,
     required Directory directory,
     required String? activeBackgroundImageFilename,
+    required double activeBackgroundSize,
     required String? pauseBackgroundImageFilename,
+    required double pauseBackgroundSize,
     required String? endActiveSessionSoundFilename,
     required String? endPauseSessionSoundFilename,
     required String? endWorkingSoundFilename,
@@ -336,7 +354,9 @@ class AppPreferences with ChangeNotifier {
         _pauseDuration = pauseDuration,
         saveDirectory = directory,
         _activeBackgroundImageFilename = activeBackgroundImageFilename,
+        _activeBackgroundSize = activeBackgroundSize,
         _pauseBackgroundImageFilename = pauseBackgroundImageFilename,
+        _pauseBackgroundSize = pauseBackgroundSize,
         _endActiveSessionSoundFilename = endActiveSessionSoundFilename,
         _endPauseSessionSoundFilename = endPauseSessionSoundFilename,
         _endWorkingSoundFilename = endWorkingSoundFilename,
@@ -390,7 +410,9 @@ class AppPreferences with ChangeNotifier {
         'sessionTime': _sessionDuration.inSeconds,
         'pauseDuration': _pauseDuration.inSeconds,
         'activeBackgroundImageFilename': _activeBackgroundImageFilename,
+        'activeBackgroundSize': _activeBackgroundSize,
         'pauseBackgroundImageFilename': _pauseBackgroundImageFilename,
+        'pauseBackgroundSize': _pauseBackgroundSize,
         'endActiveSessionSoundFilename': _endActiveSessionSoundFilename,
         'endPauseSessionSoundFilename': _endPauseSessionSoundFilename,
         'endWorkingSoundFilename': _endWorkingSoundFilename,

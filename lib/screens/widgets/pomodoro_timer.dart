@@ -71,19 +71,25 @@ class PomodoroTimer extends StatelessWidget {
     final pomodoro = PomodoroStatus.of(context);
 
     Widget background = Container();
+    double imageSize = 1;
     if (pomodoro.stopWatchStatus == StopWatchStatus.inPauseSession &&
         preferences.pauseBackgroundImagePath != null) {
       background = Image.file(File(preferences.pauseBackgroundImagePath!));
+      imageSize = preferences.pauseBackgroundSize;
     } else if (preferences.activeBackgroundImagePath != null) {
       background = Image.file(File(preferences.activeBackgroundImagePath!));
+      imageSize = preferences.activeBackgroundSize;
     }
 
     return SizedBox(
-      height: windowHeight * 0.6,
       width: windowHeight * 0.6,
+      height: windowHeight * 0.6,
       child: Stack(
         alignment: Alignment.center,
-        children: [background, _buildText(context)],
+        children: [
+          SizedBox(width: windowHeight * 0.6 * imageSize, child: background),
+          _buildText(context)
+        ],
       ),
     );
   }
