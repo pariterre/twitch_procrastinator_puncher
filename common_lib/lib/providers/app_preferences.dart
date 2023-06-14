@@ -227,7 +227,7 @@ class AppPreferences with ChangeNotifier {
   void _save() async {
     if (!kIsWeb) {
       final file = File(_savePath);
-      await file.writeAsString(json.encode(_serializePreferences));
+      await file.writeAsString(json.encode(serialize()));
     }
     notifyListeners();
   }
@@ -413,7 +413,7 @@ class AppPreferences with ChangeNotifier {
 
   ///
   /// Serialize all the values
-  Map<String, dynamic> get _serializePreferences => {
+  Map<String, dynamic> serialize() => {
         'nbSessions': _nbSessions,
         'sessionTime': _sessionDuration.inSeconds,
         'pauseDuration': _pauseDuration.inSeconds,
@@ -450,4 +450,59 @@ class AppPreferences with ChangeNotifier {
         'textHallOfFameTotal': textHallOfFameTotal.serialize(),
         'lastVisitedDirectory': _lastVisitedDirectory.path,
       };
+
+  void deserialize(map, {bool updateOnly = false}) {
+    nbSessions = map['nbSessions'];
+    sessionDuration = Duration(seconds: map['sessionTime']);
+    pauseDuration = Duration(seconds: map['pauseDuration']);
+    // directory =  directory;
+    // activeBackgroundImageFilename = map['activeBackgroundImageFilename'];
+    activeBackgroundSize = map['activeBackgroundSize'];
+    // pauseBackgroundImageFilename = map['pauseBackgroundImageFilename'];
+    pauseBackgroundSize = map['pauseBackgroundSize'];
+    // endActiveSessionSoundFilename = map['endActiveSessionSoundFilename'];
+    // endPauseSessionSoundFilename = map['endPauseSessionSoundFilename'];
+    // endWorkingSoundFilename = map['endWorkingSoundFilename'];
+    backgroundColor = Color(map['backgroundColor']);
+    fontPomodoro = AppFonts.values[map['fontPomodoro']];
+    backgroundColorHallOfFame = Color(map['backgroundColorHallOfFame']);
+    textColorHallOfFame = Color(map['textColorHallOfFame']);
+    textDuringInitialization = TextOnPomodoro.deserialize(
+        map['textDuringInitialization'],
+        defaultText: '');
+    textDuringActiveSession = TextOnPomodoro.deserialize(
+        map['textDuringActiveSession'],
+        defaultText: '');
+    textDuringPauseSession = TextOnPomodoro.deserialize(
+        map['textDuringPauseSession'],
+        defaultText: '');
+    textDuringPause =
+        TextOnPomodoro.deserialize(map['textDuringPause'], defaultText: r'');
+    textDone = TextOnPomodoro.deserialize(map['textDone'], defaultText: '');
+    saveToTextFile = map['saveToTextFile'];
+    useHallOfFame = map['useHallOfFame'];
+    mustFollowForFaming = map['mustFollowForFaming'];
+    hallOfFameScrollVelocity = map['hallOfFameScrollVelocity'];
+    textNewcomersGreetings =
+        TextToChat.deserialize(map['textNewcomersGreetings'], defaultText: '');
+    textUserHasConnectedGreetings = TextToChat.deserialize(
+        map['textUserHasConnectedGreetings'],
+        defaultText: '');
+    textWhitelist =
+        PlainText.deserialize(map['textWhitelist'], defaultText: '');
+    textBlacklist =
+        PlainText.deserialize(map['textBlacklist'], defaultText: '');
+    fontHallOfFame = AppFonts.values[map['fontHallOfFame']];
+    textHallOfFameTitle =
+        PlainText.deserialize(map['textHallOfFameTitle'], defaultText: '');
+    textHallOfFameName =
+        PlainText.deserialize(map?['textHallOfFameName'], defaultText: '');
+    textHallOfFameToday =
+        PlainText.deserialize(map['textHallOfFameToday'], defaultText: '');
+    textHallOfFameAlltime =
+        PlainText.deserialize(map['textHallOfFameAlltime'], defaultText: '');
+    textHallOfFameTotal =
+        PlainText.deserialize(map['textHallOfFameTotal'], defaultText: '');
+    //lastVisitedDirectory = Directory(map['lastVisitedDirectory']);
+  }
 }

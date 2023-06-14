@@ -7,6 +7,7 @@ import 'package:common_lib/pomodoro_timer.dart';
 import 'package:common_lib/providers/app_preferences.dart';
 import 'package:common_lib/providers/participants.dart';
 import 'package:common_lib/providers/pomodoro_status.dart';
+import 'package:common_lib/widgets/web_socket_holders.dart';
 import 'package:flutter/material.dart';
 import 'package:twitch_manager/twitch_app_info.dart';
 import 'package:twitch_manager/twitch_manager.dart';
@@ -151,44 +152,47 @@ class _MainScreenState extends State<MainScreen> {
     final padding = ThemePadding.normal(context);
 
     final widget = Scaffold(
-      body: Container(
-        height: windowHeight,
-        decoration: BoxDecoration(color: ThemeColor().background),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            FutureBuilder(
-                future: managerFactory,
-                builder: (context, snapshot) {
-                  if (_twitchManager == null && snapshot.hasData) {
-                    _setTwitchManager(snapshot.data);
-                  }
+      body: WebSocketServerHolder(
+        child: Container(
+          height: windowHeight,
+          decoration: BoxDecoration(color: ThemeColor().background),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              FutureBuilder(
+                  future: managerFactory,
+                  builder: (context, snapshot) {
+                    if (_twitchManager == null && snapshot.hasData) {
+                      _setTwitchManager(snapshot.data);
+                    }
 
-                  return ConfigurationBoard(
-                    startTimerCallback: _startTimer,
-                    pauseTimerCallback: _pauseTimer,
-                    resetTimerCallback: _resetTimer,
-                    gainFocusCallback: (hasFocus) {
-                      _statusWithFocus = hasFocus;
-                      if (isInitialized) setState(() {});
-                    },
-                    connectToTwitch: _connectToTwitch,
-                    twitchStatus: !snapshot.hasData
-                        ? TwitchStatus.initializing
-                        : _twitchManager != null && _twitchManager!.isConnected
-                            ? TwitchStatus.connected
-                            : TwitchStatus.notConnected,
-                  );
-                }),
-            Column(
-              children: [
-                SizedBox(height: padding),
-                PomodoroTimer(textWithFocus: _statusWithFocus),
-                SizedBox(height: padding),
-                if (preferences.useHallOfFame) const HallOfFame(),
-              ],
-            ),
-          ],
+                    return ConfigurationBoard(
+                      startTimerCallback: _startTimer,
+                      pauseTimerCallback: _pauseTimer,
+                      resetTimerCallback: _resetTimer,
+                      gainFocusCallback: (hasFocus) {
+                        _statusWithFocus = hasFocus;
+                        if (isInitialized) setState(() {});
+                      },
+                      connectToTwitch: _connectToTwitch,
+                      twitchStatus: !snapshot.hasData
+                          ? TwitchStatus.initializing
+                          : _twitchManager != null &&
+                                  _twitchManager!.isConnected
+                              ? TwitchStatus.connected
+                              : TwitchStatus.notConnected,
+                    );
+                  }),
+              Column(
+                children: [
+                  SizedBox(height: padding),
+                  PomodoroTimer(textWithFocus: _statusWithFocus),
+                  SizedBox(height: padding),
+                  if (preferences.useHallOfFame) const HallOfFame(),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

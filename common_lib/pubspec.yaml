@@ -16,6 +16,7 @@ dependencies:
     path: ../plugins/twitch_manager
   google_fonts: ^4.0.4
   infinite_carousel: ^1.0.3
+  web_socket_client: ^0.1.0-dev.3
   cupertino_icons: ^1.0.2
 
 dev_dependencies:

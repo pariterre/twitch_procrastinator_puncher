@@ -4,6 +4,7 @@ import 'package:common_lib/models/app_theme.dart';
 import 'package:common_lib/pomodoro_timer.dart';
 import 'package:common_lib/providers/app_preferences.dart';
 import 'package:common_lib/providers/pomodoro_status.dart';
+import 'package:common_lib/widgets/web_socket_holders.dart';
 import 'package:flutter/material.dart';
 
 class MainScreen extends StatefulWidget {
@@ -67,21 +68,23 @@ class _MainScreenState extends State<MainScreen> {
 
     final widget = Scaffold(
       backgroundColor: ThemeColor().background.withOpacity(0),
-      body: SizedBox(
-        height: windowHeight,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Column(
-              children: [
-                SizedBox(height: padding),
-                const PomodoroTimer(
-                    textWithFocus: StopWatchStatus.initializing),
-                SizedBox(height: padding),
-                if (preferences.useHallOfFame) const HallOfFame(),
-              ],
-            ),
-          ],
+      body: WebSocketClientHolder(
+        child: SizedBox(
+          height: windowHeight,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Column(
+                children: [
+                  SizedBox(height: padding),
+                  const PomodoroTimer(
+                      textWithFocus: StopWatchStatus.initializing),
+                  SizedBox(height: padding),
+                  if (preferences.useHallOfFame) const HallOfFame(),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
