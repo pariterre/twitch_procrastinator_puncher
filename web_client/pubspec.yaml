@@ -1,0 +1,24 @@
+name: web_client
+description: This is the web client that connects to the main_program to update visual.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.3 <4.0.0'
+  
+dependencies:
+  flutter:
+    sdk: flutter
+  common_lib:
+    path: ../common_lib
+  provider: ^6.0.5
+  audioplayers: ^4.1.0
+  cupertino_icons: ^1.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+  
+flutter:
+  uses-material-design: true

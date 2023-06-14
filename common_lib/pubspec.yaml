@@ -1,0 +1,27 @@
+name: common_lib
+description: Common library between web_client and main_program.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.3 <4.0.0'
+  
+dependencies:
+  flutter:
+    sdk: flutter
+  path: ^1.8.3
+  path_provider: ^2.0.15
+  provider: ^6.0.5
+  twitch_manager:
+    path: ../plugins/twitch_manager
+  google_fonts: ^4.0.4
+  infinite_carousel: ^1.0.3
+  cupertino_icons: ^1.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true

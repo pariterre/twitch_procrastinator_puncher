@@ -1,0 +1,48 @@
+import 'package:common_lib/models/app_theme.dart';
+import 'package:flutter/material.dart';
+
+class DropMenuSelectorTile<T> extends StatelessWidget {
+  const DropMenuSelectorTile({
+    super.key,
+    required this.title,
+    required this.value,
+    required this.items,
+    required this.onChanged,
+  });
+
+  final String title;
+  final T value;
+  final List<DropdownMenuItem<T>>? items;
+  final Function(T?)? onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final padding = ThemePadding.normal(context);
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          'Font',
+          style: TextStyle(
+              color: ThemeColor().configurationText,
+              fontWeight: FontWeight.bold),
+        ),
+        SizedBox(
+          width: padding,
+        ),
+        Flexible(
+          child: Container(
+            decoration: const BoxDecoration(color: Colors.white),
+            child: DropdownButtonFormField<T>(
+                value: value,
+                style: const TextStyle(color: Colors.black),
+                dropdownColor: Colors.white,
+                items: items,
+                onChanged: onChanged),
+          ),
+        ),
+      ],
+    );
+  }
+}
