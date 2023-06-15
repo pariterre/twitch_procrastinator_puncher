@@ -39,6 +39,34 @@ class PreferencedInt extends PreferencedElement {
   }
 }
 
+class PreferencedDuration extends PreferencedElement {
+  @override
+  PreferencedDuration(this._value);
+
+  void set(Duration value) {
+    this.value = value;
+  }
+
+  int serialize() {
+    return _value.inSeconds;
+  }
+
+  static PreferencedDuration deserialize(map, [int defaultValue = 0]) =>
+      PreferencedDuration(Duration(seconds: map ?? defaultValue));
+
+  Duration _value;
+  Duration get value => _value;
+  set value(Duration value) {
+    _value = value;
+    if (onChanged != null) onChanged!();
+  }
+
+  @override
+  String toString() {
+    return _value.toString();
+  }
+}
+
 class PreferencedText extends PreferencedElement {
   String _text;
   Color _color;

@@ -31,20 +31,8 @@ class AppPreferences with ChangeNotifier {
   PreferencedInt nbSessions;
 
   // Session time
-  Duration _sessionDuration;
-  Duration get sessionDuration => _sessionDuration;
-  set sessionDuration(Duration value) {
-    _sessionDuration = value;
-    _save();
-  }
-
-  // Pause time
-  Duration _pauseDuration;
-  Duration get pauseDuration => _pauseDuration;
-  set pauseDuration(Duration value) {
-    _pauseDuration = value;
-    _save();
-  }
+  PreferencedDuration sessionDuration;
+  PreferencedDuration pauseDuration;
 
   // Background image during the countdown
   String? _activeBackgroundImageFilename;
@@ -266,10 +254,10 @@ class AppPreferences with ChangeNotifier {
     return AppPreferences._(
         nbSessions:
             PreferencedInt.deserialize(previousPreferences?['nbSessions'], 0),
-        sessionDuration:
-            Duration(seconds: previousPreferences?['sessionTime'] ?? 0),
-        pauseDuration:
-            Duration(seconds: previousPreferences?['pauseDuration'] ?? 0),
+        sessionDuration: PreferencedDuration.deserialize(
+            previousPreferences?['sessionDuration'], 0),
+        pauseDuration: PreferencedDuration.deserialize(
+            previousPreferences?['pauseDuration'], 0),
         directory: directory,
         activeBackgroundImageFilename:
             previousPreferences?['activeBackgroundImageFilename'],
@@ -324,8 +312,8 @@ class AppPreferences with ChangeNotifier {
 
   AppPreferences._({
     required this.nbSessions,
-    required Duration sessionDuration,
-    required Duration pauseDuration,
+    required this.sessionDuration,
+    required this.pauseDuration,
     required Directory directory,
     required String? activeBackgroundImageFilename,
     required double activeBackgroundSize,
@@ -358,9 +346,7 @@ class AppPreferences with ChangeNotifier {
     required this.textHallOfFameAlltime,
     required this.textHallOfFameTotal,
     required Directory lastVisitedDirectory,
-  })  : _sessionDuration = sessionDuration,
-        _pauseDuration = pauseDuration,
-        _saveDirectory = directory,
+  })  : _saveDirectory = directory,
         _activeBackgroundImageFilename = activeBackgroundImageFilename,
         _activeBackgroundSize = activeBackgroundSize,
         _pauseBackgroundImageFilename = pauseBackgroundImageFilename,
@@ -380,6 +366,8 @@ class AppPreferences with ChangeNotifier {
         _lastVisitedDirectory = lastVisitedDirectory {
     // Set the necessary callback
     nbSessions.onChanged = _save;
+    sessionDuration.onChanged = _save;
+    pauseDuration.onChanged = _save;
     textDuringInitialization.onChanged = _save;
     textDuringActiveSession.onChanged = _save;
     textDuringPauseSession.onChanged = _save;
@@ -417,8 +405,8 @@ class AppPreferences with ChangeNotifier {
   Map<String, dynamic> serialize() => {
         'directory': saveDirectory.path,
         'nbSessions': nbSessions.serialize(),
-        'sessionTime': _sessionDuration.inSeconds,
-        'pauseDuration': _pauseDuration.inSeconds,
+        'sessionDuration': sessionDuration.serialize(),
+        'pauseDuration': pauseDuration.serialize(),
         'activeBackgroundImageFilename': _activeBackgroundImageFilename,
         'activeBackgroundSize': _activeBackgroundSize,
         'pauseBackgroundImageFilename': _pauseBackgroundImageFilename,
@@ -454,9 +442,9 @@ class AppPreferences with ChangeNotifier {
       };
 
   void updateFromSerialized(map) {
-    nbSessions = map['nbSessions'];
-    sessionDuration = Duration(seconds: map['sessionTime']);
-    pauseDuration = Duration(seconds: map['pauseDuration']);
+    nbSessions = PreferencedInt.deserialize(map['nbSessions']);
+    sessionDuration = PreferencedDuration.deserialize(map['sessionDuration']);
+    pauseDuration = PreferencedDuration.deserialize(map['pauseDuration']);
     _saveDirectory = Directory(map['directory']);
     _activeBackgroundImageFilename = map['activeBackgroundImageFilename'];
     activeBackgroundSize = map['activeBackgroundSize'];

@@ -1,5 +1,6 @@
 import 'package:common_lib/models/app_theme.dart';
 import 'package:common_lib/models/helpers.dart';
+import 'package:common_lib/models/preferenced_element.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -45,7 +46,7 @@ class TimeSelectorTile extends StatefulWidget {
   });
 
   final String title;
-  final Duration initialValue;
+  final PreferencedDuration initialValue;
   final Function(Duration value) onValidChange;
 
   @override
@@ -54,7 +55,7 @@ class TimeSelectorTile extends StatefulWidget {
 
 class _TimeSelectorTileState extends State<TimeSelectorTile> {
   late final _controller =
-      TextEditingController(text: durationAsString(widget.initialValue));
+      TextEditingController(text: durationAsString(widget.initialValue.value));
 
   @override
   Widget build(BuildContext context) {

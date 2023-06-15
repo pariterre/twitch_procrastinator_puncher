@@ -159,7 +159,9 @@ class ConfigurationBoard extends StatelessWidget {
           initialValue:
               AppPreferences.of(context, listen: false).sessionDuration,
           onValidChange: (value) {
-            AppPreferences.of(context, listen: false).sessionDuration = value;
+            AppPreferences.of(context, listen: false)
+                .sessionDuration
+                .set(value);
             PomodoroStatus.of(context, listen: false).focusSessionDuration =
                 value;
           },
@@ -169,7 +171,7 @@ class ConfigurationBoard extends StatelessWidget {
           title: 'Pause duration (mm:ss)',
           initialValue: AppPreferences.of(context, listen: false).pauseDuration,
           onValidChange: (value) {
-            AppPreferences.of(context, listen: false).pauseDuration = value;
+            AppPreferences.of(context, listen: false).pauseDuration.set(value);
             PomodoroStatus.of(context, listen: false).pauseSessionDuration =
                 value;
           },

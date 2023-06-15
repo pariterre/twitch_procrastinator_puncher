@@ -81,16 +81,16 @@ class PomodoroStatus with ChangeNotifier {
   ///
   /// Reset the counter
   void reset({
-    required PreferencedInt nbSession,
-    required Duration focusSessionDuration,
-    required Duration pauseSessionDuration,
+    required PreferencedInt nbSessions,
+    required PreferencedDuration focusSessionDuration,
+    required PreferencedDuration pauseSessionDuration,
     bool notify = true,
   }) {
     // Reset all the internal states
-    _nbSessions = nbSession.value;
+    _nbSessions = nbSessions.value;
     _currentSession = 0;
-    _focusSessionDuration = focusSessionDuration;
-    _pauseSessionDuration = pauseSessionDuration;
+    _focusSessionDuration = focusSessionDuration.value;
+    _pauseSessionDuration = pauseSessionDuration.value;
 
     _stopWatchStatus = StopWatchStatus.initializing;
     _timer = Duration(seconds: _focusSessionDuration.inSeconds);

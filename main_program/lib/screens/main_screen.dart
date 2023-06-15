@@ -64,11 +64,9 @@ class _MainScreenState extends State<MainScreen> {
     final pomodoro = PomodoroStatus.of(context, listen: false);
     final appPreferences = AppPreferences.of(context, listen: false);
     pomodoro.reset(
-      nbSession: appPreferences.nbSessions,
-      focusSessionDuration:
-          Duration(seconds: appPreferences.sessionDuration.inSeconds),
-      pauseSessionDuration:
-          Duration(seconds: appPreferences.pauseDuration.inSeconds),
+      nbSessions: appPreferences.nbSessions,
+      focusSessionDuration: appPreferences.sessionDuration,
+      pauseSessionDuration: appPreferences.pauseDuration,
       notify: !preventFromNotifying,
     );
     _statusWithFocus = StopWatchStatus.initializing;
