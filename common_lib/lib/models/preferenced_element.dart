@@ -65,7 +65,7 @@ class PreferencedText extends PreferencedElement {
   static PreferencedText deserialize(Map<String, dynamic>? map,
       [String defaultValue = '']) {
     final text = map?['text'] ?? defaultValue;
-    final color = Color(map?['color'] ?? 0xFFFFFFFF);
+    final color = Color(map?['color'] ?? 0xFF000000);
     return PreferencedText(text, color: color);
   }
 

@@ -283,12 +283,12 @@ class AppPreferences with ChangeNotifier {
             previousPreferences?['endPauseSessionSoundFilename'],
         endWorkingSoundFilename:
             previousPreferences?['endWorkingSoundFilename'],
-        backgroundColor: previousPreferences?['backgroundColor'] ?? 0xFF00FF00,
+        backgroundColor: previousPreferences?['backgroundColor'] ?? 0xFFFFFFFF,
         fontPomodoro: previousPreferences?['fontPomodoro'] ?? 0,
         backgroundColorHallOfFame:
             previousPreferences?['backgroundColorHallOfFame'] ?? 0xFF2D4AA8,
         textColorHallOfFame:
-            previousPreferences?['textColorHallOfFame'] ?? 0xFFFFFFFF,
+            previousPreferences?['textColorHallOfFame'] ?? 0xFF000000,
         textDuringInitialization: TextOnPomodoro.deserialize(
             previousPreferences?['textDuringInitialization'], 'Welcome!'),
         textDuringActiveSession: TextOnPomodoro.deserialize(
