@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:common_lib/models/config.dart';
@@ -6,8 +7,9 @@ import 'package:common_lib/providers/app_preferences.dart';
 import 'package:common_lib/providers/pomodoro_status.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:web_socket_client/web_socket_client.dart' as ws;
 
-class PomodoroTimer extends StatelessWidget {
+class PomodoroTimer extends StatefulWidget {
   const PomodoroTimer({
     super.key,
     required this.textWithFocus,
@@ -16,11 +18,16 @@ class PomodoroTimer extends StatelessWidget {
   // This is so during initialization phase, one can see what they are modifying
   final StopWatchStatus textWithFocus;
 
+  @override
+  State<PomodoroTimer> createState() => _PomodoroTimerState();
+}
+
+class _PomodoroTimerState extends State<PomodoroTimer> {
   StopWatchStatus _statusToShow(context) {
     final pomodoro = PomodoroStatus.of(context);
 
     return pomodoro.stopWatchStatus == StopWatchStatus.initializing
-        ? textWithFocus
+        ? widget.textWithFocus
         : pomodoro.stopWatchStatus;
   }
 
@@ -70,6 +77,20 @@ class PomodoroTimer extends StatelessWidget {
     );
   }
 
+  Uint8List? imageBackground;
+
+  Future<Uint8List> coucou() async {
+    final channel = ws.WebSocket(Uri.parse('ws://localhost:9876'));
+    channel.messages.listen((message) {
+      final image = jsonDecode(jsonDecode(message)["bytes"]) as List;
+      imageBackground = Uint8List(image.length);
+      for (var i = 0; i < image.length; i++) {
+        imageBackground![i] = image[i];
+      }
+    });
+    return Uint8List(100);
+  }
+
   Widget _buildImage(context) {
     final windowHeight = MediaQuery.of(context).size.height;
     final preferences = AppPreferences.of(context);
@@ -77,15 +98,28 @@ class PomodoroTimer extends StatelessWidget {
     Widget background = Container();
     double imageSize = 1;
     final status = _statusToShow(context);
-    if (!kIsWeb &&
-        (status == StopWatchStatus.inPauseSession ||
-            status == StopWatchStatus.paused) &&
-        preferences.pauseBackgroundImagePath != null) {
-      background = Image.file(File(preferences.pauseBackgroundImagePath!));
-      imageSize = preferences.pauseBackgroundSize;
-    } else if (preferences.activeBackgroundImagePath != null) {
-      background = Image.file(File(preferences.activeBackgroundImagePath!));
-      imageSize = preferences.activeBackgroundSize;
+
+    if (kIsWeb) {
+      background = FutureBuilder(
+        future: coucou(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) return Container();
+          return imageBackground == null
+              ? Container()
+              : Image.memory(imageBackground!);
+        },
+      );
+    }
+    if (!kIsWeb) {
+      if ((status == StopWatchStatus.inPauseSession ||
+              status == StopWatchStatus.paused) &&
+          preferences.pauseBackgroundImagePath != null) {
+        background = Image.file(File(preferences.pauseBackgroundImagePath!));
+        imageSize = preferences.pauseBackgroundSize;
+      } else if (preferences.activeBackgroundImagePath != null) {
+        background = Image.file(File(preferences.activeBackgroundImagePath!));
+        imageSize = preferences.activeBackgroundSize;
+      }
     }
 
     return SizedBox(width: windowHeight * 0.6 * imageSize, child: background);

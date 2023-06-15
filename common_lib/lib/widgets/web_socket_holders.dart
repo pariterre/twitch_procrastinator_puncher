@@ -57,14 +57,51 @@ class WebSocketServerHolder extends StatefulWidget {
 
 class _WebSocketServerHolderState extends State<WebSocketServerHolder> {
   WebSocket? _socket;
+  WebSocket? _webServer;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    initializedWebsocket();
+    _initializedWebSocket();
+    _initializeWebServer();
   }
 
-  void initializedWebsocket() async {
+  void coucou(Socket socket) {
+    socket.listen((data) async {
+      // final answerAsString = String.fromCharCodes(data).trim().split('\r\n');
+      // for (final coucou in answerAsString) {
+      //   debugPrint(coucou);
+      // }
+
+      final preferences = AppPreferences.of(context, listen: false);
+      final image = File(preferences.activeBackgroundImagePath!);
+      final bytes = await image.readAsBytes();
+      debugPrint('Received GET request');
+      socket.write('HTTP/1.1 200 OK\nContent-Type: text\n'
+          'Content-Length: ${bytes.length}\n'
+          '\n'
+          '$bytes');
+    });
+  }
+
+  void _initializeWebServer() async {
+    if (_webServer != null) return;
+    // _webServer = await ServerSocket.bind('localhost', 9876);
+    // _webServer!.listen(coucou);
+
+    var webSocketTransformer = WebSocketTransformer();
+    HttpServer server = await HttpServer.bind(InternetAddress.anyIPv6, 9876);
+    server.transform(webSocketTransformer).listen((WebSocket webSocket) async {
+      _webServer = webSocket;
+      final preferences = AppPreferences.of(context, listen: false);
+      final image = File(preferences.activeBackgroundImagePath!);
+      final bytes = await image.readAsBytes();
+      debugPrint('Received GET request');
+      webSocket.add(jsonEncode({"bytes": bytes.toString()}));
+    });
+  }
+
+  void _initializedWebSocket() async {
     if (_socket != null) return;
 
     var webSocketTransformer = WebSocketTransformer();
@@ -73,14 +110,14 @@ class _WebSocketServerHolderState extends State<WebSocketServerHolder> {
     server.transform(webSocketTransformer).listen((WebSocket webSocket) {
       log('Client has connected');
       _socket = webSocket;
-      _sendAll();
+      _sendAll(listen: false);
     });
   }
 
-  void _sendAll() {
-    final preferences = AppPreferences.of(context);
-    final participants = Participants.of(context);
-    final status = PomodoroStatus.of(context);
+  void _sendAll({listen = true}) {
+    final preferences = AppPreferences.of(context, listen: listen);
+    final participants = Participants.of(context, listen: listen);
+    final status = PomodoroStatus.of(context, listen: listen);
     _socket!.add(json.encode({
       'preferences': preferences.serialize(),
       'participants': participants.serialize(),
