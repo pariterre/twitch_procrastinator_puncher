@@ -4,6 +4,7 @@ import 'package:common_lib/models/config.dart';
 import 'package:common_lib/models/text_on_pomodoro.dart';
 import 'package:common_lib/providers/app_preferences.dart';
 import 'package:common_lib/providers/pomodoro_status.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class PomodoroTimer extends StatelessWidget {
@@ -76,7 +77,8 @@ class PomodoroTimer extends StatelessWidget {
     Widget background = Container();
     double imageSize = 1;
     final status = _statusToShow(context);
-    if ((status == StopWatchStatus.inPauseSession ||
+    if (!kIsWeb &&
+        (status == StopWatchStatus.inPauseSession ||
             status == StopWatchStatus.paused) &&
         preferences.pauseBackgroundImagePath != null) {
       background = Image.file(File(preferences.pauseBackgroundImagePath!));

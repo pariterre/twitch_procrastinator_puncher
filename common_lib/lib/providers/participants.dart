@@ -210,6 +210,13 @@ class Participants extends ChangeNotifier {
   Map<String, dynamic> serialize() =>
       {'participants': all.map((e) => e.serialize()).toList()};
 
+  void updateFromSerialized(map) {
+    all.clear();
+    for (final p in map['participants']) {
+      all.add(Participant.deserialize(p));
+    }
+  }
+
   ///
   /// Save the current participants list to a file
   Future<void> _save() async {

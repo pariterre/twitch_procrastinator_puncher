@@ -20,8 +20,10 @@ String get rootPath => Platform.isWindows ? r'C:\' : '/';
 
 class AppPreferences with ChangeNotifier {
   // Path to save data folder and file
-  final Directory saveDirectory;
+  Directory _saveDirectory;
+  Directory get saveDirectory => _saveDirectory;
   String get _savePath => _path(saveDirectory, preferencesFilename);
+
   Directory _lastVisitedDirectory = Directory('');
   Directory get lastVisitedDirectory => _lastVisitedDirectory;
 
@@ -360,7 +362,7 @@ class AppPreferences with ChangeNotifier {
   })  : _nbSessions = nbSessions,
         _sessionDuration = sessionDuration,
         _pauseDuration = pauseDuration,
-        saveDirectory = directory,
+        _saveDirectory = directory,
         _activeBackgroundImageFilename = activeBackgroundImageFilename,
         _activeBackgroundSize = activeBackgroundSize,
         _pauseBackgroundImageFilename = pauseBackgroundImageFilename,
@@ -414,6 +416,7 @@ class AppPreferences with ChangeNotifier {
   ///
   /// Serialize all the values
   Map<String, dynamic> serialize() => {
+        'directory': saveDirectory.path,
         'nbSessions': _nbSessions,
         'sessionTime': _sessionDuration.inSeconds,
         'pauseDuration': _pauseDuration.inSeconds,
@@ -451,18 +454,18 @@ class AppPreferences with ChangeNotifier {
         'lastVisitedDirectory': _lastVisitedDirectory.path,
       };
 
-  void deserialize(map, {bool updateOnly = false}) {
+  void updateFromSerialized(map) {
     nbSessions = map['nbSessions'];
     sessionDuration = Duration(seconds: map['sessionTime']);
     pauseDuration = Duration(seconds: map['pauseDuration']);
-    // directory =  directory;
-    // activeBackgroundImageFilename = map['activeBackgroundImageFilename'];
+    _saveDirectory = Directory(map['directory']);
+    _activeBackgroundImageFilename = map['activeBackgroundImageFilename'];
     activeBackgroundSize = map['activeBackgroundSize'];
-    // pauseBackgroundImageFilename = map['pauseBackgroundImageFilename'];
+    _pauseBackgroundImageFilename = map['pauseBackgroundImageFilename'];
     pauseBackgroundSize = map['pauseBackgroundSize'];
-    // endActiveSessionSoundFilename = map['endActiveSessionSoundFilename'];
-    // endPauseSessionSoundFilename = map['endPauseSessionSoundFilename'];
-    // endWorkingSoundFilename = map['endWorkingSoundFilename'];
+    _endActiveSessionSoundFilename = map['endActiveSessionSoundFilename'];
+    _endPauseSessionSoundFilename = map['endPauseSessionSoundFilename'];
+    _endWorkingSoundFilename = map['endWorkingSoundFilename'];
     backgroundColor = Color(map['backgroundColor']);
     fontPomodoro = AppFonts.values[map['fontPomodoro']];
     backgroundColorHallOfFame = Color(map['backgroundColorHallOfFame']);
@@ -503,6 +506,6 @@ class AppPreferences with ChangeNotifier {
         PlainText.deserialize(map['textHallOfFameAlltime'], defaultText: '');
     textHallOfFameTotal =
         PlainText.deserialize(map['textHallOfFameTotal'], defaultText: '');
-    //lastVisitedDirectory = Directory(map['lastVisitedDirectory']);
+    _lastVisitedDirectory = Directory(map['lastVisitedDirectory']);
   }
 }

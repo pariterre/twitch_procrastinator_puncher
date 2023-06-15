@@ -15,6 +15,7 @@ class PomodoroStatus with ChangeNotifier {
 
   int _currentSession = 0;
   int get currentSession => _currentSession;
+
   Duration _focusSessionDuration = const Duration();
   Duration get focusSessionDuration => _focusSessionDuration;
   set focusSessionDuration(Duration duration) {
@@ -102,6 +103,24 @@ class PomodoroStatus with ChangeNotifier {
   }
   static PomodoroStatus of(BuildContext context, {listen = true}) =>
       Provider.of<PomodoroStatus>(context, listen: listen);
+
+  Map<String, dynamic> serialize() => {
+        'nbSessions': nbSessions,
+        'currentSession': currentSession,
+        'focusSessionDuration': focusSessionDuration.inSeconds,
+        'pauseSessionDuration': pauseSessionDuration.inSeconds,
+        'stopWatchStatus': stopWatchStatus.index,
+        'timer': timer.inSeconds
+      };
+
+  void updateFromSerialized(map) {
+    nbSessions = map['nbSessions'];
+    _currentSession = map['currentSession'];
+    focusSessionDuration = Duration(seconds: map['focusSessionDuration']);
+    pauseSessionDuration = Duration(seconds: map['pauseSessionDuration']);
+    _stopWatchStatus = StopWatchStatus.values[map['stopWatchStatus']];
+    timer = Duration(seconds: map['timer']);
+  }
 
   // TIMER CALLBACK
   Function() sessionHasFinishedCallback;

@@ -3,6 +3,8 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:common_lib/providers/app_preferences.dart';
+import 'package:common_lib/providers/participants.dart';
+import 'package:common_lib/providers/pomodoro_status.dart';
 import 'package:flutter/material.dart';
 import 'package:web_socket_client/web_socket_client.dart' as ws;
 
@@ -28,8 +30,14 @@ class _WebSocketClientHolderState extends State<WebSocketClientHolder> {
     final channel = ws.WebSocket(Uri.parse(_serverUrl));
 
     channel.messages.listen((message) {
+      final map = jsonDecode(message);
+
       final preferences = AppPreferences.of(context, listen: false);
-      preferences.deserialize(jsonDecode(message), updateOnly: true);
+      final participants = Participants.of(context, listen: false);
+      final status = PomodoroStatus.of(context, listen: false);
+      preferences.updateFromSerialized(map['preferences']);
+      participants.updateFromSerialized(map['participants']);
+      status.updateFromSerialized(map['status']);
     });
   }
 
@@ -65,15 +73,24 @@ class _WebSocketServerHolderState extends State<WebSocketServerHolder> {
     server.transform(webSocketTransformer).listen((WebSocket webSocket) {
       log('Client has connected');
       _socket = webSocket;
+      _sendAll();
     });
+  }
+
+  void _sendAll() {
+    final preferences = AppPreferences.of(context);
+    final participants = Participants.of(context);
+    final status = PomodoroStatus.of(context);
+    _socket!.add(json.encode({
+      'preferences': preferences.serialize(),
+      'participants': participants.serialize(),
+      'status': status.serialize(),
+    }));
   }
 
   @override
   Widget build(BuildContext context) {
-    final preferences = AppPreferences.of(context);
-    if (_socket != null) {
-      _socket!.add(json.encode(preferences.serialize()));
-    }
+    if (_socket != null) _sendAll();
 
     return widget.child;
   }
