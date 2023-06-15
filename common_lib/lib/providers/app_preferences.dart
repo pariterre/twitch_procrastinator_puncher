@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:common_lib/models/app_fonts.dart';
 import 'package:common_lib/models/app_theme.dart';
 import 'package:common_lib/models/config.dart';
-import 'package:common_lib/models/text_on_pomodoro.dart';
+import 'package:common_lib/models/preferenced_element.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
@@ -28,12 +28,7 @@ class AppPreferences with ChangeNotifier {
   Directory get lastVisitedDirectory => _lastVisitedDirectory;
 
   // Number of total session
-  int _nbSessions;
-  int get nbSessions => _nbSessions;
-  set nbSessions(int value) {
-    _nbSessions = value;
-    _save();
-  }
+  PreferencedInt nbSessions;
 
   // Session time
   Duration _sessionDuration;
@@ -216,13 +211,13 @@ class AppPreferences with ChangeNotifier {
     _save();
   }
 
-  PlainText textWhitelist;
-  PlainText textBlacklist;
-  PlainText textHallOfFameTitle;
-  PlainText textHallOfFameName;
-  PlainText textHallOfFameToday;
-  PlainText textHallOfFameAlltime;
-  PlainText textHallOfFameTotal;
+  PreferencedText textWhitelist;
+  PreferencedText textBlacklist;
+  PreferencedText textHallOfFameTitle;
+  PreferencedText textHallOfFameName;
+  PreferencedText textHallOfFameToday;
+  PreferencedText textHallOfFameAlltime;
+  PreferencedText textHallOfFameTotal;
 
   ///
   /// Save the current preferences to a file
@@ -269,7 +264,8 @@ class AppPreferences with ChangeNotifier {
 
     // Call the real constructor
     return AppPreferences._(
-        nbSessions: previousPreferences?['nbSessions'] ?? 0,
+        nbSessions:
+            PreferencedInt.deserialize(previousPreferences?['nbSessions'], 0),
         sessionDuration:
             Duration(seconds: previousPreferences?['sessionTime'] ?? 0),
         pauseDuration:
@@ -294,37 +290,40 @@ class AppPreferences with ChangeNotifier {
         textColorHallOfFame:
             previousPreferences?['textColorHallOfFame'] ?? 0xFFFFFFFF,
         textDuringInitialization: TextOnPomodoro.deserialize(
-            previousPreferences?['textDuringInitialization'],
-            defaultText: 'Welcome!'),
+            previousPreferences?['textDuringInitialization'], 'Welcome!'),
         textDuringActiveSession: TextOnPomodoro.deserialize(
             previousPreferences?['textDuringActiveSession'],
-            defaultText: r'Session {currentSession}/{maxSessions}\n{timer}!'),
+            r'Session {currentSession}/{maxSessions}\n{timer}!'),
         textDuringPauseSession: TextOnPomodoro.deserialize(
-            previousPreferences?['textDuringPauseSession'],
-            defaultText: r'Pause\n{timer}!'),
-        textDuringPause: TextOnPomodoro.deserialize(previousPreferences?['textDuringPause'],
-            defaultText: r'Pause!'),
-        textDone: TextOnPomodoro.deserialize(previousPreferences?['textDone'],
-            defaultText: r'Congratulation!'),
+            previousPreferences?['textDuringPauseSession'], r'Pause\n{timer}!'),
+        textDuringPause: TextOnPomodoro.deserialize(
+            previousPreferences?['textDuringPause'], r'Pause!'),
+        textDone: TextOnPomodoro.deserialize(
+            previousPreferences?['textDone'], r'Congratulation!'),
         saveToTextFile: previousPreferences?['saveToTextFile'] ?? false,
         useHallOfFame: previousPreferences?['useHallOfFame'] ?? true,
-        mustFollowForFaming: previousPreferences?['mustFollowForFaming'] ?? true,
-        hallOfFameScrollVelocity: previousPreferences?['hallOfFameScrollVelocity'] ?? 2000,
-        textNewcomersGreetings: TextToChat.deserialize(previousPreferences?['textNewcomersGreetings'], defaultText: r'Welcome to {username} who has joined for the first time!'),
-        textUserHasConnectedGreetings: TextToChat.deserialize(previousPreferences?['textUserHasConnectedGreetings'], defaultText: r'Welcome back to {username} who has joined us!'),
-        textWhitelist: PlainText.deserialize(previousPreferences?['textWhitelist'], defaultText: r''),
-        textBlacklist: PlainText.deserialize(previousPreferences?['textBlacklist'], defaultText: r''),
+        mustFollowForFaming:
+            previousPreferences?['mustFollowForFaming'] ?? true,
+        hallOfFameScrollVelocity:
+            previousPreferences?['hallOfFameScrollVelocity'] ?? 2000,
+        textNewcomersGreetings: TextToChat.deserialize(
+            previousPreferences?['textNewcomersGreetings'],
+            r'Welcome to {username} who has joined for the first time!'),
+        textUserHasConnectedGreetings: TextToChat.deserialize(
+            previousPreferences?['textUserHasConnectedGreetings'], r'Welcome back to {username} who has joined us!'),
+        textWhitelist: PreferencedText.deserialize(previousPreferences?['textWhitelist']),
+        textBlacklist: PreferencedText.deserialize(previousPreferences?['textBlacklist']),
         fontHallOfFame: previousPreferences?['fontHallOfFame'] ?? 0,
-        textHallOfFameTitle: PlainText.deserialize(previousPreferences?['textHallOfFameTitle'], defaultText: r'Hall of fame'),
-        textHallOfFameName: PlainText.deserialize(previousPreferences?['textHallOfFameName'], defaultText: r'Name of the viewers'),
-        textHallOfFameToday: PlainText.deserialize(previousPreferences?['textHallOfFameToday'], defaultText: r'Today'),
-        textHallOfFameAlltime: PlainText.deserialize(previousPreferences?['textHallOfFameAlltime'], defaultText: r'All time'),
-        textHallOfFameTotal: PlainText.deserialize(previousPreferences?['textHallOfFameTotal'], defaultText: r'Total'),
+        textHallOfFameTitle: PreferencedText.deserialize(previousPreferences?['textHallOfFameTitle'], 'Hall of fame'),
+        textHallOfFameName: PreferencedText.deserialize(previousPreferences?['textHallOfFameName'], 'Name of the viewers'),
+        textHallOfFameToday: PreferencedText.deserialize(previousPreferences?['textHallOfFameToday'], 'Today'),
+        textHallOfFameAlltime: PreferencedText.deserialize(previousPreferences?['textHallOfFameAlltime'], 'All time'),
+        textHallOfFameTotal: PreferencedText.deserialize(previousPreferences?['textHallOfFameTotal'], 'Total'),
         lastVisitedDirectory: Directory(previousPreferences?['lastVisitedDirectory'] ?? directory.path));
   }
 
   AppPreferences._({
-    required int nbSessions,
+    required this.nbSessions,
     required Duration sessionDuration,
     required Duration pauseDuration,
     required Directory directory,
@@ -359,8 +358,7 @@ class AppPreferences with ChangeNotifier {
     required this.textHallOfFameAlltime,
     required this.textHallOfFameTotal,
     required Directory lastVisitedDirectory,
-  })  : _nbSessions = nbSessions,
-        _sessionDuration = sessionDuration,
+  })  : _sessionDuration = sessionDuration,
         _pauseDuration = pauseDuration,
         _saveDirectory = directory,
         _activeBackgroundImageFilename = activeBackgroundImageFilename,
@@ -381,19 +379,20 @@ class AppPreferences with ChangeNotifier {
         _fontHallOfFame = AppFonts.values[fontHallOfFame],
         _lastVisitedDirectory = lastVisitedDirectory {
     // Set the necessary callback
-    textDuringInitialization.saveCallback = _save;
-    textDuringActiveSession.saveCallback = _save;
-    textDuringPauseSession.saveCallback = _save;
-    textDuringPause.saveCallback = _save;
-    textDone.saveCallback = _save;
-    textNewcomersGreetings.saveCallback = _save;
-    textUserHasConnectedGreetings.saveCallback = _save;
-    textBlacklist.saveCallback = _save;
-    textHallOfFameTitle.saveCallback = _save;
-    textHallOfFameName.saveCallback = _save;
-    textHallOfFameToday.saveCallback = _save;
-    textHallOfFameAlltime.saveCallback = _save;
-    textHallOfFameTotal.saveCallback = _save;
+    nbSessions.onChanged = _save;
+    textDuringInitialization.onChanged = _save;
+    textDuringActiveSession.onChanged = _save;
+    textDuringPauseSession.onChanged = _save;
+    textDuringPause.onChanged = _save;
+    textDone.onChanged = _save;
+    textNewcomersGreetings.onChanged = _save;
+    textUserHasConnectedGreetings.onChanged = _save;
+    textBlacklist.onChanged = _save;
+    textHallOfFameTitle.onChanged = _save;
+    textHallOfFameName.onChanged = _save;
+    textHallOfFameToday.onChanged = _save;
+    textHallOfFameAlltime.onChanged = _save;
+    textHallOfFameTotal.onChanged = _save;
 
     // Force the repainting of the colors
     this.backgroundColor = _backgroundColor;
@@ -417,7 +416,7 @@ class AppPreferences with ChangeNotifier {
   /// Serialize all the values
   Map<String, dynamic> serialize() => {
         'directory': saveDirectory.path,
-        'nbSessions': _nbSessions,
+        'nbSessions': nbSessions.serialize(),
         'sessionTime': _sessionDuration.inSeconds,
         'pauseDuration': _pauseDuration.inSeconds,
         'activeBackgroundImageFilename': _activeBackgroundImageFilename,
@@ -470,42 +469,35 @@ class AppPreferences with ChangeNotifier {
     fontPomodoro = AppFonts.values[map['fontPomodoro']];
     backgroundColorHallOfFame = Color(map['backgroundColorHallOfFame']);
     textColorHallOfFame = Color(map['textColorHallOfFame']);
-    textDuringInitialization = TextOnPomodoro.deserialize(
-        map['textDuringInitialization'],
-        defaultText: '');
-    textDuringActiveSession = TextOnPomodoro.deserialize(
-        map['textDuringActiveSession'],
-        defaultText: '');
-    textDuringPauseSession = TextOnPomodoro.deserialize(
-        map['textDuringPauseSession'],
-        defaultText: '');
-    textDuringPause =
-        TextOnPomodoro.deserialize(map['textDuringPause'], defaultText: r'');
-    textDone = TextOnPomodoro.deserialize(map['textDone'], defaultText: '');
+    textDuringInitialization =
+        TextOnPomodoro.deserialize(map['textDuringInitialization']);
+    textDuringActiveSession =
+        TextOnPomodoro.deserialize(map['textDuringActiveSession']);
+    textDuringPauseSession =
+        TextOnPomodoro.deserialize(map['textDuringPauseSession']);
+    textDuringPause = TextOnPomodoro.deserialize(map['textDuringPause']);
+    textDone = TextOnPomodoro.deserialize(map['textDone']);
     saveToTextFile = map['saveToTextFile'];
     useHallOfFame = map['useHallOfFame'];
     mustFollowForFaming = map['mustFollowForFaming'];
     hallOfFameScrollVelocity = map['hallOfFameScrollVelocity'];
     textNewcomersGreetings =
-        TextToChat.deserialize(map['textNewcomersGreetings'], defaultText: '');
-    textUserHasConnectedGreetings = TextToChat.deserialize(
-        map['textUserHasConnectedGreetings'],
-        defaultText: '');
-    textWhitelist =
-        PlainText.deserialize(map['textWhitelist'], defaultText: '');
-    textBlacklist =
-        PlainText.deserialize(map['textBlacklist'], defaultText: '');
+        TextToChat.deserialize(map['textNewcomersGreetings']);
+    textUserHasConnectedGreetings =
+        TextToChat.deserialize(map['textUserHasConnectedGreetings']);
+    textWhitelist = PreferencedText.deserialize(map['textWhitelist']);
+    textBlacklist = PreferencedText.deserialize(map['textBlacklist']);
     fontHallOfFame = AppFonts.values[map['fontHallOfFame']];
     textHallOfFameTitle =
-        PlainText.deserialize(map['textHallOfFameTitle'], defaultText: '');
+        PreferencedText.deserialize(map['textHallOfFameTitle']);
     textHallOfFameName =
-        PlainText.deserialize(map?['textHallOfFameName'], defaultText: '');
+        PreferencedText.deserialize(map?['textHallOfFameName']);
     textHallOfFameToday =
-        PlainText.deserialize(map['textHallOfFameToday'], defaultText: '');
+        PreferencedText.deserialize(map['textHallOfFameToday']);
     textHallOfFameAlltime =
-        PlainText.deserialize(map['textHallOfFameAlltime'], defaultText: '');
+        PreferencedText.deserialize(map['textHallOfFameAlltime']);
     textHallOfFameTotal =
-        PlainText.deserialize(map['textHallOfFameTotal'], defaultText: '');
+        PreferencedText.deserialize(map['textHallOfFameTotal']);
     _lastVisitedDirectory = Directory(map['lastVisitedDirectory']);
   }
 }

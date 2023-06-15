@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:common_lib/models/preferenced_element.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -80,13 +81,13 @@ class PomodoroStatus with ChangeNotifier {
   ///
   /// Reset the counter
   void reset({
-    required int nbSession,
+    required PreferencedInt nbSession,
     required Duration focusSessionDuration,
     required Duration pauseSessionDuration,
     bool notify = true,
   }) {
     // Reset all the internal states
-    _nbSessions = nbSession;
+    _nbSessions = nbSession.value;
     _currentSession = 0;
     _focusSessionDuration = focusSessionDuration;
     _pauseSessionDuration = pauseSessionDuration;

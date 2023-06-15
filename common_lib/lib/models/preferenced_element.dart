@@ -3,20 +3,55 @@ import 'package:common_lib/models/helpers.dart';
 import 'package:common_lib/models/participant.dart';
 import 'package:common_lib/providers/pomodoro_status.dart';
 
-class PlainText {
+abstract class PreferencedElement {
+  PreferencedElement({this.onChanged});
+
+  Function()? onChanged;
+
+  static PreferencedElement deserialize() => throw UnimplementedError();
+}
+
+class PreferencedInt extends PreferencedElement {
+  @override
+  PreferencedInt(this._value);
+
+  void set(int value) {
+    this.value = value;
+  }
+
+  int serialize() {
+    return _value;
+  }
+
+  static PreferencedInt deserialize(map, [int defaultValue = 0]) =>
+      PreferencedInt(map ?? defaultValue);
+
+  int _value;
+  int get value => _value;
+  set value(int value) {
+    _value = value;
+    if (onChanged != null) onChanged!();
+  }
+
+  @override
+  String toString() {
+    return _value.toString();
+  }
+}
+
+class PreferencedText extends PreferencedElement {
   String _text;
   Color _color;
-  Function()? saveCallback;
 
   String get text => _text;
   set text(String value) {
     _text = value;
-    if (saveCallback != null) saveCallback!();
+    if (onChanged != null) onChanged!();
   }
 
-  PlainText({
-    required String text,
-    this.saveCallback,
+  PreferencedText(
+    String text, {
+    super.onChanged,
     required Color color,
   })  : _text = text,
         _color = color;
@@ -24,26 +59,21 @@ class PlainText {
   Color get color => _color;
   set color(Color value) {
     _color = value;
-    if (saveCallback != null) saveCallback!();
+    if (onChanged != null) onChanged!();
   }
 
-  static PlainText deserialize(
-    Map<String, dynamic>? map, {
-    required String defaultText,
-  }) {
-    final text = map?['text'] ?? defaultText;
+  static PreferencedText deserialize(Map<String, dynamic>? map,
+      [String defaultValue = '']) {
+    final text = map?['text'] ?? defaultValue;
     final color = Color(map?['color'] ?? 0xFFFFFFFF);
-    return PlainText(text: text, color: color);
+    return PreferencedText(text, color: color);
   }
 
-  Map<String, dynamic> serialize() => {
-        'text': _text,
-        'color': _color.value,
-      };
+  Map<String, dynamic> serialize() => {'text': _text, 'color': _color.value};
 }
 
-class TextToChat extends PlainText {
-  TextToChat({required super.text}) : super(color: Colors.white);
+class TextToChat extends PreferencedText {
+  TextToChat(String text) : super(text, color: Colors.white);
 
   String formattedText(BuildContext context, Participant participant) {
     return text
@@ -52,27 +82,26 @@ class TextToChat extends PlainText {
         .replaceAll(r'\n', '\n');
   }
 
-  static TextToChat deserialize(
-    Map<String, dynamic>? map, {
-    required String defaultText,
-  }) {
-    final text = map?['text'] ?? defaultText;
-    return TextToChat(text: text);
+  static TextToChat deserialize(Map<String, dynamic>? map,
+      [String defaultValue = '']) {
+    final text = map?['text'] ?? defaultValue;
+    return TextToChat(text);
   }
 }
 
-class TextOnPomodoro extends PlainText {
+class TextOnPomodoro extends PreferencedText {
   Offset _offset;
   double _size;
 
-  TextOnPomodoro({
-    required super.text,
+  TextOnPomodoro(
+    String text, {
     required Offset offset,
     required double size,
     required super.color,
-    super.saveCallback,
+    super.onChanged,
   })  : _offset = offset,
-        _size = size;
+        _size = size,
+        super(text);
 
   // Foreground text during active session
   String formattedText(BuildContext context) {
@@ -93,28 +122,23 @@ class TextOnPomodoro extends PlainText {
   Offset get offset => _offset;
   void addToOffset(Offset offset) {
     _offset += offset;
-    if (saveCallback != null) saveCallback!();
+    if (onChanged != null) onChanged!();
   }
 
   double get size => _size;
   void increaseSize(double value) {
     _size += value;
-    if (saveCallback != null) saveCallback!();
+    if (onChanged != null) onChanged!();
   }
 
-  static TextOnPomodoro deserialize(
-    Map<String, dynamic>? map, {
-    required String defaultText,
-  }) {
-    final text = map?['text'] ?? defaultText;
+  static TextOnPomodoro deserialize(Map<String, dynamic>? map,
+      [String defaultValue = '']) {
+    final text = map?['text'] ?? defaultValue;
     final offset = map?['offset'] ?? [0.0, 0.0];
     final size = map?['size'] ?? 1.0;
     final color = Color(map?['color'] ?? 0xFFFFFFFF);
-    return TextOnPomodoro(
-        text: text,
-        offset: Offset(offset[0], offset[1]),
-        size: size,
-        color: color);
+    return TextOnPomodoro(text,
+        offset: Offset(offset[0], offset[1]), size: size, color: color);
   }
 
   @override

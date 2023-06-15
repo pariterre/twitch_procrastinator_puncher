@@ -1,4 +1,5 @@
 import 'package:common_lib/models/app_theme.dart';
+import 'package:common_lib/models/preferenced_element.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -23,7 +24,7 @@ class IntSelectorTile extends StatefulWidget {
   });
 
   final String title;
-  final int initialValue;
+  final PreferencedInt initialValue;
   final Function(int value) onValidChange;
 
   @override

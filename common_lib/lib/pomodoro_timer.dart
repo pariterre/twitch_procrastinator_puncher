@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:common_lib/models/config.dart';
-import 'package:common_lib/models/text_on_pomodoro.dart';
+import 'package:common_lib/models/preferenced_element.dart';
 import 'package:common_lib/providers/app_preferences.dart';
 import 'package:common_lib/providers/pomodoro_status.dart';
 import 'package:flutter/foundation.dart';

@@ -1,7 +1,7 @@
 import 'package:arrow_pad/arrow_pad.dart';
 import 'package:common_lib/models/app_theme.dart';
 import 'package:common_lib/models/config.dart';
-import 'package:common_lib/models/text_on_pomodoro.dart';
+import 'package:common_lib/models/preferenced_element.dart';
 import 'package:common_lib/providers/app_preferences.dart';
 import 'package:common_lib/providers/participants.dart';
 import 'package:common_lib/providers/pomodoro_status.dart';
@@ -149,7 +149,7 @@ class ConfigurationBoard extends StatelessWidget {
           title: 'Number of sessions',
           initialValue: AppPreferences.of(context, listen: false).nbSessions,
           onValidChange: (value) {
-            AppPreferences.of(context, listen: false).nbSessions = value;
+            AppPreferences.of(context, listen: false).nbSessions.set(value);
             PomodoroStatus.of(context, listen: false).nbSessions = value;
           },
         ),
@@ -563,7 +563,7 @@ class ConfigurationBoard extends StatelessWidget {
   StringSelectorTile _buildStringSelectorTile(
     context, {
     required String title,
-    required PlainText plainText,
+    required PreferencedText plainText,
     StopWatchStatus? focus,
     Function()? onTextComplete,
     Color? initialColor,
