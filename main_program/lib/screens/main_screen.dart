@@ -153,7 +153,7 @@ class _MainScreenState extends State<MainScreen> {
       body: WebSocketServerHolder(
         child: Container(
           height: windowHeight,
-          decoration: BoxDecoration(color: ThemeColor().background),
+          decoration: BoxDecoration(color: preferences.backgroundColor.value),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [

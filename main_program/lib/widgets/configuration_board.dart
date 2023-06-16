@@ -71,12 +71,12 @@ class ConfigurationBoard extends StatelessWidget {
   }
 
   Widget _buildColorPickers(BuildContext context) {
-    final appPreferences = AppPreferences.of(context);
+    final preferences = AppPreferences.of(context);
 
     return ColorSelectorTile(
         title: 'Background color',
-        currentColor: ThemeColor().background,
-        onChanged: (color) => appPreferences.backgroundColor = color);
+        currentColor: preferences.backgroundColor.value,
+        onChanged: (color) => preferences.backgroundColor.set(color));
   }
 
   Widget _buildController(context) {
@@ -483,9 +483,9 @@ class ConfigurationBoard extends StatelessWidget {
         SizedBox(height: padding),
         ColorSelectorTile(
             title: 'Color of the hall of fame',
-            currentColor: ThemeColor().hallOfFame,
+            currentColor: preferences.backgroundColorHallOfFame.value,
             onChanged: (color) =>
-                preferences.backgroundColorHallOfFame = color),
+                preferences.backgroundColorHallOfFame.set(color)),
         SizedBox(height: padding),
         DropMenuSelectorTile<AppFonts>(
             title: 'Font',
@@ -506,7 +506,7 @@ class ConfigurationBoard extends StatelessWidget {
         SizedBox(height: padding),
         ColorSelectorTile(
             title: 'Text color on the hall of fame',
-            currentColor: ThemeColor().hallOfFameText,
+            currentColor: preferences.textColorHallOfFame,
             onChanged: (color) => preferences.textColorHallOfFame = color),
         SizedBox(height: padding),
         PlusOrMinusListTile(

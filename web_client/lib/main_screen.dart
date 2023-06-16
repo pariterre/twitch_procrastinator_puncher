@@ -67,7 +67,7 @@ class _MainScreenState extends State<MainScreen> {
     final padding = ThemePadding.normal(context);
 
     final widget = Scaffold(
-      backgroundColor: ThemeColor().background.withOpacity(0),
+      backgroundColor: preferences.backgroundColor.value.withOpacity(0),
       body: WebSocketClientHolder(
         child: SizedBox(
           height: windowHeight,

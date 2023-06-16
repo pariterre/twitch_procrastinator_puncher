@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:common_lib/models/app_fonts.dart';
-import 'package:common_lib/models/app_theme.dart';
 import 'package:common_lib/models/config.dart';
 import 'package:common_lib/models/preferenced_element.dart';
 import 'package:flutter/foundation.dart';
@@ -21,7 +20,6 @@ class AppPreferences with ChangeNotifier {
   // Path to save data folder and file
   Directory _saveDirectory;
   Directory get saveDirectory => _saveDirectory;
-  String get _savePath => _path(saveDirectory, preferencesFilename);
 
   Directory _lastVisitedDirectory = Directory('');
   Directory get lastVisitedDirectory => _lastVisitedDirectory;
@@ -43,28 +41,8 @@ class AppPreferences with ChangeNotifier {
   PreferencedSoundFile endWorkingSound;
 
   // Colors of the app
-  Color _backgroundColor;
-  Color get backgroundColor => _backgroundColor;
-  set backgroundColor(Color value) {
-    _backgroundColor = value;
-    ThemeColor().background = _backgroundColor;
-    _save();
-  }
-
-  AppFonts _fontPomodoro;
-  AppFonts get fontPomodoro => _fontPomodoro;
-  set fontPomodoro(AppFonts value) {
-    _fontPomodoro = value;
-    _save();
-  }
-
-  Color _backgroundColorHallOfFame;
-  Color get backgroundColorHallOfFame => _backgroundColorHallOfFame;
-  set backgroundColorHallOfFame(Color value) {
-    _backgroundColorHallOfFame = value;
-    ThemeColor().hallOfFame = backgroundColorHallOfFame;
-    _save();
-  }
+  PreferencedColor backgroundColor;
+  PreferencedColor backgroundColorHallOfFame;
 
   // Foreground texts
   TextOnPomodoro textDuringInitialization;
@@ -72,6 +50,15 @@ class AppPreferences with ChangeNotifier {
   TextOnPomodoro textDuringPauseSession;
   TextOnPomodoro textDuringPause;
   TextOnPomodoro textDone;
+
+  AppFonts get fontPomodoro => textDuringInitialization.font;
+  set fontPomodoro(AppFonts value) {
+    textDuringInitialization.font = value;
+    textDuringActiveSession.font = value;
+    textDuringPauseSession.font = value;
+    textDuringPause.font = value;
+    textDone.font = value;
+  }
 
   bool _saveToTextFile;
   bool get saveToTextFile => _saveToTextFile;
@@ -105,21 +92,6 @@ class AppPreferences with ChangeNotifier {
   TextToChat textNewcomersGreetings;
   TextToChat textUserHasConnectedGreetings;
 
-  AppFonts _fontHallOfFame;
-  AppFonts get fontHallOfFame => _fontHallOfFame;
-  set fontHallOfFame(AppFonts value) {
-    _fontHallOfFame = value;
-    _save();
-  }
-
-  Color _textColorHallOfFame;
-  Color get textColorHallOfFame => _textColorHallOfFame;
-  set textColorHallOfFame(Color value) {
-    _textColorHallOfFame = value;
-    ThemeColor().hallOfFameText = textColorHallOfFame;
-    _save();
-  }
-
   PreferencedText textWhitelist;
   PreferencedText textBlacklist;
   PreferencedText textHallOfFameTitle;
@@ -128,11 +100,29 @@ class AppPreferences with ChangeNotifier {
   PreferencedText textHallOfFameAlltime;
   PreferencedText textHallOfFameTotal;
 
+  AppFonts get fontHallOfFame => textHallOfFameTitle.font;
+  set fontHallOfFame(AppFonts value) {
+    textHallOfFameTitle.font = value;
+    textHallOfFameName.font = value;
+    textHallOfFameToday.font = value;
+    textHallOfFameAlltime.font = value;
+    textHallOfFameTotal.font = value;
+  }
+
+  Color get textColorHallOfFame => textHallOfFameTitle.color;
+  set textColorHallOfFame(Color value) {
+    textHallOfFameTitle.color = value;
+    textHallOfFameName.color = value;
+    textHallOfFameToday.color = value;
+    textHallOfFameAlltime.color = value;
+    textHallOfFameTotal.color = value;
+  }
+
   ///
   /// Save the current preferences to a file
   void _save() async {
     if (!kIsWeb) {
-      final file = File(_savePath);
+      final file = File('${_saveDirectory.path}/$preferencesFilename');
       await file.writeAsString(json.encode(serialize()));
     }
     notifyListeners();
@@ -174,6 +164,8 @@ class AppPreferences with ChangeNotifier {
     // Call the real constructor
     return AppPreferences._(
         directory: directory,
+        lastVisitedDirectory: Directory(
+            previousPreferences?['lastVisitedDirectory'] ?? directory.path),
         nbSessions:
             PreferencedInt.deserialize(previousPreferences?['nbSessions'], 0),
         sessionDuration: PreferencedDuration.deserialize(
@@ -190,10 +182,11 @@ class AppPreferences with ChangeNotifier {
             directory, previousPreferences?['endPauseSessionSound']),
         endWorkingSound: PreferencedSoundFile.deserialize(
             directory, previousPreferences?['endWorkingSound']),
-        backgroundColor: previousPreferences?['backgroundColor'] ?? 0xFFFFFFFF,
+        backgroundColor: PreferencedColor.deserialize(
+            previousPreferences?['backgroundColor'], 0xFFFFFFFF),
+        backgroundColorHallOfFame: PreferencedColor.deserialize(
+            previousPreferences?['backgroundColorHallOfFame'], 0xFF2D4AA8),
         fontPomodoro: previousPreferences?['fontPomodoro'] ?? 0,
-        backgroundColorHallOfFame:
-            previousPreferences?['backgroundColorHallOfFame'] ?? 0xFF2D4AA8,
         textColorHallOfFame:
             previousPreferences?['textColorHallOfFame'] ?? 0xFF000000,
         textDuringInitialization: TextOnPomodoro.deserialize(
@@ -203,19 +196,14 @@ class AppPreferences with ChangeNotifier {
             r'Session {currentSession}/{maxSessions}\n{timer}!'),
         textDuringPauseSession: TextOnPomodoro.deserialize(
             previousPreferences?['textDuringPauseSession'], r'Pause\n{timer}!'),
-        textDuringPause: TextOnPomodoro.deserialize(
-            previousPreferences?['textDuringPause'], r'Pause!'),
-        textDone: TextOnPomodoro.deserialize(
-            previousPreferences?['textDone'], r'Congratulation!'),
+        textDuringPause:
+            TextOnPomodoro.deserialize(previousPreferences?['textDuringPause'], r'Pause!'),
+        textDone: TextOnPomodoro.deserialize(previousPreferences?['textDone'], r'Congratulation!'),
         saveToTextFile: previousPreferences?['saveToTextFile'] ?? false,
         useHallOfFame: previousPreferences?['useHallOfFame'] ?? true,
-        mustFollowForFaming:
-            previousPreferences?['mustFollowForFaming'] ?? true,
-        hallOfFameScrollVelocity:
-            previousPreferences?['hallOfFameScrollVelocity'] ?? 2000,
-        textNewcomersGreetings: TextToChat.deserialize(
-            previousPreferences?['textNewcomersGreetings'],
-            r'Welcome to {username} who has joined for the first time!'),
+        mustFollowForFaming: previousPreferences?['mustFollowForFaming'] ?? true,
+        hallOfFameScrollVelocity: previousPreferences?['hallOfFameScrollVelocity'] ?? 2000,
+        textNewcomersGreetings: TextToChat.deserialize(previousPreferences?['textNewcomersGreetings'], r'Welcome to {username} who has joined for the first time!'),
         textUserHasConnectedGreetings: TextToChat.deserialize(previousPreferences?['textUserHasConnectedGreetings'], r'Welcome back to {username} who has joined us!'),
         textWhitelist: PreferencedText.deserialize(previousPreferences?['textWhitelist']),
         textBlacklist: PreferencedText.deserialize(previousPreferences?['textBlacklist']),
@@ -224,12 +212,12 @@ class AppPreferences with ChangeNotifier {
         textHallOfFameName: PreferencedText.deserialize(previousPreferences?['textHallOfFameName'], 'Name of the viewers'),
         textHallOfFameToday: PreferencedText.deserialize(previousPreferences?['textHallOfFameToday'], 'Today'),
         textHallOfFameAlltime: PreferencedText.deserialize(previousPreferences?['textHallOfFameAlltime'], 'All time'),
-        textHallOfFameTotal: PreferencedText.deserialize(previousPreferences?['textHallOfFameTotal'], 'Total'),
-        lastVisitedDirectory: Directory(previousPreferences?['lastVisitedDirectory'] ?? directory.path));
+        textHallOfFameTotal: PreferencedText.deserialize(previousPreferences?['textHallOfFameTotal'], 'Total'));
   }
 
   AppPreferences._({
     required Directory directory,
+    required Directory lastVisitedDirectory,
     required this.nbSessions,
     required this.sessionDuration,
     required this.pauseDuration,
@@ -238,9 +226,9 @@ class AppPreferences with ChangeNotifier {
     required this.endActiveSessionSound,
     required this.endPauseSessionSound,
     required this.endWorkingSound,
-    required int backgroundColor,
+    required this.backgroundColor,
+    required this.backgroundColorHallOfFame,
     required int fontPomodoro,
-    required int backgroundColorHallOfFame,
     required int textColorHallOfFame,
     required this.textDuringInitialization,
     required this.textDuringActiveSession,
@@ -261,18 +249,12 @@ class AppPreferences with ChangeNotifier {
     required this.textHallOfFameToday,
     required this.textHallOfFameAlltime,
     required this.textHallOfFameTotal,
-    required Directory lastVisitedDirectory,
   })  : _saveDirectory = directory,
-        _backgroundColor = Color(backgroundColor),
-        _fontPomodoro = AppFonts.values[fontPomodoro],
-        _backgroundColorHallOfFame = Color(backgroundColorHallOfFame),
-        _textColorHallOfFame = Color(textColorHallOfFame),
+        _lastVisitedDirectory = lastVisitedDirectory,
         _saveToTextFile = saveToTextFile,
         _useHallOfFame = useHallOfFame,
         _mustFollowForFaming = mustFollowForFaming,
-        _hallOfFameScrollVelocity = hallOfFameScrollVelocity,
-        _fontHallOfFame = AppFonts.values[fontHallOfFame],
-        _lastVisitedDirectory = lastVisitedDirectory {
+        _hallOfFameScrollVelocity = hallOfFameScrollVelocity {
     // Set the necessary callback
     nbSessions.onChanged = _save;
 
@@ -291,6 +273,9 @@ class AppPreferences with ChangeNotifier {
     endWorkingSound.onChanged = _save;
     endWorkingSound.lastVisitedFolderCallback = _setLastVisited;
 
+    backgroundColor.onChanged = _save;
+    backgroundColorHallOfFame.onChanged = _save;
+
     textDuringInitialization.onChanged = _save;
     textDuringActiveSession.onChanged = _save;
     textDuringPauseSession.onChanged = _save;
@@ -299,6 +284,7 @@ class AppPreferences with ChangeNotifier {
     textNewcomersGreetings.onChanged = _save;
     textUserHasConnectedGreetings.onChanged = _save;
     textBlacklist.onChanged = _save;
+
     textHallOfFameTitle.onChanged = _save;
     textHallOfFameName.onChanged = _save;
     textHallOfFameToday.onChanged = _save;
@@ -306,9 +292,9 @@ class AppPreferences with ChangeNotifier {
     textHallOfFameTotal.onChanged = _save;
 
     // Force the repainting of the colors
-    this.backgroundColor = _backgroundColor;
-    this.backgroundColorHallOfFame = _backgroundColorHallOfFame;
-    this.textColorHallOfFame = _textColorHallOfFame;
+    this.fontPomodoro = AppFonts.values[fontPomodoro];
+    this.fontHallOfFame = AppFonts.values[fontHallOfFame];
+    this.textColorHallOfFame = Color(textColorHallOfFame);
   }
 
   // INTERNAL METHODS
@@ -322,6 +308,7 @@ class AppPreferences with ChangeNotifier {
   /// Serialize all the values
   Map<String, dynamic> serialize() => {
         'directory': saveDirectory.path,
+        'lastVisitedDirectory': _lastVisitedDirectory.path,
         'nbSessions': nbSessions.serialize(),
         'sessionDuration': sessionDuration.serialize(),
         'pauseDuration': pauseDuration.serialize(),
@@ -330,10 +317,10 @@ class AppPreferences with ChangeNotifier {
         'endActiveSessionSound': endActiveSessionSound.serialize(),
         'endPauseSessionSound': endPauseSessionSound.serialize(),
         'endWorkingSound': endWorkingSound.serialize(),
-        'backgroundColor': _backgroundColor.value,
-        'fontPomodoro': _fontPomodoro.index,
-        'backgroundColorHallOfFame': _backgroundColorHallOfFame.value,
-        'textColorHallOfFame': _textColorHallOfFame.value,
+        'backgroundColor': backgroundColor.serialize(),
+        'backgroundColorHallOfFame': backgroundColorHallOfFame.serialize(),
+        'fontPomodoro': fontPomodoro.index,
+        'textColorHallOfFame': textColorHallOfFame.value,
         'textDuringInitialization': textDuringInitialization.serialize(),
         'textDuringActiveSession': textDuringActiveSession.serialize(),
         'textDuringPauseSession': textDuringPauseSession.serialize(),
@@ -348,33 +335,39 @@ class AppPreferences with ChangeNotifier {
             textUserHasConnectedGreetings.serialize(),
         'textWhitelist': textWhitelist.serialize(),
         'textBlacklist': textBlacklist.serialize(),
-        'fontHallOfFame': _fontHallOfFame.index,
+        'fontHallOfFame': fontHallOfFame.index,
         'textHallOfFameTitle': textHallOfFameTitle.serialize(),
         'textHallOfFameName': textHallOfFameName.serialize(),
         'textHallOfFameToday': textHallOfFameToday.serialize(),
         'textHallOfFameAlltime': textHallOfFameAlltime.serialize(),
         'textHallOfFameTotal': textHallOfFameTotal.serialize(),
-        'lastVisitedDirectory': _lastVisitedDirectory.path,
       };
 
   void updateFromSerialized(map) {
+    _saveDirectory = Directory(map['directory']);
+    _lastVisitedDirectory = Directory(map['lastVisitedDirectory']);
+
     nbSessions = PreferencedInt.deserialize(map['nbSessions']);
     sessionDuration = PreferencedDuration.deserialize(map['sessionDuration']);
     pauseDuration = PreferencedDuration.deserialize(map['pauseDuration']);
-    _saveDirectory = Directory(map['directory']);
+
     activeBackgroundImage = PreferencedImageFile.deserialize(
         saveDirectory, map['activeBackgroundImageFilename']);
     pauseBackgroundImage = PreferencedImageFile.deserialize(
         saveDirectory, map['pauseBackgroundImageFilename']);
+
     endActiveSessionSound = PreferencedSoundFile(
         saveDirectory, map['endActiveSessionSoundFilename']);
     endPauseSessionSound =
         PreferencedSoundFile(saveDirectory, map['endPauseSessionSound']);
     endWorkingSound =
         PreferencedSoundFile(saveDirectory, map['endWorkingSound']);
-    backgroundColor = Color(map['backgroundColor']);
+
+    backgroundColor = PreferencedColor.deserialize(map['backgroundColor']);
+    backgroundColorHallOfFame =
+        PreferencedColor.deserialize(map['backgroundColorHallOfFame']);
+
     fontPomodoro = AppFonts.values[map['fontPomodoro']];
-    backgroundColorHallOfFame = Color(map['backgroundColorHallOfFame']);
     textColorHallOfFame = Color(map['textColorHallOfFame']);
     textDuringInitialization =
         TextOnPomodoro.deserialize(map['textDuringInitialization']);
@@ -405,6 +398,5 @@ class AppPreferences with ChangeNotifier {
         PreferencedText.deserialize(map['textHallOfFameAlltime']);
     textHallOfFameTotal =
         PreferencedText.deserialize(map['textHallOfFameTotal']);
-    _lastVisitedDirectory = Directory(map['lastVisitedDirectory']);
   }
 }

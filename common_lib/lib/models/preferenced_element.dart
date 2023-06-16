@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:common_lib/models/app_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:common_lib/models/helpers.dart';
 import 'package:common_lib/models/participant.dart';
@@ -34,6 +35,34 @@ class PreferencedInt extends PreferencedElement {
   int _value;
   int get value => _value;
   set value(int value) {
+    _value = value;
+    if (onChanged != null) onChanged!();
+  }
+
+  @override
+  String toString() {
+    return _value.toString();
+  }
+}
+
+class PreferencedColor extends PreferencedElement {
+  @override
+  PreferencedColor(this._value);
+
+  void set(Color value) {
+    this.value = value;
+  }
+
+  int serialize() {
+    return _value.value;
+  }
+
+  static PreferencedColor deserialize(map, [int defaultValue = 0xFF000000]) =>
+      PreferencedColor(Color(map ?? defaultValue));
+
+  Color _value;
+  Color get value => _value;
+  set value(Color value) {
     _value = value;
     if (onChanged != null) onChanged!();
   }
@@ -146,6 +175,7 @@ class PreferencedSoundFile extends PreferencedFile {
 class PreferencedText extends PreferencedElement {
   String _text;
   Color _color;
+  AppFonts _font;
 
   String get text => _text;
   set text(String value) {
@@ -157,8 +187,10 @@ class PreferencedText extends PreferencedElement {
     String text, {
     super.onChanged,
     required Color color,
+    AppFonts? font,
   })  : _text = text,
-        _color = color;
+        _color = color,
+        _font = font ?? AppFonts.alegreya;
 
   Color get color => _color;
   set color(Color value) {
@@ -166,14 +198,22 @@ class PreferencedText extends PreferencedElement {
     if (onChanged != null) onChanged!();
   }
 
+  AppFonts get font => _font;
+  set font(AppFonts value) {
+    _font = value;
+    if (onChanged != null) onChanged!();
+  }
+
   static PreferencedText deserialize(Map<String, dynamic>? map,
       [String defaultValue = '']) {
     final text = map?['text'] ?? defaultValue;
     final color = Color(map?['color'] ?? 0xFF000000);
-    return PreferencedText(text, color: color);
+    final font = AppFonts.values[map?['font']];
+    return PreferencedText(text, color: color, font: font);
   }
 
-  Map<String, dynamic> serialize() => {'text': _text, 'color': _color.value};
+  Map<String, dynamic> serialize() =>
+      {'text': _text, 'color': _color.value, 'font': _font.index};
 }
 
 class TextToChat extends PreferencedText {
