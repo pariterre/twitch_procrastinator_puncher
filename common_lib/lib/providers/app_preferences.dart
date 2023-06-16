@@ -7,7 +7,6 @@ import 'package:common_lib/models/config.dart';
 import 'package:common_lib/models/preferenced_element.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -35,91 +34,13 @@ class AppPreferences with ChangeNotifier {
   PreferencedDuration pauseDuration;
 
   // Background image during the countdown
-  String? _activeBackgroundImageFilename;
-  String? get activeBackgroundImagePath =>
-      _activeBackgroundImageFilename == null
-          ? null
-          : _path(saveDirectory, _activeBackgroundImageFilename!);
-  Future<void> setActiveBackgroundImagePath(String? value) async {
-    if (value == null) {
-      _activeBackgroundImageFilename = null;
-    } else {
-      _activeBackgroundImageFilename = await _copyFile(original: value);
-    }
-    _save();
-  }
+  PreferencedImageFile activeBackgroundImage;
+  PreferencedImageFile pauseBackgroundImage;
 
-  double _activeBackgroundSize;
-  double get activeBackgroundSize => _activeBackgroundSize;
-  set activeBackgroundSize(double value) {
-    _activeBackgroundSize = value;
-    _save();
-  }
-
-  // Background image during the pause
-  String? _pauseBackgroundImageFilename;
-  String? get pauseBackgroundImagePath => _pauseBackgroundImageFilename == null
-      ? null
-      : _path(saveDirectory, _pauseBackgroundImageFilename!);
-  Future<void> setPauseBackgroundImagePath(String? value) async {
-    if (value == null) {
-      _pauseBackgroundImageFilename = null;
-    } else {
-      _pauseBackgroundImageFilename = await _copyFile(original: value);
-    }
-    _save();
-  }
-
-  double _pauseBackgroundSize;
-  double get pauseBackgroundSize => _pauseBackgroundSize;
-  set pauseBackgroundSize(double value) {
-    _pauseBackgroundSize = value;
-    _save();
-  }
-
-  // Sound at end of sessions
-  String? _endActiveSessionSoundFilename;
-  String? get endActiveSessionSoundFilePath =>
-      _endActiveSessionSoundFilename == null
-          ? null
-          : _path(saveDirectory, _endActiveSessionSoundFilename!);
-  Future<void> setEndActiveSessionSoundFilePath(String? value) async {
-    if (value == null) {
-      _endActiveSessionSoundFilename = null;
-    } else {
-      _endActiveSessionSoundFilename = await _copyFile(original: value);
-    }
-    _save();
-  }
-
-  // Sound at end of pause
-  String? _endPauseSessionSoundFilename;
-  String? get endPauseSessionSoundFilePath =>
-      _endPauseSessionSoundFilename == null
-          ? null
-          : _path(saveDirectory, _endPauseSessionSoundFilename!);
-  Future<void> setEndPauseSessionSoundFilePath(String? value) async {
-    if (value == null) {
-      _endPauseSessionSoundFilename = null;
-    } else {
-      _endPauseSessionSoundFilename = await _copyFile(original: value);
-    }
-    _save();
-  }
-
-  // Sound at end of pause
-  String? _endWorkingSoundFilename;
-  String? get endWorkingSoundFilePath => _endWorkingSoundFilename == null
-      ? null
-      : _path(saveDirectory, _endWorkingSoundFilename!);
-  Future<void> setWorkingSoundFilePath(String? value) async {
-    if (value == null) {
-      _endWorkingSoundFilename = null;
-    } else {
-      _endWorkingSoundFilename = await _copyFile(original: value);
-    }
-    _save();
-  }
+  // Sound during count downd
+  PreferencedSoundFile endActiveSessionSound;
+  PreferencedSoundFile endPauseSessionSound;
+  PreferencedSoundFile endWorkingSound;
 
   // Colors of the app
   Color _backgroundColor;
@@ -252,25 +173,23 @@ class AppPreferences with ChangeNotifier {
 
     // Call the real constructor
     return AppPreferences._(
+        directory: directory,
         nbSessions:
             PreferencedInt.deserialize(previousPreferences?['nbSessions'], 0),
         sessionDuration: PreferencedDuration.deserialize(
             previousPreferences?['sessionDuration'], 0),
         pauseDuration: PreferencedDuration.deserialize(
             previousPreferences?['pauseDuration'], 0),
-        directory: directory,
-        activeBackgroundImageFilename:
-            previousPreferences?['activeBackgroundImageFilename'],
-        activeBackgroundSize: previousPreferences?['activeBackgroundSize'] ?? 1,
-        pauseBackgroundImageFilename:
-            previousPreferences?['pauseBackgroundImageFilename'],
-        pauseBackgroundSize: previousPreferences?['pauseBackgroundSize'] ?? 1,
-        endActiveSessionSoundFilename:
-            previousPreferences?['endActiveSessionSoundFilename'],
-        endPauseSessionSoundFilename:
-            previousPreferences?['endPauseSessionSoundFilename'],
-        endWorkingSoundFilename:
-            previousPreferences?['endWorkingSoundFilename'],
+        activeBackgroundImage: PreferencedImageFile.deserialize(
+            directory, previousPreferences?['activeBackgroundImage']),
+        pauseBackgroundImage: PreferencedImageFile.deserialize(
+            directory, previousPreferences?['pauseBackgroundImage']),
+        endActiveSessionSound: PreferencedSoundFile.deserialize(
+            directory, previousPreferences?['endActiveSessionSound']),
+        endPauseSessionSound: PreferencedSoundFile.deserialize(
+            directory, previousPreferences?['endPauseSessionSound']),
+        endWorkingSound: PreferencedSoundFile.deserialize(
+            directory, previousPreferences?['endWorkingSound']),
         backgroundColor: previousPreferences?['backgroundColor'] ?? 0xFFFFFFFF,
         fontPomodoro: previousPreferences?['fontPomodoro'] ?? 0,
         backgroundColorHallOfFame:
@@ -297,8 +216,7 @@ class AppPreferences with ChangeNotifier {
         textNewcomersGreetings: TextToChat.deserialize(
             previousPreferences?['textNewcomersGreetings'],
             r'Welcome to {username} who has joined for the first time!'),
-        textUserHasConnectedGreetings: TextToChat.deserialize(
-            previousPreferences?['textUserHasConnectedGreetings'], r'Welcome back to {username} who has joined us!'),
+        textUserHasConnectedGreetings: TextToChat.deserialize(previousPreferences?['textUserHasConnectedGreetings'], r'Welcome back to {username} who has joined us!'),
         textWhitelist: PreferencedText.deserialize(previousPreferences?['textWhitelist']),
         textBlacklist: PreferencedText.deserialize(previousPreferences?['textBlacklist']),
         fontHallOfFame: previousPreferences?['fontHallOfFame'] ?? 0,
@@ -311,17 +229,15 @@ class AppPreferences with ChangeNotifier {
   }
 
   AppPreferences._({
+    required Directory directory,
     required this.nbSessions,
     required this.sessionDuration,
     required this.pauseDuration,
-    required Directory directory,
-    required String? activeBackgroundImageFilename,
-    required double activeBackgroundSize,
-    required String? pauseBackgroundImageFilename,
-    required double pauseBackgroundSize,
-    required String? endActiveSessionSoundFilename,
-    required String? endPauseSessionSoundFilename,
-    required String? endWorkingSoundFilename,
+    required this.activeBackgroundImage,
+    required this.pauseBackgroundImage,
+    required this.endActiveSessionSound,
+    required this.endPauseSessionSound,
+    required this.endWorkingSound,
     required int backgroundColor,
     required int fontPomodoro,
     required int backgroundColorHallOfFame,
@@ -347,13 +263,6 @@ class AppPreferences with ChangeNotifier {
     required this.textHallOfFameTotal,
     required Directory lastVisitedDirectory,
   })  : _saveDirectory = directory,
-        _activeBackgroundImageFilename = activeBackgroundImageFilename,
-        _activeBackgroundSize = activeBackgroundSize,
-        _pauseBackgroundImageFilename = pauseBackgroundImageFilename,
-        _pauseBackgroundSize = pauseBackgroundSize,
-        _endActiveSessionSoundFilename = endActiveSessionSoundFilename,
-        _endPauseSessionSoundFilename = endPauseSessionSoundFilename,
-        _endWorkingSoundFilename = endWorkingSoundFilename,
         _backgroundColor = Color(backgroundColor),
         _fontPomodoro = AppFonts.values[fontPomodoro],
         _backgroundColorHallOfFame = Color(backgroundColorHallOfFame),
@@ -366,8 +275,22 @@ class AppPreferences with ChangeNotifier {
         _lastVisitedDirectory = lastVisitedDirectory {
     // Set the necessary callback
     nbSessions.onChanged = _save;
+
     sessionDuration.onChanged = _save;
     pauseDuration.onChanged = _save;
+
+    activeBackgroundImage.onChanged = _save;
+    activeBackgroundImage.lastVisitedFolderCallback = _setLastVisited;
+    pauseBackgroundImage.onChanged = _save;
+    pauseBackgroundImage.lastVisitedFolderCallback = _setLastVisited;
+
+    endActiveSessionSound.onChanged = _save;
+    endActiveSessionSound.lastVisitedFolderCallback = _setLastVisited;
+    endPauseSessionSound.onChanged = _save;
+    endPauseSessionSound.lastVisitedFolderCallback = _setLastVisited;
+    endWorkingSound.onChanged = _save;
+    endWorkingSound.lastVisitedFolderCallback = _setLastVisited;
+
     textDuringInitialization.onChanged = _save;
     textDuringActiveSession.onChanged = _save;
     textDuringPauseSession.onChanged = _save;
@@ -389,15 +312,10 @@ class AppPreferences with ChangeNotifier {
   }
 
   // INTERNAL METHODS
-
   ///
   /// Copy a file and return the name of the new file
-  Future<String> _copyFile({required String original}) async {
-    final file = File(original);
-    final newFile = await file.copy(_path(saveDirectory, basename(file.path)));
-
-    _lastVisitedDirectory = file.parent;
-    return basename(newFile.path);
+  void _setLastVisited(Directory path) {
+    _lastVisitedDirectory = path;
   }
 
   ///
@@ -407,13 +325,11 @@ class AppPreferences with ChangeNotifier {
         'nbSessions': nbSessions.serialize(),
         'sessionDuration': sessionDuration.serialize(),
         'pauseDuration': pauseDuration.serialize(),
-        'activeBackgroundImageFilename': _activeBackgroundImageFilename,
-        'activeBackgroundSize': _activeBackgroundSize,
-        'pauseBackgroundImageFilename': _pauseBackgroundImageFilename,
-        'pauseBackgroundSize': _pauseBackgroundSize,
-        'endActiveSessionSoundFilename': _endActiveSessionSoundFilename,
-        'endPauseSessionSoundFilename': _endPauseSessionSoundFilename,
-        'endWorkingSoundFilename': _endWorkingSoundFilename,
+        'activeBackgroundImage': activeBackgroundImage.serialize(),
+        'pauseBackgroundImage': pauseBackgroundImage.serialize(),
+        'endActiveSessionSound': endActiveSessionSound.serialize(),
+        'endPauseSessionSound': endPauseSessionSound.serialize(),
+        'endWorkingSound': endWorkingSound.serialize(),
         'backgroundColor': _backgroundColor.value,
         'fontPomodoro': _fontPomodoro.index,
         'backgroundColorHallOfFame': _backgroundColorHallOfFame.value,
@@ -446,13 +362,16 @@ class AppPreferences with ChangeNotifier {
     sessionDuration = PreferencedDuration.deserialize(map['sessionDuration']);
     pauseDuration = PreferencedDuration.deserialize(map['pauseDuration']);
     _saveDirectory = Directory(map['directory']);
-    _activeBackgroundImageFilename = map['activeBackgroundImageFilename'];
-    activeBackgroundSize = map['activeBackgroundSize'];
-    _pauseBackgroundImageFilename = map['pauseBackgroundImageFilename'];
-    pauseBackgroundSize = map['pauseBackgroundSize'];
-    _endActiveSessionSoundFilename = map['endActiveSessionSoundFilename'];
-    _endPauseSessionSoundFilename = map['endPauseSessionSoundFilename'];
-    _endWorkingSoundFilename = map['endWorkingSoundFilename'];
+    activeBackgroundImage = PreferencedImageFile.deserialize(
+        saveDirectory, map['activeBackgroundImageFilename']);
+    pauseBackgroundImage = PreferencedImageFile.deserialize(
+        saveDirectory, map['pauseBackgroundImageFilename']);
+    endActiveSessionSound = PreferencedSoundFile(
+        saveDirectory, map['endActiveSessionSoundFilename']);
+    endPauseSessionSound =
+        PreferencedSoundFile(saveDirectory, map['endPauseSessionSound']);
+    endWorkingSound =
+        PreferencedSoundFile(saveDirectory, map['endWorkingSound']);
     backgroundColor = Color(map['backgroundColor']);
     fontPomodoro = AppFonts.values[map['fontPomodoro']];
     backgroundColorHallOfFame = Color(map['backgroundColorHallOfFame']);

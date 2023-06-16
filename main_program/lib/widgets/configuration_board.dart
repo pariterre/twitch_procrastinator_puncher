@@ -188,54 +188,49 @@ class ConfigurationBoard extends StatelessWidget {
       children: [
         FileSelectorTile(
           title: 'Active image',
-          path: appPreferences.activeBackgroundImagePath,
-          isImage: true,
+          file: appPreferences.activeBackgroundImage,
           selectFileCallback: (filename) async =>
-              await appPreferences.setActiveBackgroundImagePath(filename),
+              await appPreferences.activeBackgroundImage.setFile(filename),
           onSizeChanged: (direction) {
             if (direction == PlusOrMinusSelection.plus) {
-              appPreferences.activeBackgroundSize += 0.1;
+              appPreferences.activeBackgroundImage.size += 0.1;
             } else {
-              appPreferences.activeBackgroundSize -= 0.1;
+              appPreferences.activeBackgroundImage.size -= 0.1;
             }
           },
         ),
         SizedBox(height: padding * 0.5),
         FileSelectorTile(
           title: 'Paused image',
-          path: appPreferences.pauseBackgroundImagePath,
-          isImage: true,
+          file: appPreferences.pauseBackgroundImage,
           selectFileCallback: (filename) async =>
-              await appPreferences.setPauseBackgroundImagePath(filename),
+              await appPreferences.pauseBackgroundImage.setFile(filename),
           onSizeChanged: (direction) {
             if (direction == PlusOrMinusSelection.plus) {
-              appPreferences.pauseBackgroundSize += 0.05;
+              appPreferences.pauseBackgroundImage.size += 0.05;
             } else {
-              appPreferences.pauseBackgroundSize -= 0.05;
+              appPreferences.pauseBackgroundImage.size -= 0.05;
             }
           },
         ),
         SizedBox(height: padding * 0.5),
         FileSelectorTile(
             title: 'Alarm end of active session',
-            path: appPreferences.endActiveSessionSoundFilePath,
-            isSound: true,
-            selectFileCallback: (filename) async => await appPreferences
-                .setEndActiveSessionSoundFilePath(filename)),
+            file: appPreferences.endActiveSessionSound,
+            selectFileCallback: (filename) async =>
+                await appPreferences.endActiveSessionSound.setFile(filename)),
         SizedBox(height: padding * 0.5),
         FileSelectorTile(
             title: 'Alarm end of pause',
-            path: appPreferences.endPauseSessionSoundFilePath,
-            isSound: true,
+            file: appPreferences.endPauseSessionSound,
             selectFileCallback: (filename) async =>
-                await appPreferences.setEndPauseSessionSoundFilePath(filename)),
+                await appPreferences.endPauseSessionSound.setFile(filename)),
         SizedBox(height: padding * 0.5),
         FileSelectorTile(
             title: 'Alarm end of working',
-            path: appPreferences.endWorkingSoundFilePath,
-            isSound: true,
+            file: appPreferences.endWorkingSound,
             selectFileCallback: (filename) async =>
-                await appPreferences.setWorkingSoundFilePath(filename)),
+                await appPreferences.endWorkingSound.setFile(filename)),
       ],
     );
   }

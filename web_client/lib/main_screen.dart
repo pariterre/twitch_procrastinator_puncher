@@ -33,30 +33,30 @@ class _MainScreenState extends State<MainScreen> {
   Future<void> _activeSessionDone() async {
     final preferences = AppPreferences.of(context, listen: false);
 
-    if (preferences.endActiveSessionSoundFilePath != null) {
+    if (preferences.endActiveSessionSound.file != null) {
       final player = AudioPlayer();
-      await player.play(
-          DeviceFileSource('${preferences.endActiveSessionSoundFilePath}'));
+      await player
+          .play(DeviceFileSource(preferences.endActiveSessionSound.filepath!));
     }
   }
 
   Future<void> _pauseSessionDone() async {
     final preferences = AppPreferences.of(context, listen: false);
 
-    if (preferences.endPauseSessionSoundFilePath != null) {
+    if (preferences.endPauseSessionSound.file != null) {
       final player = AudioPlayer();
-      await player.play(
-          DeviceFileSource('${preferences.endPauseSessionSoundFilePath}'));
+      await player
+          .play(DeviceFileSource(preferences.endPauseSessionSound.filepath!));
     }
   }
 
   Future<void> _workingDone() async {
     final preferences = AppPreferences.of(context, listen: false);
 
-    if (preferences.endWorkingSoundFilePath != null) {
+    if (preferences.endWorkingSound.file != null) {
       final player = AudioPlayer();
       await player
-          .play(DeviceFileSource('${preferences.endWorkingSoundFilePath}'));
+          .play(DeviceFileSource(preferences.endWorkingSound.filepath!));
     }
   }
 

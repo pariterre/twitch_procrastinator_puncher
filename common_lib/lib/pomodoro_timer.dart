@@ -113,12 +113,12 @@ class _PomodoroTimerState extends State<PomodoroTimer> {
     if (!kIsWeb) {
       if ((status == StopWatchStatus.inPauseSession ||
               status == StopWatchStatus.paused) &&
-          preferences.pauseBackgroundImagePath != null) {
-        background = Image.file(File(preferences.pauseBackgroundImagePath!));
-        imageSize = preferences.pauseBackgroundSize;
-      } else if (preferences.activeBackgroundImagePath != null) {
-        background = Image.file(File(preferences.activeBackgroundImagePath!));
-        imageSize = preferences.activeBackgroundSize;
+          preferences.pauseBackgroundImage.file != null) {
+        background = Image.file(preferences.pauseBackgroundImage.file!);
+        imageSize = preferences.pauseBackgroundImage.size;
+      } else if (preferences.activeBackgroundImage.file != null) {
+        background = Image.file(preferences.activeBackgroundImage.file!);
+        imageSize = preferences.activeBackgroundImage.size;
       }
     }
 

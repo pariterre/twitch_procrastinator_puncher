@@ -66,35 +66,15 @@ class _WebSocketServerHolderState extends State<WebSocketServerHolder> {
     _initializeWebServer();
   }
 
-  void coucou(Socket socket) {
-    socket.listen((data) async {
-      // final answerAsString = String.fromCharCodes(data).trim().split('\r\n');
-      // for (final coucou in answerAsString) {
-      //   debugPrint(coucou);
-      // }
-
-      final preferences = AppPreferences.of(context, listen: false);
-      final image = File(preferences.activeBackgroundImagePath!);
-      final bytes = await image.readAsBytes();
-      debugPrint('Received GET request');
-      socket.write('HTTP/1.1 200 OK\nContent-Type: text\n'
-          'Content-Length: ${bytes.length}\n'
-          '\n'
-          '$bytes');
-    });
-  }
-
   void _initializeWebServer() async {
     if (_webServer != null) return;
-    // _webServer = await ServerSocket.bind('localhost', 9876);
-    // _webServer!.listen(coucou);
 
     var webSocketTransformer = WebSocketTransformer();
     HttpServer server = await HttpServer.bind(InternetAddress.anyIPv6, 9876);
     server.transform(webSocketTransformer).listen((WebSocket webSocket) async {
       _webServer = webSocket;
       final preferences = AppPreferences.of(context, listen: false);
-      final image = File(preferences.activeBackgroundImagePath!);
+      final image = preferences.activeBackgroundImage.file!;
       final bytes = await image.readAsBytes();
       debugPrint('Received GET request');
       webSocket.add(jsonEncode({"bytes": bytes.toString()}));

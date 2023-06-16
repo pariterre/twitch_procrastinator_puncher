@@ -2,38 +2,33 @@ import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:common_lib/models/app_theme.dart';
+import 'package:common_lib/models/preferenced_element.dart';
 import 'package:common_lib/providers/app_preferences.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
 import 'package:twitch_procastinator_puncher/widgets/plus_or_minus.dart';
 
 class FileSelectorTile extends StatelessWidget {
   const FileSelectorTile({
     super.key,
     required this.title,
-    required this.path,
+    required this.file,
     required this.selectFileCallback,
     this.tooltipText,
-    this.isImage = false,
-    this.isSound = false,
     this.onSizeChanged,
   });
 
   final String title;
-  final String? path;
+  final PreferencedFile file;
   final String? tooltipText;
-  final bool isImage;
-  final bool isSound;
-  final Function(String?) selectFileCallback;
+  final Function(File?) selectFileCallback;
   final Function(PlusOrMinusSelection)? onSizeChanged;
 
   Future<void> _pickFile(context) async {
     final List<String> extensions = [];
-    if (isImage) {
+    if (file.fileType == FileType.image) {
       extensions.addAll(['.jpg', '.png', '.jpeg']);
-    }
-    if (isSound) {
+    } else if (file.fileType == FileType.sound) {
       extensions.addAll(['.mp3', '.wav']);
     }
 
@@ -50,12 +45,12 @@ class FileSelectorTile extends StatelessWidget {
     );
 
     if (path == null) return;
-    selectFileCallback(path);
+    selectFileCallback(File(path));
   }
 
   void _playSound() async {
     final player = AudioPlayer();
-    await player.play(DeviceFileSource(path!));
+    await player.play(DeviceFileSource(file.file!.path));
   }
 
   @override
@@ -92,7 +87,7 @@ class FileSelectorTile extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.only(left: padding),
                 child: Text(
-                  path != null ? basename(path!) : 'None selected',
+                  file.filename ?? 'None selected',
                   style: TextStyle(color: ThemeColor().configurationText),
                 ),
               ),
@@ -102,20 +97,22 @@ class FileSelectorTile extends StatelessWidget {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (isImage && path != null)
+            if (file.fileType == FileType.image && file.file != null)
               // Show a thumbnail
               SizedBox(
                   height: windowHeight * 0.045,
                   width: windowHeight * 0.045,
-                  child: Image.file(File(path!))),
-            if (isImage && path != null && onSizeChanged != null)
+                  child: Image.file(file.file!)),
+            if (file.fileType == FileType.image &&
+                file.file != null &&
+                onSizeChanged != null)
               // Show a thumbnail
               SizedBox(
                   width: windowHeight * 0.04,
                   child: PlusOrMinus(
                     onTap: onSizeChanged!,
                   )),
-            if (isSound && path != null)
+            if (file.fileType == FileType.sound && file.file != null)
               SizedBox(
                   height: windowHeight * 0.045,
                   width: windowHeight * 0.045,
@@ -137,7 +134,7 @@ class FileSelectorTile extends StatelessWidget {
                 ),
               ),
             ),
-            if (path != null)
+            if (file.file != null)
               SizedBox(
                 height: windowHeight * 0.045,
                 width: windowHeight * 0.045,

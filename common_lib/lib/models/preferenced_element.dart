@@ -1,7 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:common_lib/models/helpers.dart';
 import 'package:common_lib/models/participant.dart';
 import 'package:common_lib/providers/pomodoro_status.dart';
+import 'package:path/path.dart';
+
+enum FileType { image, sound }
 
 abstract class PreferencedElement {
   PreferencedElement({this.onChanged});
@@ -65,6 +70,77 @@ class PreferencedDuration extends PreferencedElement {
   String toString() {
     return _value.toString();
   }
+}
+
+abstract class PreferencedFile extends PreferencedElement {
+  FileType get fileType;
+
+  @override
+  PreferencedFile(this.savepath, String? file, [this.lastVisitedFolderCallback])
+      : _file = file == null ? null : File('${savepath.path}/$file');
+  final Directory savepath;
+  Function(Directory)? lastVisitedFolderCallback;
+
+  Map<String, dynamic> serialize() {
+    return {'filename': _file == null ? null : basename(_file!.path)};
+  }
+
+  File? _file;
+  File? get file => _file;
+  String? get filepath => _file == null ? null : _file!.path;
+  String? get filename => _file == null ? null : basename(_file!.path);
+  Future<void> setFile(File? originalFile) async {
+    _file = originalFile == null ? null : await _copyFile(originalFile);
+    if (onChanged != null) onChanged!();
+    if (originalFile != null && lastVisitedFolderCallback != null) {
+      lastVisitedFolderCallback!(originalFile.parent);
+    }
+  }
+
+  @override
+  String toString() {
+    return _file == null ? '' : basename(_file!.path);
+  }
+
+  ///
+  /// Copy a file and return the name of the new file
+  Future<File> _copyFile(File original) async {
+    final targetPath = '${savepath.path}/${basename(original.path)}';
+    return await original.copy(targetPath);
+  }
+}
+
+class PreferencedImageFile extends PreferencedFile {
+  @override
+  FileType get fileType => FileType.image;
+
+  PreferencedImageFile(super.savepath, super.file, {double? size})
+      : _size = size ?? 1;
+
+  double _size;
+  double get size => _size;
+  set size(double value) {
+    _size = value;
+    if (onChanged != null) onChanged!();
+  }
+
+  @override
+  Map<String, dynamic> serialize() {
+    return super.serialize()..addAll({'size': _size});
+  }
+
+  static PreferencedImageFile deserialize(Directory savepath, map) =>
+      PreferencedImageFile(savepath, map?['filename'], size: map?['size']);
+}
+
+class PreferencedSoundFile extends PreferencedFile {
+  PreferencedSoundFile(super.savepath, super.file);
+
+  @override
+  FileType get fileType => FileType.sound;
+
+  static PreferencedSoundFile deserialize(Directory savepath, map) =>
+      PreferencedSoundFile(savepath, map?['filename']);
 }
 
 class PreferencedText extends PreferencedElement {
