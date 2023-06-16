@@ -8,7 +8,7 @@ import 'package:twitch_procastinator_puncher/screens/main_screen.dart';
 void main() async {
   final appPreferences = await AppPreferences.factory();
   final participants = await Participants.factory(
-      mustFollowForFaming: appPreferences.mustFollowForFaming,
+      mustFollowForFaming: appPreferences.mustFollowForFaming.value,
       whitelist: appPreferences.textWhitelist.text,
       blacklist: appPreferences.textBlacklist.text);
 

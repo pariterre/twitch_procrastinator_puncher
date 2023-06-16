@@ -366,9 +366,9 @@ class ConfigurationBoard extends StatelessWidget {
             ],
           ),
           visualDensity: VisualDensity.compact,
-          value: preferences.saveToTextFile,
+          value: preferences.saveToTextFile.value,
           onChanged: (value) {
-            preferences.saveToTextFile = value!;
+            preferences.saveToTextFile.set(value!);
           },
         ),
       ],
@@ -414,8 +414,8 @@ class ConfigurationBoard extends StatelessWidget {
             style: TextStyle(color: Colors.white),
           ),
           visualDensity: VisualDensity.compact,
-          value: preferences.useHallOfFame,
-          onChanged: (value) => preferences.useHallOfFame = value!,
+          value: preferences.useHallOfFame.value,
+          onChanged: (value) => preferences.useHallOfFame.set(value!),
         ),
         SizedBox(height: padding),
         CheckboxListTile(
@@ -447,9 +447,9 @@ class ConfigurationBoard extends StatelessWidget {
             ],
           ),
           visualDensity: VisualDensity.compact,
-          value: preferences.mustFollowForFaming,
+          value: preferences.mustFollowForFaming.value,
           onChanged: (value) {
-            preferences.mustFollowForFaming = value!;
+            preferences.mustFollowForFaming.set(value!);
             participants.mustFollowForFaming = value;
           },
         ),

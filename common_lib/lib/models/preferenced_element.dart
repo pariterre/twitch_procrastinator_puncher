@@ -45,6 +45,34 @@ class PreferencedInt extends PreferencedElement {
   }
 }
 
+class PreferencedBool extends PreferencedElement {
+  @override
+  PreferencedBool(this._value);
+
+  void set(bool value) {
+    this.value = value;
+  }
+
+  bool serialize() {
+    return _value;
+  }
+
+  static PreferencedBool deserialize(map, [bool defaultValue = false]) =>
+      PreferencedBool(map ?? defaultValue);
+
+  bool _value;
+  bool get value => _value;
+  set value(bool value) {
+    _value = value;
+    if (onChanged != null) onChanged!();
+  }
+
+  @override
+  String toString() {
+    return _value.toString();
+  }
+}
+
 class PreferencedColor extends PreferencedElement {
   @override
   PreferencedColor(this._value);

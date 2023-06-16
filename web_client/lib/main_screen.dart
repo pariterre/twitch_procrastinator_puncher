@@ -80,7 +80,7 @@ class _MainScreenState extends State<MainScreen> {
                   const PomodoroTimer(
                       textWithFocus: StopWatchStatus.initializing),
                   SizedBox(height: padding),
-                  if (preferences.useHallOfFame) const HallOfFame(),
+                  if (preferences.useHallOfFame.value) const HallOfFame(),
                 ],
               ),
             ],

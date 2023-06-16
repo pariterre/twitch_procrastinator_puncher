@@ -61,7 +61,7 @@ class _PomodoroTimerState extends State<PomodoroTimer> {
             fontSize: windowHeight * 0.11 * textOnPomodoro.size));
 
     final preferences = AppPreferences.of(context, listen: false);
-    if (preferences.saveToTextFile) {
+    if (preferences.saveToTextFile.value) {
       final file =
           File('${preferences.saveDirectory.path}/$textExportFilename');
       file.writeAsString(textOnPomodoro.formattedText(context));

@@ -9,7 +9,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final appPreferences = await AppPreferences.factory();
   final participants = await Participants.factory(
-      mustFollowForFaming: appPreferences.mustFollowForFaming,
+      mustFollowForFaming: appPreferences.mustFollowForFaming.value,
       whitelist: appPreferences.textWhitelist.text,
       blacklist: appPreferences.textBlacklist.text);
 
