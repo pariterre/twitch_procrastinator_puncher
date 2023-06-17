@@ -323,6 +323,83 @@ class AppPreferences with ChangeNotifier {
         'textHallOfFameTotal': textHallOfFameTotal.serialize(),
       };
 
+  ///
+  /// Serialize all the values
+  Map<String, dynamic> serializeForWebClient() {
+    final out = <String, dynamic>{};
+    if (nbSessions.wasChanged) {
+      out['nbSessions'] = nbSessions.serialize();
+    }
+    if (sessionDuration.wasChanged) {
+      out['sessionDuration'] = sessionDuration.serialize();
+    }
+    if (pauseDuration.wasChanged) {
+      out['pauseDuration'] = pauseDuration.serialize();
+    }
+    if (activeBackgroundImage.wasChanged) {
+      out['activeBackgroundImage'] = activeBackgroundImage.serialize();
+    }
+    if (pauseBackgroundImage.wasChanged) {
+      out['pauseBackgroundImage'] = pauseBackgroundImage.serialize();
+    }
+    if (endActiveSessionSound.wasChanged) {
+      out['endActiveSessionSound'] = endActiveSessionSound.serialize();
+    }
+    if (endPauseSessionSound.wasChanged) {
+      out['endPauseSessionSound'] = endPauseSessionSound.serialize();
+    }
+    if (endWorkingSound.wasChanged) {
+      out['endWorkingSound'] = endWorkingSound.serialize();
+    }
+    if (backgroundColor.wasChanged) {
+      out['backgroundColor'] = backgroundColor.serialize();
+    }
+    if (backgroundColorHallOfFame.wasChanged) {
+      out['backgroundColorHallOfFame'] = backgroundColorHallOfFame.serialize();
+    }
+    out['fontPomodoro'] = fontPomodoro.index;
+    out['textColorHallOfFame'] = textColorHallOfFame.value;
+    if (textDuringInitialization.wasChanged) {
+      out['textDuringInitialization'] = textDuringInitialization.serialize();
+    }
+    if (textDuringActiveSession.wasChanged) {
+      out['textDuringActiveSession'] = textDuringActiveSession.serialize();
+    }
+    if (textDuringPauseSession.wasChanged) {
+      out['textDuringPauseSession'] = textDuringPauseSession.serialize();
+    }
+    if (textDuringPause.wasChanged) {
+      out['textDuringPause'] = textDuringPause.serialize();
+    }
+    if (textDone.wasChanged) {
+      out['textDone'] = textDone.serialize();
+    }
+    if (useHallOfFame.wasChanged) {
+      out['useHallOfFame'] = useHallOfFame.serialize();
+    }
+    if (hallOfFameScrollVelocity.wasChanged) {
+      out['hallOfFameScrollVelocity'] = hallOfFameScrollVelocity.serialize();
+    }
+    out['fontHallOfFame'] = fontHallOfFame.index;
+    if (textHallOfFameTitle.wasChanged) {
+      out['textHallOfFameTitle'] = textHallOfFameTitle.serialize();
+    }
+    if (textHallOfFameName.wasChanged) {
+      out['textHallOfFameName'] = textHallOfFameName.serialize();
+    }
+    if (textHallOfFameToday.wasChanged) {
+      out['textHallOfFameToday'] = textHallOfFameToday.serialize();
+    }
+    if (textHallOfFameAlltime.wasChanged) {
+      out['textHallOfFameAlltime'] = textHallOfFameAlltime.serialize();
+    }
+    if (textHallOfFameTotal.wasChanged) {
+      out['textHallOfFameTotal'] = textHallOfFameTotal.serialize();
+    }
+
+    return out;
+  }
+
   void updateFromSerialized(map) {
     _saveDirectory = Directory(map['directory']);
     _lastVisitedDirectory = Directory(map['lastVisitedDirectory']);

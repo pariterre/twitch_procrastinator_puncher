@@ -12,6 +12,7 @@ enum FileType { image, sound }
 abstract class PreferencedElement {
   PreferencedElement({this.onChanged});
 
+  bool wasChanged = false;
   Function()? onChanged;
 
   static PreferencedElement deserialize() => throw UnimplementedError();
@@ -36,6 +37,7 @@ class PreferencedInt extends PreferencedElement {
   int get value => _value;
   set value(int value) {
     _value = value;
+    wasChanged = true;
     if (onChanged != null) onChanged!();
   }
 
@@ -64,6 +66,7 @@ class PreferencedBool extends PreferencedElement {
   bool get value => _value;
   set value(bool value) {
     _value = value;
+    wasChanged = true;
     if (onChanged != null) onChanged!();
   }
 
@@ -92,6 +95,7 @@ class PreferencedColor extends PreferencedElement {
   Color get value => _value;
   set value(Color value) {
     _value = value;
+    wasChanged = true;
     if (onChanged != null) onChanged!();
   }
 
@@ -120,6 +124,7 @@ class PreferencedDuration extends PreferencedElement {
   Duration get value => _value;
   set value(Duration value) {
     _value = value;
+    wasChanged = true;
     if (onChanged != null) onChanged!();
   }
 
@@ -148,6 +153,7 @@ abstract class PreferencedFile extends PreferencedElement {
   String? get filename => _file == null ? null : basename(_file!.path);
   Future<void> setFile(File? originalFile) async {
     _file = originalFile == null ? null : await _copyFile(originalFile);
+    wasChanged = true;
     if (onChanged != null) onChanged!();
     if (originalFile != null && lastVisitedFolderCallback != null) {
       lastVisitedFolderCallback!(originalFile.parent);
@@ -178,6 +184,7 @@ class PreferencedImageFile extends PreferencedFile {
   double get size => _size;
   set size(double value) {
     _size = value;
+    wasChanged = true;
     if (onChanged != null) onChanged!();
   }
 
@@ -208,6 +215,7 @@ class PreferencedText extends PreferencedElement {
   String get text => _text;
   set text(String value) {
     _text = value;
+    wasChanged = true;
     if (onChanged != null) onChanged!();
   }
 
@@ -223,12 +231,14 @@ class PreferencedText extends PreferencedElement {
   Color get color => _color;
   set color(Color value) {
     _color = value;
+    wasChanged = true;
     if (onChanged != null) onChanged!();
   }
 
   AppFonts get font => _font;
   set font(AppFonts value) {
     _font = value;
+    wasChanged = true;
     if (onChanged != null) onChanged!();
   }
 
@@ -294,12 +304,14 @@ class TextOnPomodoro extends PreferencedText {
   Offset get offset => _offset;
   void addToOffset(Offset offset) {
     _offset += offset;
+    wasChanged = true;
     if (onChanged != null) onChanged!();
   }
 
   double get size => _size;
   void increaseSize(double value) {
     _size += value;
+    wasChanged = true;
     if (onChanged != null) onChanged!();
   }
 
