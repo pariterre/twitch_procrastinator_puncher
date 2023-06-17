@@ -21,6 +21,7 @@ dependencies:
   common_lib:
     path: ../common_lib
   window_manager: ^0.3.4
+  url_launcher: ^6.1.11
 
 dev_dependencies:
   flutter_test:

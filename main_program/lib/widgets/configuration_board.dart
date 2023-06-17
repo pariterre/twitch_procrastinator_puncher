@@ -6,12 +6,14 @@ import 'package:common_lib/providers/app_preferences.dart';
 import 'package:common_lib/providers/participants.dart';
 import 'package:common_lib/providers/pomodoro_status.dart';
 import 'package:flutter/material.dart';
+import 'package:twitch_procastinator_puncher/models/locale.dart';
 import 'package:twitch_procastinator_puncher/models/twitch_status.dart';
 import 'package:twitch_procastinator_puncher/widgets/checkbox_tile.dart';
 import 'package:twitch_procastinator_puncher/widgets/color_selector_tile.dart';
 import 'package:twitch_procastinator_puncher/widgets/dropmenu_selector_tile.dart';
 import 'package:twitch_procastinator_puncher/widgets/file_selector_tile.dart';
 import 'package:twitch_procastinator_puncher/widgets/int_selector_tile.dart';
+import 'package:twitch_procastinator_puncher/widgets/language_selector.dart';
 import 'package:twitch_procastinator_puncher/widgets/plus_or_minus.dart';
 import 'package:twitch_procastinator_puncher/widgets/plus_or_minus_tile.dart';
 import 'package:twitch_procastinator_puncher/widgets/string_selector_tile.dart';
@@ -43,34 +45,63 @@ class ConfigurationBoard extends StatelessWidget {
 
     return Container(
       width: windowHeight * 0.5,
-      height: windowHeight * 0.7,
       decoration: BoxDecoration(color: ThemeColor().configurationBoard),
       padding: EdgeInsets.only(bottom: padding),
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: padding, vertical: padding),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildController(context),
-              const Divider(),
-              _buildInformation(context),
-              const Divider(),
-              _buildTimerConfiguration(context),
-              const Divider(),
-              _buildImageSelectors(context),
-              const Divider(),
-              _buildColorPickers(context),
-              const Divider(),
-              _buildTextOnImage(context),
-              const Divider(),
-              _buildHallOfFame(context),
-            ],
-          ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildTitle(context),
+            SizedBox(height: windowHeight * 0.02),
+            SizedBox(
+              height: windowHeight * 0.63,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildInformation(context),
+                    const Divider(),
+                    _buildController(context),
+                    const Divider(),
+                    _buildTimerConfiguration(context),
+                    const Divider(),
+                    _buildImageSelectors(context),
+                    const Divider(),
+                    _buildColorPickers(context),
+                    const Divider(),
+                    _buildTextOnImage(context),
+                    const Divider(),
+                    _buildHallOfFame(context),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
+    );
+  }
+
+  Widget _buildTitle(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        const LanguageSelector(),
+        Center(
+          child: Text(
+            'The Procrastinator Puncher (${AppLocale.of(context).coucou})',
+            style: TextStyle(
+                color: ThemeColor().configurationText,
+                fontSize: ThemeSize.text(context) * 1.20,
+                fontWeight: FontWeight.bold),
+          ),
+        ),
+      ],
     );
   }
 
