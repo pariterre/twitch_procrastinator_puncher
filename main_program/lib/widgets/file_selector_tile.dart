@@ -50,7 +50,7 @@ class FileSelectorTile extends StatelessWidget {
 
   void _playSound() async {
     final player = AudioPlayer();
-    await player.play(DeviceFileSource(file.file!.path));
+    await player.play(DeviceFileSource(file.filename!));
   }
 
   @override
@@ -97,14 +97,14 @@ class FileSelectorTile extends StatelessWidget {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (file.fileType == FileType.image && file.file != null)
+            if (file.fileType == FileType.image && file.filename != null)
               // Show a thumbnail
               SizedBox(
                   height: windowHeight * 0.045,
                   width: windowHeight * 0.045,
-                  child: Image.file(file.file!)),
+                  child: (file as PreferencedImageFile).image!),
             if (file.fileType == FileType.image &&
-                file.file != null &&
+                file.filename != null &&
                 onSizeChanged != null)
               // Show a thumbnail
               SizedBox(
@@ -112,7 +112,7 @@ class FileSelectorTile extends StatelessWidget {
                   child: PlusOrMinus(
                     onTap: onSizeChanged!,
                   )),
-            if (file.fileType == FileType.sound && file.file != null)
+            if (file.fileType == FileType.sound && file.filename != null)
               SizedBox(
                   height: windowHeight * 0.045,
                   width: windowHeight * 0.045,
@@ -134,7 +134,7 @@ class FileSelectorTile extends StatelessWidget {
                 ),
               ),
             ),
-            if (file.file != null)
+            if (file.filename != null)
               SizedBox(
                 height: windowHeight * 0.045,
                 width: windowHeight * 0.045,

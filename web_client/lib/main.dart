@@ -1,3 +1,4 @@
+import 'package:common_lib/models/config.dart';
 import 'package:common_lib/providers/app_preferences.dart';
 import 'package:common_lib/providers/participants.dart';
 import 'package:common_lib/providers/pomodoro_status.dart';
@@ -7,6 +8,7 @@ import 'package:web_client/main_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await declareAppDirectory();
   final appPreferences = await AppPreferences.factory();
   final participants = await Participants.factory(
       mustFollowForFaming: appPreferences.mustFollowForFaming.value,

@@ -26,16 +26,26 @@ class _WebSocketClientHolderState extends State<WebSocketClientHolder> {
     initializedWebsocket();
   }
 
+  bool initializing = true;
   void initializedWebsocket() async {
     final channel = ws.WebSocket(Uri.parse(_serverUrl));
 
+    initializing = true;
     channel.messages.listen((message) {
       final map = jsonDecode(message);
+
+      if (initializing) {
+        if (map?['answerType'] != 'initial') {
+          channel.send(jsonEncode({'command': 'initializing'}));
+          return;
+        }
+        initializing = false;
+      }
 
       final preferences = AppPreferences.of(context, listen: false);
       final participants = Participants.of(context, listen: false);
       final status = PomodoroStatus.of(context, listen: false);
-      preferences.updateFromSerialized(map['preferences']);
+      preferences.updateWebClient(map['preferences']);
       participants.updateFromSerialized(map['participants']);
       status.updateFromSerialized(map['status']);
     });
@@ -57,28 +67,11 @@ class WebSocketServerHolder extends StatefulWidget {
 
 class _WebSocketServerHolderState extends State<WebSocketServerHolder> {
   WebSocket? _socket;
-  WebSocket? _webServer;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _initializedWebSocket();
-    _initializeWebServer();
-  }
-
-  void _initializeWebServer() async {
-    if (_webServer != null) return;
-
-    var webSocketTransformer = WebSocketTransformer();
-    HttpServer server = await HttpServer.bind(InternetAddress.anyIPv6, 9876);
-    server.transform(webSocketTransformer).listen((WebSocket webSocket) async {
-      _webServer = webSocket;
-      final preferences = AppPreferences.of(context, listen: false);
-      final image = preferences.activeBackgroundImage.file!;
-      final bytes = await image.readAsBytes();
-      debugPrint('Received GET request');
-      webSocket.add(jsonEncode({"bytes": bytes.toString()}));
-    });
   }
 
   void _initializedWebSocket() async {
@@ -90,16 +83,29 @@ class _WebSocketServerHolderState extends State<WebSocketServerHolder> {
     server.transform(webSocketTransformer).listen((WebSocket webSocket) {
       log('Client has connected');
       _socket = webSocket;
-      _sendAll(listen: false);
+      _socket!.listen(_listenToWebClient);
+      _sendAll(initial: true);
     });
   }
 
-  void _sendAll({listen = true}) {
-    final preferences = AppPreferences.of(context, listen: listen);
-    final participants = Participants.of(context, listen: listen);
-    final status = PomodoroStatus.of(context, listen: listen);
+  void _listenToWebClient(message) {
+    final map = jsonDecode(message);
+    // Invalid formatting
+    if (map?['command'] == null) return;
+
+    if (map!['command'] == 'initializing') {
+      _sendAll(initial: true);
+    }
+  }
+
+  void _sendAll({initial = false}) {
+    final preferences = AppPreferences.of(context, listen: !initial);
+    final participants = Participants.of(context, listen: !initial);
+    final status = PomodoroStatus.of(context, listen: !initial);
+
     _socket!.add(json.encode({
-      'preferences': preferences.serialize(),
+      'answerType': initial ? 'initial' : 'normal',
+      'preferences': preferences.serializeForWebClient(initial),
       'participants': participants.serialize(),
       'status': status.serialize(),
     }));

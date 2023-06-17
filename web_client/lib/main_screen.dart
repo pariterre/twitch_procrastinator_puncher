@@ -1,6 +1,7 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:common_lib/hall_of_fame.dart';
 import 'package:common_lib/models/app_theme.dart';
+import 'package:common_lib/models/config.dart';
 import 'package:common_lib/pomodoro_timer.dart';
 import 'package:common_lib/providers/app_preferences.dart';
 import 'package:common_lib/providers/pomodoro_status.dart';
@@ -33,30 +34,33 @@ class _MainScreenState extends State<MainScreen> {
   Future<void> _activeSessionDone() async {
     final preferences = AppPreferences.of(context, listen: false);
 
-    if (preferences.endActiveSessionSound.file != null) {
+    if (preferences.endActiveSessionSound.filename != null) {
+      final filepath =
+          '${appDirectory.path}/${preferences.endWorkingSound.filename!}';
       final player = AudioPlayer();
-      await player
-          .play(DeviceFileSource(preferences.endActiveSessionSound.filepath!));
+      await player.play(DeviceFileSource(filepath));
     }
   }
 
   Future<void> _pauseSessionDone() async {
     final preferences = AppPreferences.of(context, listen: false);
 
-    if (preferences.endPauseSessionSound.file != null) {
+    if (preferences.endPauseSessionSound.filename != null) {
+      final filepath =
+          '${appDirectory.path}/${preferences.endWorkingSound.filename!}';
       final player = AudioPlayer();
-      await player
-          .play(DeviceFileSource(preferences.endPauseSessionSound.filepath!));
+      await player.play(DeviceFileSource(filepath));
     }
   }
 
   Future<void> _workingDone() async {
     final preferences = AppPreferences.of(context, listen: false);
 
-    if (preferences.endWorkingSound.file != null) {
+    if (preferences.endWorkingSound.filename != null) {
+      final filepath =
+          '${appDirectory.path}/${preferences.endWorkingSound.filename!}';
       final player = AudioPlayer();
-      await player
-          .play(DeviceFileSource(preferences.endWorkingSound.filepath!));
+      await player.play(DeviceFileSource(filepath));
     }
   }
 
@@ -67,7 +71,7 @@ class _MainScreenState extends State<MainScreen> {
     final padding = ThemePadding.normal(context);
 
     final widget = Scaffold(
-      backgroundColor: preferences.backgroundColor.value.withOpacity(0),
+      backgroundColor: preferences.backgroundColor.value,
       body: WebSocketClientHolder(
         child: SizedBox(
           height: windowHeight,

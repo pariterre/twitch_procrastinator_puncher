@@ -1,3 +1,4 @@
+import 'package:common_lib/models/config.dart';
 import 'package:common_lib/providers/app_preferences.dart';
 import 'package:common_lib/providers/participants.dart';
 import 'package:common_lib/providers/pomodoro_status.dart';
@@ -6,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:twitch_procastinator_puncher/screens/main_screen.dart';
 
 void main() async {
+  await declareAppDirectory();
   final appPreferences = await AppPreferences.factory();
   final participants = await Participants.factory(
       mustFollowForFaming: appPreferences.mustFollowForFaming.value,

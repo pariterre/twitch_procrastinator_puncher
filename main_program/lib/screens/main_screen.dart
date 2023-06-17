@@ -76,30 +76,33 @@ class _MainScreenState extends State<MainScreen> {
   Future<void> _activeSessionDone() async {
     final preferences = AppPreferences.of(context, listen: false);
 
-    if (preferences.endActiveSessionSound.file != null) {
+    if (preferences.endActiveSessionSound.filename != null) {
+      final filepath =
+          '${appDirectory.path}/${preferences.endWorkingSound.filename!}';
       final player = AudioPlayer();
-      await player
-          .play(DeviceFileSource(preferences.endActiveSessionSound.filepath!));
+      await player.play(DeviceFileSource(filepath));
     }
   }
 
   Future<void> _pauseSessionDone() async {
     final preferences = AppPreferences.of(context, listen: false);
 
-    if (preferences.endPauseSessionSound.file != null) {
+    if (preferences.endPauseSessionSound.filename != null) {
+      final filepath =
+          '${appDirectory.path}/${preferences.endWorkingSound.filename!}';
       final player = AudioPlayer();
-      await player
-          .play(DeviceFileSource(preferences.endPauseSessionSound.filepath!));
+      await player.play(DeviceFileSource(filepath));
     }
   }
 
   Future<void> _workingDone() async {
     final preferences = AppPreferences.of(context, listen: false);
 
-    if (preferences.endWorkingSound.file != null) {
+    if (preferences.endWorkingSound.filename != null) {
+      final filepath =
+          '${appDirectory.path}/${preferences.endWorkingSound.filename!}';
       final player = AudioPlayer();
-      await player
-          .play(DeviceFileSource(preferences.endWorkingSound.filepath!));
+      await player.play(DeviceFileSource(filepath));
     }
   }
 

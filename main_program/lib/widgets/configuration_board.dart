@@ -357,7 +357,7 @@ class ConfigurationBoard extends StatelessWidget {
                     'on the imsage is updated too.\n'
                     'This allows to access the current state of the timer outside\n'
                     'of this software. The file is in:\n'
-                    '${preferences.saveDirectory.path}/$textExportFilename',
+                    '${appDirectory.path}/$textExportFilename',
                 child: const Icon(
                   Icons.info,
                   color: Colors.white,

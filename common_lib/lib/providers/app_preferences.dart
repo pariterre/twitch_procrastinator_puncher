@@ -6,21 +6,16 @@ import 'package:common_lib/models/config.dart';
 import 'package:common_lib/models/preferenced_element.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 export 'package:common_lib/models/app_fonts.dart';
 
-String _path(Directory directory, String filename) =>
-    '${directory.path}/$filename';
-
 String get rootPath => Platform.isWindows ? r'C:\' : '/';
 
 class AppPreferences with ChangeNotifier {
-  // Path to save data folder and file
-  Directory _saveDirectory;
-  Directory get saveDirectory => _saveDirectory;
+  static String get _savepath => '${appDirectory.path}/$preferencesFilename';
 
+  // Last visited directory when selecting a file
   Directory _lastVisitedDirectory = Directory('');
   Directory get lastVisitedDirectory => _lastVisitedDirectory;
 
@@ -100,7 +95,7 @@ class AppPreferences with ChangeNotifier {
   /// Save the current preferences to a file
   void _save() async {
     if (!kIsWeb) {
-      final file = File('${_saveDirectory.path}/$preferencesFilename');
+      final file = File(_savepath);
       await file.writeAsString(json.encode(serialize()));
     }
     notifyListeners();
@@ -117,33 +112,25 @@ class AppPreferences with ChangeNotifier {
   /// Main constructor of the AppPreferences. If [reload] is false, then the
   /// previously saved folder is ignored
   static Future<AppPreferences> factory({reload = true}) async {
-    // Read the previously saved preference file if it exists
-    late final Directory directory;
-    if (kIsWeb) {
-      directory = Directory('');
-    } else {
-      final documentDirectory = await getApplicationDocumentsDirectory();
-      directory = Directory('${documentDirectory.path}/$twitchAppName');
-      if (!(await directory.exists())) {
-        await directory.create(recursive: true);
-      }
-    }
-
-    final preferencesFile = File(_path(directory, preferencesFilename));
     Map<String, dynamic>? previousPreferences;
-    if (!kIsWeb && reload && await preferencesFile.exists()) {
-      try {
-        previousPreferences = jsonDecode(await preferencesFile.readAsString());
-      } catch (_) {
-        previousPreferences = null;
+    if (!kIsWeb) {
+      // Read the previously saved preference file if it exists
+      final preferencesFile = File(_savepath);
+
+      if (reload && await preferencesFile.exists()) {
+        try {
+          previousPreferences =
+              jsonDecode(await preferencesFile.readAsString());
+        } catch (_) {
+          previousPreferences = null;
+        }
       }
     }
 
     // Call the real constructor
     return AppPreferences._(
-        directory: directory,
-        lastVisitedDirectory: Directory(
-            previousPreferences?['lastVisitedDirectory'] ?? directory.path),
+        lastVisitedDirectory:
+            Directory(previousPreferences?['lastVisitedDirectory'] ?? ''),
         nbSessions:
             PreferencedInt.deserialize(previousPreferences?['nbSessions'], 0),
         sessionDuration: PreferencedDuration.deserialize(
@@ -151,15 +138,15 @@ class AppPreferences with ChangeNotifier {
         pauseDuration: PreferencedDuration.deserialize(
             previousPreferences?['pauseDuration'], 0),
         activeBackgroundImage: PreferencedImageFile.deserialize(
-            directory, previousPreferences?['activeBackgroundImage']),
+            previousPreferences?['activeBackgroundImage']),
         pauseBackgroundImage: PreferencedImageFile.deserialize(
-            directory, previousPreferences?['pauseBackgroundImage']),
+            previousPreferences?['pauseBackgroundImage']),
         endActiveSessionSound: PreferencedSoundFile.deserialize(
-            directory, previousPreferences?['endActiveSessionSound']),
+            previousPreferences?['endActiveSessionSound']),
         endPauseSessionSound: PreferencedSoundFile.deserialize(
-            directory, previousPreferences?['endPauseSessionSound']),
+            previousPreferences?['endPauseSessionSound']),
         endWorkingSound: PreferencedSoundFile.deserialize(
-            directory, previousPreferences?['endWorkingSound']),
+            previousPreferences?['endWorkingSound']),
         backgroundColor: PreferencedColor.deserialize(
             previousPreferences?['backgroundColor'], 0xFFFFFFFF),
         backgroundColorHallOfFame: PreferencedColor.deserialize(
@@ -170,12 +157,9 @@ class AppPreferences with ChangeNotifier {
         textDuringInitialization: TextOnPomodoro.deserialize(
             previousPreferences?['textDuringInitialization'], 'Welcome!'),
         textDuringActiveSession: TextOnPomodoro.deserialize(
-            previousPreferences?['textDuringActiveSession'],
-            r'Session {currentSession}/{maxSessions}\n{timer}!'),
-        textDuringPauseSession: TextOnPomodoro.deserialize(
-            previousPreferences?['textDuringPauseSession'], r'Pause\n{timer}!'),
-        textDuringPause:
-            TextOnPomodoro.deserialize(previousPreferences?['textDuringPause'], r'Pause!'),
+            previousPreferences?['textDuringActiveSession'], r'Session {currentSession}/{maxSessions}\n{timer}!'),
+        textDuringPauseSession: TextOnPomodoro.deserialize(previousPreferences?['textDuringPauseSession'], r'Pause\n{timer}!'),
+        textDuringPause: TextOnPomodoro.deserialize(previousPreferences?['textDuringPause'], r'Pause!'),
         textDone: TextOnPomodoro.deserialize(previousPreferences?['textDone'], r'Congratulation!'),
         saveToTextFile: PreferencedBool.deserialize(previousPreferences?['saveToTextFile'], false),
         useHallOfFame: PreferencedBool.deserialize(previousPreferences?['useHallOfFame'], true),
@@ -194,7 +178,6 @@ class AppPreferences with ChangeNotifier {
   }
 
   AppPreferences._({
-    required Directory directory,
     required Directory lastVisitedDirectory,
     required this.nbSessions,
     required this.sessionDuration,
@@ -227,8 +210,7 @@ class AppPreferences with ChangeNotifier {
     required this.textHallOfFameToday,
     required this.textHallOfFameAlltime,
     required this.textHallOfFameTotal,
-  })  : _saveDirectory = directory,
-        _lastVisitedDirectory = lastVisitedDirectory {
+  }) : _lastVisitedDirectory = lastVisitedDirectory {
     // Set the necessary callback
     nbSessions.onChanged = _save;
 
@@ -287,7 +269,6 @@ class AppPreferences with ChangeNotifier {
   ///
   /// Serialize all the values
   Map<String, dynamic> serialize() => {
-        'directory': saveDirectory.path,
         'lastVisitedDirectory': _lastVisitedDirectory.path,
         'nbSessions': nbSessions.serialize(),
         'sessionDuration': sessionDuration.serialize(),
@@ -325,137 +306,198 @@ class AppPreferences with ChangeNotifier {
 
   ///
   /// Serialize all the values
-  Map<String, dynamic> serializeForWebClient() {
+  Map<String, dynamic> serializeForWebClient(bool initial) {
     final out = <String, dynamic>{};
-    if (nbSessions.wasChanged) {
+    if (initial || nbSessions.shouldSendToWebClient) {
       out['nbSessions'] = nbSessions.serialize();
+      nbSessions.shouldSendToWebClient = false;
     }
-    if (sessionDuration.wasChanged) {
+    if (initial || sessionDuration.shouldSendToWebClient) {
       out['sessionDuration'] = sessionDuration.serialize();
+      sessionDuration.shouldSendToWebClient = false;
     }
-    if (pauseDuration.wasChanged) {
+    if (initial || pauseDuration.shouldSendToWebClient) {
       out['pauseDuration'] = pauseDuration.serialize();
+      pauseDuration.shouldSendToWebClient = false;
     }
-    if (activeBackgroundImage.wasChanged) {
-      out['activeBackgroundImage'] = activeBackgroundImage.serialize();
+    if (initial || activeBackgroundImage.shouldSendToWebClient) {
+      out['activeBackgroundImage'] =
+          activeBackgroundImage.serialize(withRawFile: true);
+      activeBackgroundImage.shouldSendToWebClient = false;
     }
-    if (pauseBackgroundImage.wasChanged) {
-      out['pauseBackgroundImage'] = pauseBackgroundImage.serialize();
+    if (initial || pauseBackgroundImage.shouldSendToWebClient) {
+      out['pauseBackgroundImage'] =
+          pauseBackgroundImage.serialize(withRawFile: true);
+      pauseBackgroundImage.shouldSendToWebClient = false;
     }
-    if (endActiveSessionSound.wasChanged) {
-      out['endActiveSessionSound'] = endActiveSessionSound.serialize();
+    if (initial || endActiveSessionSound.shouldSendToWebClient) {
+      out['endActiveSessionSound'] =
+          endActiveSessionSound.serialize(withRawFile: true);
+      endActiveSessionSound.shouldSendToWebClient = false;
     }
-    if (endPauseSessionSound.wasChanged) {
-      out['endPauseSessionSound'] = endPauseSessionSound.serialize();
+    if (initial || endPauseSessionSound.shouldSendToWebClient) {
+      out['endPauseSessionSound'] =
+          endPauseSessionSound.serialize(withRawFile: true);
+      endPauseSessionSound.shouldSendToWebClient = false;
     }
-    if (endWorkingSound.wasChanged) {
-      out['endWorkingSound'] = endWorkingSound.serialize();
+    if (initial || endWorkingSound.shouldSendToWebClient) {
+      out['endWorkingSound'] = endWorkingSound.serialize(withRawFile: true);
+      endWorkingSound.shouldSendToWebClient = false;
     }
-    if (backgroundColor.wasChanged) {
+    if (initial || backgroundColor.shouldSendToWebClient) {
       out['backgroundColor'] = backgroundColor.serialize();
+      backgroundColor.shouldSendToWebClient = false;
     }
-    if (backgroundColorHallOfFame.wasChanged) {
+    if (initial || backgroundColorHallOfFame.shouldSendToWebClient) {
       out['backgroundColorHallOfFame'] = backgroundColorHallOfFame.serialize();
+      backgroundColorHallOfFame.shouldSendToWebClient = false;
     }
     out['fontPomodoro'] = fontPomodoro.index;
     out['textColorHallOfFame'] = textColorHallOfFame.value;
-    if (textDuringInitialization.wasChanged) {
+    if (initial || textDuringInitialization.shouldSendToWebClient) {
       out['textDuringInitialization'] = textDuringInitialization.serialize();
+      textDuringInitialization.shouldSendToWebClient = false;
     }
-    if (textDuringActiveSession.wasChanged) {
+    if (initial || textDuringActiveSession.shouldSendToWebClient) {
       out['textDuringActiveSession'] = textDuringActiveSession.serialize();
+      textDuringActiveSession.shouldSendToWebClient = false;
     }
-    if (textDuringPauseSession.wasChanged) {
+    if (initial || textDuringPauseSession.shouldSendToWebClient) {
       out['textDuringPauseSession'] = textDuringPauseSession.serialize();
+      textDuringPauseSession.shouldSendToWebClient = false;
     }
-    if (textDuringPause.wasChanged) {
+    if (initial || textDuringPause.shouldSendToWebClient) {
       out['textDuringPause'] = textDuringPause.serialize();
+      textDuringPause.shouldSendToWebClient = false;
     }
-    if (textDone.wasChanged) {
+    if (initial || textDone.shouldSendToWebClient) {
       out['textDone'] = textDone.serialize();
+      textDone.shouldSendToWebClient = false;
     }
-    if (useHallOfFame.wasChanged) {
+    if (initial || useHallOfFame.shouldSendToWebClient) {
       out['useHallOfFame'] = useHallOfFame.serialize();
+      useHallOfFame.shouldSendToWebClient = false;
     }
-    if (hallOfFameScrollVelocity.wasChanged) {
+    if (initial || hallOfFameScrollVelocity.shouldSendToWebClient) {
       out['hallOfFameScrollVelocity'] = hallOfFameScrollVelocity.serialize();
+      hallOfFameScrollVelocity.shouldSendToWebClient = false;
     }
     out['fontHallOfFame'] = fontHallOfFame.index;
-    if (textHallOfFameTitle.wasChanged) {
+    if (initial || textHallOfFameTitle.shouldSendToWebClient) {
       out['textHallOfFameTitle'] = textHallOfFameTitle.serialize();
+      textHallOfFameTitle.shouldSendToWebClient = false;
     }
-    if (textHallOfFameName.wasChanged) {
+    if (initial || textHallOfFameName.shouldSendToWebClient) {
       out['textHallOfFameName'] = textHallOfFameName.serialize();
+      textHallOfFameName.shouldSendToWebClient = false;
     }
-    if (textHallOfFameToday.wasChanged) {
+    if (initial || textHallOfFameToday.shouldSendToWebClient) {
       out['textHallOfFameToday'] = textHallOfFameToday.serialize();
+      textHallOfFameToday.shouldSendToWebClient = false;
     }
-    if (textHallOfFameAlltime.wasChanged) {
+    if (initial || textHallOfFameAlltime.shouldSendToWebClient) {
       out['textHallOfFameAlltime'] = textHallOfFameAlltime.serialize();
+      textHallOfFameAlltime.shouldSendToWebClient = false;
     }
-    if (textHallOfFameTotal.wasChanged) {
+    if (initial || textHallOfFameTotal.shouldSendToWebClient) {
       out['textHallOfFameTotal'] = textHallOfFameTotal.serialize();
+      textHallOfFameTotal.shouldSendToWebClient = false;
     }
 
     return out;
   }
 
-  void updateFromSerialized(map) {
-    _saveDirectory = Directory(map['directory']);
-    _lastVisitedDirectory = Directory(map['lastVisitedDirectory']);
+  void updateWebClient(map) {
+    if (map?['nbSessions'] != null) {
+      nbSessions = PreferencedInt.deserialize(map['nbSessions']);
+    }
+    if (map?['sessionDuration'] != null) {
+      sessionDuration = PreferencedDuration.deserialize(map['sessionDuration']);
+    }
+    if (map?['pauseDuration'] != null) {
+      pauseDuration = PreferencedDuration.deserialize(map['pauseDuration']);
+    }
 
-    nbSessions = PreferencedInt.deserialize(map['nbSessions']);
-    sessionDuration = PreferencedDuration.deserialize(map['sessionDuration']);
-    pauseDuration = PreferencedDuration.deserialize(map['pauseDuration']);
+    if (map?['activeBackgroundImage'] != null) {
+      activeBackgroundImage =
+          PreferencedImageFile.deserialize(map['activeBackgroundImage']);
+    }
+    if (map?['pauseBackgroundImage'] != null) {
+      pauseBackgroundImage =
+          PreferencedImageFile.deserialize(map['pauseBackgroundImage']);
+    }
 
-    activeBackgroundImage = PreferencedImageFile.deserialize(
-        saveDirectory, map['activeBackgroundImageFilename']);
-    pauseBackgroundImage = PreferencedImageFile.deserialize(
-        saveDirectory, map['pauseBackgroundImageFilename']);
+    if (map?['endActiveSessionSound'] != null) {
+      endActiveSessionSound =
+          PreferencedSoundFile.deserialize(map['endActiveSessionSound']);
+    }
+    if (map?['endPauseSessionSound'] != null) {
+      endPauseSessionSound =
+          PreferencedSoundFile.deserialize(map['endPauseSessionSound']);
+    }
+    if (map?['endWorkingSound'] != null) {
+      endWorkingSound =
+          PreferencedSoundFile.deserialize(map['endWorkingSound']);
+    }
 
-    endActiveSessionSound = PreferencedSoundFile.deserialize(
-        saveDirectory, map['endActiveSessionSoundFilename']);
-    endPauseSessionSound = PreferencedSoundFile.deserialize(
-        saveDirectory, map['endPauseSessionSound']);
-    endWorkingSound =
-        PreferencedSoundFile.deserialize(saveDirectory, map['endWorkingSound']);
-
-    backgroundColor = PreferencedColor.deserialize(map['backgroundColor']);
-    backgroundColorHallOfFame =
-        PreferencedColor.deserialize(map['backgroundColorHallOfFame']);
+    if (map?['backgroundColor'] != null) {
+      backgroundColor = PreferencedColor.deserialize(map['backgroundColor']);
+    }
+    if (map?['backgroundColorHallOfFame'] != null) {
+      backgroundColorHallOfFame =
+          PreferencedColor.deserialize(map['backgroundColorHallOfFame']);
+    }
 
     fontPomodoro = AppFonts.values[map['fontPomodoro']];
     textColorHallOfFame = Color(map['textColorHallOfFame']);
-    textDuringInitialization =
-        TextOnPomodoro.deserialize(map['textDuringInitialization']);
-    textDuringActiveSession =
-        TextOnPomodoro.deserialize(map['textDuringActiveSession']);
-    textDuringPauseSession =
-        TextOnPomodoro.deserialize(map['textDuringPauseSession']);
-    textDuringPause = TextOnPomodoro.deserialize(map['textDuringPause']);
-    textDone = TextOnPomodoro.deserialize(map['textDone']);
-    saveToTextFile = PreferencedBool.deserialize(map['saveToTextFile']);
-    useHallOfFame = PreferencedBool.deserialize(map['useHallOfFame']);
-    mustFollowForFaming =
-        PreferencedBool.deserialize(map['mustFollowForFaming']);
-    hallOfFameScrollVelocity =
-        PreferencedInt.deserialize(map['hallOfFameScrollVelocity']);
-    textNewcomersGreetings =
-        TextToChat.deserialize(map['textNewcomersGreetings']);
-    textUserHasConnectedGreetings =
-        TextToChat.deserialize(map['textUserHasConnectedGreetings']);
-    textWhitelist = PreferencedText.deserialize(map['textWhitelist']);
-    textBlacklist = PreferencedText.deserialize(map['textBlacklist']);
+    if (map?['textDuringInitialization'] != null) {
+      textDuringInitialization =
+          TextOnPomodoro.deserialize(map['textDuringInitialization']);
+    }
+    if (map?['textDuringActiveSession'] != null) {
+      textDuringActiveSession =
+          TextOnPomodoro.deserialize(map['textDuringActiveSession']);
+    }
+    if (map?['textDuringPauseSession'] != null) {
+      textDuringPauseSession =
+          TextOnPomodoro.deserialize(map['textDuringPauseSession']);
+    }
+    if (map?['textDuringPause'] != null) {
+      textDuringPause = TextOnPomodoro.deserialize(map['textDuringPause']);
+    }
+    if (map?['textDone'] != null) {
+      textDone = TextOnPomodoro.deserialize(map['textDone']);
+    }
+
+    if (map?['useHallOfFame'] != null) {
+      useHallOfFame = PreferencedBool.deserialize(map['useHallOfFame']);
+    }
+    if (map?['hallOfFameScrollVelocity'] != null) {
+      hallOfFameScrollVelocity =
+          PreferencedInt.deserialize(map['hallOfFameScrollVelocity']);
+    }
     fontHallOfFame = AppFonts.values[map['fontHallOfFame']];
-    textHallOfFameTitle =
-        PreferencedText.deserialize(map['textHallOfFameTitle']);
-    textHallOfFameName =
-        PreferencedText.deserialize(map?['textHallOfFameName']);
-    textHallOfFameToday =
-        PreferencedText.deserialize(map['textHallOfFameToday']);
-    textHallOfFameAlltime =
-        PreferencedText.deserialize(map['textHallOfFameAlltime']);
-    textHallOfFameTotal =
-        PreferencedText.deserialize(map['textHallOfFameTotal']);
+    if (map?['textHallOfFameTitle'] != null) {
+      textHallOfFameTitle =
+          PreferencedText.deserialize(map['textHallOfFameTitle']);
+    }
+    if (map?['textHallOfFameName'] != null) {
+      textHallOfFameName =
+          PreferencedText.deserialize(map?['textHallOfFameName']);
+    }
+    if (map?['textHallOfFameToday'] != null) {
+      textHallOfFameToday =
+          PreferencedText.deserialize(map['textHallOfFameToday']);
+    }
+    if (map?['textHallOfFameAlltime'] != null) {
+      textHallOfFameAlltime =
+          PreferencedText.deserialize(map['textHallOfFameAlltime']);
+    }
+    if (map?['textHallOfFameTotal'] != null) {
+      textHallOfFameTotal =
+          PreferencedText.deserialize(map['textHallOfFameTotal']);
+    }
+
+    notifyListeners();
   }
 }

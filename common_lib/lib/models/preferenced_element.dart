@@ -1,10 +1,12 @@
 import 'dart:io';
 
 import 'package:common_lib/models/app_fonts.dart';
-import 'package:flutter/material.dart';
+import 'package:common_lib/models/config.dart';
 import 'package:common_lib/models/helpers.dart';
 import 'package:common_lib/models/participant.dart';
 import 'package:common_lib/providers/pomodoro_status.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 
 enum FileType { image, sound }
@@ -12,7 +14,7 @@ enum FileType { image, sound }
 abstract class PreferencedElement {
   PreferencedElement({this.onChanged});
 
-  bool wasChanged = false;
+  bool shouldSendToWebClient = false;
   Function()? onChanged;
 
   static PreferencedElement deserialize() => throw UnimplementedError();
@@ -37,7 +39,7 @@ class PreferencedInt extends PreferencedElement {
   int get value => _value;
   set value(int value) {
     _value = value;
-    wasChanged = true;
+    shouldSendToWebClient = true;
     if (onChanged != null) onChanged!();
   }
 
@@ -66,7 +68,7 @@ class PreferencedBool extends PreferencedElement {
   bool get value => _value;
   set value(bool value) {
     _value = value;
-    wasChanged = true;
+    shouldSendToWebClient = true;
     if (onChanged != null) onChanged!();
   }
 
@@ -95,7 +97,7 @@ class PreferencedColor extends PreferencedElement {
   Color get value => _value;
   set value(Color value) {
     _value = value;
-    wasChanged = true;
+    shouldSendToWebClient = true;
     if (onChanged != null) onChanged!();
   }
 
@@ -124,7 +126,7 @@ class PreferencedDuration extends PreferencedElement {
   Duration get value => _value;
   set value(Duration value) {
     _value = value;
-    wasChanged = true;
+    shouldSendToWebClient = true;
     if (onChanged != null) onChanged!();
   }
 
@@ -138,22 +140,35 @@ abstract class PreferencedFile extends PreferencedElement {
   FileType get fileType;
 
   @override
-  PreferencedFile(this.savepath, String? file, [this.lastVisitedFolderCallback])
-      : _file = file == null ? null : File('${savepath.path}/$file');
-  final Directory savepath;
+  PreferencedFile.fromPath(String? filepath, {this.lastVisitedFolderCallback})
+      : _file = filepath == null ? null : File(filepath).readAsBytesSync(),
+        _filename = filepath == null ? null : basename(filepath);
+
+  @override
+  PreferencedFile.fromRaw(
+    Uint8List? rawFile, {
+    String? filename,
+  })  : _file = rawFile,
+        _filename = filename;
   Function(Directory)? lastVisitedFolderCallback;
 
-  Map<String, dynamic> serialize() {
-    return {'filename': _file == null ? null : basename(_file!.path)};
+  Map<String, dynamic> serialize({withRawFile = false}) {
+    return {
+      'filename': _filename,
+      'rawFile': withRawFile ? _file : null,
+    };
   }
 
-  File? _file;
-  File? get file => _file;
-  String? get filepath => _file == null ? null : _file!.path;
-  String? get filename => _file == null ? null : basename(_file!.path);
+  String? _filename;
+  String? get filename => _filename;
+
+  Uint8List? _file;
   Future<void> setFile(File? originalFile) async {
-    _file = originalFile == null ? null : await _copyFile(originalFile);
-    wasChanged = true;
+    _file = originalFile == null
+        ? null
+        : await (await _copyFile(originalFile)).readAsBytes();
+    _filename = originalFile == null ? null : basename(originalFile.path);
+    shouldSendToWebClient = true;
     if (onChanged != null) onChanged!();
     if (originalFile != null && lastVisitedFolderCallback != null) {
       lastVisitedFolderCallback!(originalFile.parent);
@@ -162,13 +177,13 @@ abstract class PreferencedFile extends PreferencedElement {
 
   @override
   String toString() {
-    return _file == null ? '' : basename(_file!.path);
+    return _filename ?? '';
   }
 
   ///
   /// Copy a file and return the name of the new file
   Future<File> _copyFile(File original) async {
-    final targetPath = '${savepath.path}/${basename(original.path)}';
+    final targetPath = '${appDirectory.path}/${basename(original.path)}';
     return await original.copy(targetPath);
   }
 }
@@ -177,34 +192,66 @@ class PreferencedImageFile extends PreferencedFile {
   @override
   FileType get fileType => FileType.image;
 
-  PreferencedImageFile(super.savepath, super.file, {double? size})
-      : _size = size ?? 1;
+  PreferencedImageFile.fromRaw(Uint8List? rawFile,
+      {String? filename, double? size})
+      : _size = size ?? 1,
+        _image = rawFile != null
+            ? Image.memory(rawFile)
+            : filename != null && !kIsWeb
+                ? Image.file(File('${appDirectory.path}/$filename'))
+                : null,
+        super.fromRaw(rawFile, filename: filename);
+
+  @override
+  Future<void> setFile(File? originalFile) async {
+    _image = originalFile == null ? null : Image.file(originalFile);
+    super.setFile(originalFile);
+  }
+
+  Image? _image;
+  Image? get image => _image;
 
   double _size;
   double get size => _size;
   set size(double value) {
     _size = value;
-    wasChanged = true;
+    shouldSendToWebClient = true;
     if (onChanged != null) onChanged!();
   }
 
   @override
-  Map<String, dynamic> serialize() {
-    return super.serialize()..addAll({'size': _size});
+  Map<String, dynamic> serialize({withRawFile = false}) {
+    return super.serialize(withRawFile: withRawFile)..addAll({'size': _size});
   }
 
-  static PreferencedImageFile deserialize(Directory savepath, map) =>
-      PreferencedImageFile(savepath, map?['filename'], size: map?['size']);
+  static PreferencedImageFile deserialize(map) => PreferencedImageFile.fromRaw(
+        map?['rawFile'] != null
+            ? Uint8List.fromList((map?['rawFile'] as List).cast<int>())
+            : map?['filename'] != null
+                ? File('${appDirectory.path}/${map?['filename']}')
+                    .readAsBytesSync()
+                : null,
+        filename: map?['filename'],
+        size: map?['size'],
+      );
 }
 
 class PreferencedSoundFile extends PreferencedFile {
-  PreferencedSoundFile(super.savepath, super.file);
+  PreferencedSoundFile.fromRaw(Uint8List? rawFile, {String? filename})
+      : super.fromRaw(rawFile, filename: filename);
 
   @override
   FileType get fileType => FileType.sound;
 
-  static PreferencedSoundFile deserialize(Directory savepath, map) =>
-      PreferencedSoundFile(savepath, map?['filename']);
+  static PreferencedSoundFile deserialize(map) => PreferencedSoundFile.fromRaw(
+        map?['rawFile'] != null
+            ? Uint8List.fromList((map?['rawFile'] as List).cast<int>())
+            : map?['filename'] != null
+                ? File('${appDirectory.path}/${map?['filename']}')
+                    .readAsBytesSync()
+                : null,
+        filename: map?['filename'],
+      );
 }
 
 class PreferencedText extends PreferencedElement {
@@ -215,7 +262,7 @@ class PreferencedText extends PreferencedElement {
   String get text => _text;
   set text(String value) {
     _text = value;
-    wasChanged = true;
+    shouldSendToWebClient = true;
     if (onChanged != null) onChanged!();
   }
 
@@ -231,14 +278,14 @@ class PreferencedText extends PreferencedElement {
   Color get color => _color;
   set color(Color value) {
     _color = value;
-    wasChanged = true;
+    shouldSendToWebClient = true;
     if (onChanged != null) onChanged!();
   }
 
   AppFonts get font => _font;
   set font(AppFonts value) {
     _font = value;
-    wasChanged = true;
+    shouldSendToWebClient = true;
     if (onChanged != null) onChanged!();
   }
 
@@ -246,7 +293,7 @@ class PreferencedText extends PreferencedElement {
       [String defaultValue = '']) {
     final text = map?['text'] ?? defaultValue;
     final color = Color(map?['color'] ?? 0xFF000000);
-    final font = AppFonts.values[map?['font']];
+    final font = AppFonts.values[map?['font'] ?? 0];
     return PreferencedText(text, color: color, font: font);
   }
 
@@ -304,14 +351,14 @@ class TextOnPomodoro extends PreferencedText {
   Offset get offset => _offset;
   void addToOffset(Offset offset) {
     _offset += offset;
-    wasChanged = true;
+    shouldSendToWebClient = true;
     if (onChanged != null) onChanged!();
   }
 
   double get size => _size;
   void increaseSize(double value) {
     _size += value;
-    wasChanged = true;
+    shouldSendToWebClient = true;
     if (onChanged != null) onChanged!();
   }
 
