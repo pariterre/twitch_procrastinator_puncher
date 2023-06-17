@@ -65,6 +65,7 @@ class _StringSelectorTileState extends State<StringSelectorTile> {
                 onChanged: (value) => widget.onTextChanged(value),
                 maxLines: 2,
                 minLines: 2,
+                style: TextStyle(fontSize: ThemeSize.text(context)),
               ),
             ),
           ),

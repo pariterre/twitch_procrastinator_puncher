@@ -7,12 +7,13 @@ import 'package:common_lib/providers/participants.dart';
 import 'package:common_lib/providers/pomodoro_status.dart';
 import 'package:flutter/material.dart';
 import 'package:twitch_procastinator_puncher/models/twitch_status.dart';
+import 'package:twitch_procastinator_puncher/widgets/checkbox_tile.dart';
 import 'package:twitch_procastinator_puncher/widgets/color_selector_tile.dart';
 import 'package:twitch_procastinator_puncher/widgets/dropmenu_selector_tile.dart';
 import 'package:twitch_procastinator_puncher/widgets/file_selector_tile.dart';
 import 'package:twitch_procastinator_puncher/widgets/int_selector_tile.dart';
 import 'package:twitch_procastinator_puncher/widgets/plus_or_minus.dart';
-import 'package:twitch_procastinator_puncher/widgets/plus_or_minus_list_tile.dart';
+import 'package:twitch_procastinator_puncher/widgets/plus_or_minus_tile.dart';
 import 'package:twitch_procastinator_puncher/widgets/string_selector_tile.dart';
 import 'package:twitch_procastinator_puncher/widgets/time_selector_tile.dart';
 
@@ -89,7 +90,8 @@ class ConfigurationBoard extends StatelessWidget {
         Text('Pomodoro controller',
             style: TextStyle(
                 color: ThemeColor().configurationText,
-                fontWeight: FontWeight.bold)),
+                fontWeight: FontWeight.bold,
+                fontSize: ThemeSize.text(context))),
         SizedBox(height: padding),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -107,15 +109,17 @@ class ConfigurationBoard extends StatelessWidget {
                     : pomodoro.stopWatchStatus == StopWatchStatus.paused
                         ? 'Resume timer'
                         : 'Pause timer',
-                style: const TextStyle(color: Colors.black),
+                style: TextStyle(
+                    color: Colors.black, fontSize: ThemeSize.text(context)),
               ),
             ),
             ElevatedButton(
               onPressed: resetTimerCallback,
               style: ThemeButton.elevated,
-              child: const Text(
+              child: Text(
                 'Reset timer',
-                style: TextStyle(color: Colors.black),
+                style: TextStyle(
+                    color: Colors.black, fontSize: ThemeSize.text(context)),
               ),
             ),
           ],
@@ -132,7 +136,9 @@ class ConfigurationBoard extends StatelessWidget {
                     twitchStatus == TwitchStatus.connected
                         ? 'Reconnect to Twitch'
                         : 'Connect to Twitch',
-                    style: const TextStyle(color: Colors.black)),
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize: ThemeSize.text(context))),
               ),
             ),
           )
@@ -265,10 +271,11 @@ class ConfigurationBoard extends StatelessWidget {
             'Text to print on the images',
             style: TextStyle(
                 color: ThemeColor().configurationText,
-                fontWeight: FontWeight.bold),
+                fontWeight: FontWeight.bold,
+                fontSize: ThemeSize.text(context)),
           ),
           SizedBox(width: padding),
-          const Tooltip(
+          Tooltip(
             message:
                 'The following tag can be used to access some interesting\n'
                 'information to display:\n'
@@ -278,10 +285,8 @@ class ConfigurationBoard extends StatelessWidget {
                 '    {sessionDuration} is the time of the focus sessions\n'
                 '    {pauseDuration} is the time of the pauses\n'
                 '    \\n is a linebreak',
-            child: Icon(
-              Icons.info,
-              color: Colors.white,
-            ),
+            child: Icon(Icons.info,
+                color: Colors.white, size: ThemeSize.icon(context)),
           ),
         ]),
         SizedBox(height: padding),
@@ -343,29 +348,14 @@ class ConfigurationBoard extends StatelessWidget {
           onColorChanged: (color) => preferences.textDone.color = color,
         ),
         SizedBox(height: padding),
-        CheckboxListTile(
-          title: Row(
-            children: [
-              const Text(
-                'Export to a file',
-                style: TextStyle(color: Colors.white),
-              ),
-              SizedBox(width: padding),
-              Tooltip(
-                message:
-                    'If this is ticked, then a file with the printed message\n'
-                    'on the imsage is updated too.\n'
-                    'This allows to access the current state of the timer outside\n'
-                    'of this software. The file is in:\n'
-                    '${appDirectory.path}/$textExportFilename',
-                child: const Icon(
-                  Icons.info,
-                  color: Colors.white,
-                ),
-              )
-            ],
-          ),
-          visualDensity: VisualDensity.compact,
+        CheckboxTile(
+          title: 'Export to a file',
+          tooltipMessage:
+              'If this is ticked, then a file with the printed message\n'
+              'on the imsage is updated too.\n'
+              'This allows to access the current state of the timer outside\n'
+              'of this software. The file is in:\n'
+              '${appDirectory.path}/$textExportFilename',
           value: preferences.saveToTextFile.value,
           onChanged: (value) {
             preferences.saveToTextFile.set(value!);
@@ -389,10 +379,11 @@ class ConfigurationBoard extends StatelessWidget {
               'Hall of fame',
               style: TextStyle(
                   color: ThemeColor().configurationText,
-                  fontWeight: FontWeight.bold),
+                  fontWeight: FontWeight.bold,
+                  fontSize: ThemeSize.text(context)),
             ),
             SizedBox(width: padding),
-            const Tooltip(
+            Tooltip(
               message:
                   'The Hall of fame necessitate that you connected to Twitch.\n\n'
                   'To personalize the message that are sent to the chat,\n'
@@ -403,50 +394,32 @@ class ConfigurationBoard extends StatelessWidget {
               child: Icon(
                 Icons.info,
                 color: Colors.white,
+                size: ThemeSize.icon(context),
               ),
             ),
           ],
         ),
         SizedBox(height: padding),
-        CheckboxListTile(
-          title: const Text(
-            'Use hall of fame',
-            style: TextStyle(color: Colors.white),
-          ),
-          visualDensity: VisualDensity.compact,
+        CheckboxTile(
+          title: 'Use hall of fame',
           value: preferences.useHallOfFame.value,
           onChanged: (value) => preferences.useHallOfFame.set(value!),
         ),
         SizedBox(height: padding),
-        CheckboxListTile(
-          title: Row(
-            children: [
-              const Text(
-                'Must be a follower to register',
-                style: TextStyle(color: Colors.white),
-              ),
-              SizedBox(width: padding),
-              const Tooltip(
-                message:
-                    'If the users must be a follower of your channel to be \n'
-                    'added to the current worker list.\n'
-                    'Warning, setting this to false can result in a lot of\n'
-                    'users being added due to the large amount of bots\n'
-                    'navigating on Twitch.\n\n'
-                    'The white and black list can be used to bypass the\n'
-                    'must follow requirements.\n'
-                    '    Whitelisted users will be added in all cases\n'
-                    '    Blacklisted users won\'t be added even if they are\n'
-                    'followers (typically, you want to add all your chatbots\n'
-                    'to that list).',
-                child: Icon(
-                  Icons.info,
-                  color: Colors.white,
-                ),
-              )
-            ],
-          ),
-          visualDensity: VisualDensity.compact,
+        CheckboxTile(
+          title: 'Must be a follower to register',
+          tooltipMessage:
+              'If the users must be a follower of your channel to be \n'
+              'added to the current worker list.\n'
+              'Warning, setting this to false can result in a lot of\n'
+              'users being added due to the large amount of bots\n'
+              'navigating on Twitch.\n\n'
+              'The white and black list can be used to bypass the\n'
+              'must follow requirements.\n'
+              '    Whitelisted users will be added in all cases\n'
+              '    Blacklisted users won\'t be added even if they are\n'
+              'followers (typically, you want to add all your chatbots\n'
+              'to that list).',
           value: preferences.mustFollowForFaming.value,
           onChanged: (value) {
             preferences.mustFollowForFaming.set(value!);
@@ -509,11 +482,8 @@ class ConfigurationBoard extends StatelessWidget {
             currentColor: preferences.textColorHallOfFame,
             onChanged: (color) => preferences.textColorHallOfFame = color),
         SizedBox(height: padding),
-        PlusOrMinusListTile(
-          title: const Text(
-            'Scroll velocity',
-            style: TextStyle(color: Colors.white),
-          ),
+        PlusOrMinusTile(
+          title: 'Scroll velocity',
           onTap: (selection) => preferences.hallOfFameScrollVelocity.set(
               preferences.hallOfFameScrollVelocity.value +
                   (selection == PlusOrMinusSelection.plus ? -100 : 100)),
@@ -523,9 +493,6 @@ class ConfigurationBoard extends StatelessWidget {
           context,
           title: 'Main title',
           plainText: preferences.textHallOfFameTitle,
-          initialColor: preferences.textHallOfFameTitle.color,
-          onColorChanged: (color) =>
-              preferences.textHallOfFameTitle.color = color,
         ),
         SizedBox(height: padding),
         _buildStringSelectorTile(
@@ -550,9 +517,6 @@ class ConfigurationBoard extends StatelessWidget {
           context,
           title: 'Total done',
           plainText: preferences.textHallOfFameTotal,
-          initialColor: preferences.textHallOfFameTotal.color,
-          onColorChanged: (color) =>
-              preferences.textHallOfFameTotal.color = color,
         ),
       ],
     );

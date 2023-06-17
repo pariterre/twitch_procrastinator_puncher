@@ -60,7 +60,8 @@ class _ColorSelectorTileState extends State<ColorSelectorTile> {
             child: Text(widget.title,
                 style: TextStyle(
                     color: ThemeColor().configurationText,
-                    fontWeight: FontWeight.bold)),
+                    fontWeight: FontWeight.bold,
+                    fontSize: ThemeSize.text(context))),
           ),
           InkWell(
             onTap: () => pickColorDialog(context,

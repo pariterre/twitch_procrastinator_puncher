@@ -46,7 +46,8 @@ class _IntSelectorTileState extends State<IntSelectorTile> {
         Text(widget.title,
             style: TextStyle(
                 color: ThemeColor().configurationText,
-                fontWeight: FontWeight.bold)),
+                fontWeight: FontWeight.bold,
+                fontSize: ThemeSize.text(context))),
         Theme(
           data: ThemeData(
             inputDecorationTheme: const InputDecorationTheme(
@@ -61,6 +62,8 @@ class _IntSelectorTileState extends State<IntSelectorTile> {
           child: SizedBox(
               width: windowHeight * 0.1,
               child: TextField(
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: ThemeSize.text(context)),
                 controller: _controller,
                 inputFormatters: [_DigitOnly()],
                 onChanged: (value) {

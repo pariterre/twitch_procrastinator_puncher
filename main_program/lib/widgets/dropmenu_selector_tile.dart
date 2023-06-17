@@ -26,7 +26,8 @@ class DropMenuSelectorTile<T> extends StatelessWidget {
           'Font',
           style: TextStyle(
               color: ThemeColor().configurationText,
-              fontWeight: FontWeight.bold),
+              fontWeight: FontWeight.bold,
+              fontSize: ThemeSize.text(context)),
         ),
         SizedBox(
           width: padding,
@@ -36,7 +37,9 @@ class DropMenuSelectorTile<T> extends StatelessWidget {
             decoration: const BoxDecoration(color: Colors.white),
             child: DropdownButtonFormField<T>(
                 value: value,
-                style: const TextStyle(color: Colors.black),
+                style: TextStyle(
+                    color: Colors.black,
+                    fontSize: ThemeSize.text(context) * 1.20),
                 dropdownColor: Colors.white,
                 items: items,
                 onChanged: onChanged),

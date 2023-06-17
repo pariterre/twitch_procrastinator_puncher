@@ -68,7 +68,8 @@ class _TimeSelectorTileState extends State<TimeSelectorTile> {
         Text(widget.title,
             style: TextStyle(
                 color: ThemeColor().configurationText,
-                fontWeight: FontWeight.bold)),
+                fontWeight: FontWeight.bold,
+                fontSize: ThemeSize.text(context))),
         Theme(
           data: ThemeData(
             inputDecorationTheme: const InputDecorationTheme(
@@ -83,6 +84,7 @@ class _TimeSelectorTileState extends State<TimeSelectorTile> {
           child: SizedBox(
               width: windowHeight * 0.1,
               child: TextField(
+                textAlign: TextAlign.center,
                 controller: _controller,
                 inputFormatters: [_TimeOnly()],
                 onChanged: (value) {
@@ -92,6 +94,7 @@ class _TimeSelectorTileState extends State<TimeSelectorTile> {
                   widget.onValidChange(
                       Duration(minutes: minutes, seconds: seconds));
                 },
+                style: TextStyle(fontSize: ThemeSize.text(context)),
               )),
         ),
       ],

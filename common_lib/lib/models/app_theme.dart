@@ -10,12 +10,6 @@ class ThemeColor {
 
   Color configurationBoard = const Color.fromARGB(255, 45, 74, 168);
   Color configurationText = Colors.white;
-  Color pomodoroText = Colors.white;
-  Color hallOfFame = const Color.fromARGB(255, 45, 74, 168);
-  Color hallOfFameText = Colors.white;
-  Color conceiled = const Color.fromARGB(255, 45, 74, 168);
-  Color conceiledContrast = Colors.amber;
-  Color revealed = const Color.fromARGB(255, 204, 234, 248);
 }
 
 class ThemeButton {
@@ -25,7 +19,10 @@ class ThemeButton {
 
 class ThemeSize {
   static double title(context) => MediaQuery.of(context).size.height * 0.028;
-  static double text(context) => MediaQuery.of(context).size.height * 0.02;
+  static double text(context) => MediaQuery.of(context).size.height * 0.019;
+  static double smallText(context) =>
+      MediaQuery.of(context).size.height * 0.017;
+  static double icon(context) => MediaQuery.of(context).size.height * 0.035;
 }
 
 class ThemePadding {
