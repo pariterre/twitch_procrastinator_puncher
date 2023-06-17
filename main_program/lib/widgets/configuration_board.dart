@@ -119,7 +119,7 @@ class ConfigurationBoard extends StatelessWidget {
             style: TextStyle(
                 color: ThemeColor().configurationText,
                 fontSize: ThemeSize.text(context))),
-        GestureDetector(
+        InkWell(
             onTap: () async {
               await launchUrl(Uri.parse(webClientSite));
             },
