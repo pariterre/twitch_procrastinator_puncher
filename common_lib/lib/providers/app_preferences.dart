@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:common_lib/models/app_fonts.dart';
 import 'package:common_lib/models/config.dart';
 import 'package:common_lib/models/preferenced_element.dart';
+import 'package:common_lib/models/preferenced_language.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -14,6 +15,9 @@ String get rootPath => Platform.isWindows ? r'C:\' : '/';
 
 class AppPreferences with ChangeNotifier {
   static String get _savepath => '${appDirectory.path}/$preferencesFilename';
+
+  // Everything related to the language
+  PreferencedLanguage texts;
 
   // If the current AppPreferences is connected to the server (only relevent for
   // the web client side)
@@ -135,6 +139,8 @@ class AppPreferences with ChangeNotifier {
     return AppPreferences._(
         lastVisitedDirectory:
             Directory(previousPreferences?['lastVisitedDirectory'] ?? ''),
+        texts:
+            PreferencedLanguage.deserialize(previousPreferences?['texts'], 0),
         nbSessions:
             PreferencedInt.deserialize(previousPreferences?['nbSessions'], 0),
         sessionDuration: PreferencedDuration.deserialize(
@@ -183,6 +189,7 @@ class AppPreferences with ChangeNotifier {
 
   AppPreferences._({
     required Directory lastVisitedDirectory,
+    required this.texts,
     required this.nbSessions,
     required this.sessionDuration,
     required this.pauseDuration,
@@ -216,6 +223,7 @@ class AppPreferences with ChangeNotifier {
     required this.textHallOfFameTotal,
   }) : _lastVisitedDirectory = lastVisitedDirectory {
     // Set the necessary callback
+    texts.onChanged = _save;
     nbSessions.onChanged = _save;
 
     sessionDuration.onChanged = _save;
@@ -274,6 +282,7 @@ class AppPreferences with ChangeNotifier {
   /// Serialize all the values
   Map<String, dynamic> serialize() => {
         'lastVisitedDirectory': _lastVisitedDirectory.path,
+        'texts': texts.serialize(),
         'nbSessions': nbSessions.serialize(),
         'sessionDuration': sessionDuration.serialize(),
         'pauseDuration': pauseDuration.serialize(),

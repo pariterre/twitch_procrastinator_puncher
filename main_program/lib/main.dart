@@ -4,7 +4,6 @@ import 'package:common_lib/providers/participants.dart';
 import 'package:common_lib/providers/pomodoro_status.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:twitch_procastinator_puncher/models/locale.dart';
 import 'package:twitch_procastinator_puncher/screens/main_screen.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -29,7 +28,6 @@ void main() async {
 
   runApp(MultiProvider(
     providers: [
-      ChangeNotifierProvider(create: (context) => AppLocale()),
       ChangeNotifierProvider(create: (context) => appPreferences),
       ChangeNotifierProvider(create: (context) => participants),
       ChangeNotifierProvider(

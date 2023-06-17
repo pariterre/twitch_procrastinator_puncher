@@ -6,7 +6,6 @@ import 'package:common_lib/providers/app_preferences.dart';
 import 'package:common_lib/providers/participants.dart';
 import 'package:common_lib/providers/pomodoro_status.dart';
 import 'package:flutter/material.dart';
-import 'package:twitch_procastinator_puncher/models/locale.dart';
 import 'package:twitch_procastinator_puncher/models/twitch_status.dart';
 import 'package:twitch_procastinator_puncher/widgets/checkbox_tile.dart';
 import 'package:twitch_procastinator_puncher/widgets/color_selector_tile.dart';
@@ -87,6 +86,8 @@ class ConfigurationBoard extends StatelessWidget {
   }
 
   Widget _buildTitle(BuildContext context) {
+    final preferences = AppPreferences.of(context);
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -94,7 +95,7 @@ class ConfigurationBoard extends StatelessWidget {
         const LanguageSelector(),
         Center(
           child: Text(
-            'The Procrastinator Puncher (${AppLocale.of(context).coucou})',
+            preferences.texts.mainTitle,
             style: TextStyle(
                 color: ThemeColor().configurationText,
                 fontSize: ThemeSize.text(context) * 1.20,
