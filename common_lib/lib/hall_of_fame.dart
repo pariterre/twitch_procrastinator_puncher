@@ -34,7 +34,7 @@ class _HallOfFameState extends State<HallOfFame> {
       _scrollVelocity = preferences.hallOfFameScrollVelocity.value;
 
       // Set the timer that advance the scroller
-      Timer.periodic(const Duration(milliseconds: 1), (timer) {
+      Timer.periodic(const Duration(milliseconds: 10), (timer) {
         if (!preferences.useHallOfFame.value) {
           // Stop the timer if there is no hall of fame
           timer.cancel();

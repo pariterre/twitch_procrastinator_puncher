@@ -114,7 +114,7 @@ class PomodoroStatus with ChangeNotifier {
         'timer': timer.inSeconds
       };
 
-  void updateFromSerialized(map) {
+  void updateWebClient(map) {
     nbSessions = map['nbSessions'];
     _currentSession = map['currentSession'];
     focusSessionDuration = Duration(seconds: map['focusSessionDuration']);

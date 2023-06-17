@@ -44,6 +44,10 @@ class Participants extends ChangeNotifier {
   /// If the participant must be a follower to be counted
   bool mustFollowForFaming;
 
+  ///
+  /// If any change occurred, web client should be notified
+  bool shouldSendToWebClient = false;
+
   void addPomodoroToAllConnected() {
     for (final user in all) {
       if (user.isConnected) {
@@ -52,6 +56,7 @@ class Participants extends ChangeNotifier {
       }
     }
     disconnectAll(); // They will be reconnected automatically
+    shouldSendToWebClient = true;
     _save();
     notifyListeners();
   }
@@ -97,6 +102,8 @@ class Participants extends ChangeNotifier {
     final followers = await _twitchManager!.api.fetchFollowers();
     if (followers == null) return;
 
+    bool hasChanged = false;
+
     // Remove users that are not followers (if must follow) and blacklisted
     for (var i = chatters.length - 1; i >= 0; i--) {
       final chatter = chatters[i];
@@ -107,6 +114,7 @@ class Participants extends ChangeNotifier {
         if (_blacklist.contains(chatter) ||
             (mustFollowForFaming && !followers.contains(chatter))) {
           chatters.removeWhere((e) => e == chatter);
+          hasChanged = true;
         }
       }
     }
@@ -119,6 +127,8 @@ class Participants extends ChangeNotifier {
         final newParticipant = Participant(username: chatter);
         newParticipant.connect();
         all.add(newParticipant);
+        hasChanged = true;
+
         if (greetNewcomerCallback != null) {
           greetNewcomerCallback!(newParticipant);
         }
@@ -133,10 +143,16 @@ class Participants extends ChangeNotifier {
             greetUserHasConnectedCallback!(participant);
           }
         }
+
         participant.connect();
+        hasChanged = true;
       }
     }
-    notifyListeners();
+
+    if (hasChanged) {
+      notifyListeners();
+      shouldSendToWebClient = true;
+    }
   }
 
   final List<Participant> all;
@@ -210,7 +226,16 @@ class Participants extends ChangeNotifier {
   Map<String, dynamic> serialize() =>
       {'participants': all.map((e) => e.serialize()).toList()};
 
-  void updateFromSerialized(map) {
+  Map<String, dynamic> serializeForWebClient(bool initial) {
+    final out =
+        shouldSendToWebClient || initial ? serialize() : {'participants': null};
+    shouldSendToWebClient = false;
+    return out;
+  }
+
+  void updateWebClient(map) {
+    if (map['participants'] == null) return;
+
     all.clear();
     for (final p in map['participants']) {
       all.add(Participant.deserialize(p));

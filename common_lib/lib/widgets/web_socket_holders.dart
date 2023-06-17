@@ -46,8 +46,8 @@ class _WebSocketClientHolderState extends State<WebSocketClientHolder> {
       final participants = Participants.of(context, listen: false);
       final status = PomodoroStatus.of(context, listen: false);
       preferences.updateWebClient(map['preferences']);
-      participants.updateFromSerialized(map['participants']);
-      status.updateFromSerialized(map['status']);
+      participants.updateWebClient(map['participants']);
+      status.updateWebClient(map['status']);
     });
   }
 
@@ -106,7 +106,7 @@ class _WebSocketServerHolderState extends State<WebSocketServerHolder> {
     _socket!.add(json.encode({
       'answerType': initial ? 'initial' : 'normal',
       'preferences': preferences.serializeForWebClient(initial),
-      'participants': participants.serialize(),
+      'participants': participants.serializeForWebClient(initial),
       'status': status.serialize(),
     }));
   }
