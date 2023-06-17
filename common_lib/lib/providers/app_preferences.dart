@@ -15,6 +15,10 @@ String get rootPath => Platform.isWindows ? r'C:\' : '/';
 class AppPreferences with ChangeNotifier {
   static String get _savepath => '${appDirectory.path}/$preferencesFilename';
 
+  // If the current AppPreferences is connected to the server (only relevent for
+  // the web client side)
+  bool isConnectedToServer = false;
+
   // Last visited directory when selecting a file
   Directory _lastVisitedDirectory = Directory('');
   Directory get lastVisitedDirectory => _lastVisitedDirectory;
@@ -498,6 +502,7 @@ class AppPreferences with ChangeNotifier {
           PreferencedText.deserialize(map['textHallOfFameTotal']);
     }
 
+    isConnectedToServer = true;
     notifyListeners();
   }
 }

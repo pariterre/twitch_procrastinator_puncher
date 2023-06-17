@@ -73,23 +73,38 @@ class _MainScreenState extends State<MainScreen> {
     final widget = Scaffold(
       backgroundColor: preferences.backgroundColor.value,
       body: WebSocketClientHolder(
-        child: SizedBox(
-          height: windowHeight,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Column(
-                children: [
-                  SizedBox(height: padding),
-                  const PomodoroTimer(
-                      textWithFocus: StopWatchStatus.initializing),
-                  SizedBox(height: padding),
-                  if (preferences.useHallOfFame.value) const HallOfFame(),
-                ],
+        child: preferences.isConnectedToServer
+            ? SizedBox(
+                height: windowHeight,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Column(
+                      children: [
+                        SizedBox(height: padding),
+                        const PomodoroTimer(
+                            textWithFocus: StopWatchStatus.initializing),
+                        SizedBox(height: padding),
+                        if (preferences.useHallOfFame.value) const HallOfFame(),
+                      ],
+                    ),
+                  ],
+                ),
+              )
+            : const Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 12),
+                    Text(
+                      'Connecting to configuration software\n'
+                      'Please make sure the software is up and running!',
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
-        ),
       ),
     );
     isInitialized = true; // Prevent from calling setState on gainFocus

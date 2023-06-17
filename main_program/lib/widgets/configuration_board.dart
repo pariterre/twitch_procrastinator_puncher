@@ -16,6 +16,7 @@ import 'package:twitch_procastinator_puncher/widgets/plus_or_minus.dart';
 import 'package:twitch_procastinator_puncher/widgets/plus_or_minus_tile.dart';
 import 'package:twitch_procastinator_puncher/widgets/string_selector_tile.dart';
 import 'package:twitch_procastinator_puncher/widgets/time_selector_tile.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ConfigurationBoard extends StatelessWidget {
   const ConfigurationBoard({
@@ -55,6 +56,8 @@ class ConfigurationBoard extends StatelessWidget {
             children: [
               _buildController(context),
               const Divider(),
+              _buildInformation(context),
+              const Divider(),
               _buildTimerConfiguration(context),
               const Divider(),
               _buildImageSelectors(context),
@@ -68,6 +71,42 @@ class ConfigurationBoard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildInformation(BuildContext context) {
+    return Wrap(
+      children: [
+        Text(
+            'This is the configuration software for the timer of the '
+            'Procrastinator Puncher! To import it into your streaming platform, '
+            'you have two options:\n'
+            '\n'
+            '    1. Grab the current window.\n'
+            '    2. Add a browser source that points to ',
+            style: TextStyle(
+                color: ThemeColor().configurationText,
+                fontSize: ThemeSize.text(context))),
+        GestureDetector(
+            onTap: () async {
+              await launchUrl(Uri.parse(webClientSite));
+            },
+            child: Text(
+              webClientSite,
+              style: TextStyle(
+                  color: ThemeColor().configurationText,
+                  fontSize: ThemeSize.text(context),
+                  decoration: TextDecoration.underline),
+            )),
+        Text(
+          '\n'
+          'Please note that you still need to have the configuration software '
+          'up and running in order to connect to the web client.',
+          style: TextStyle(
+              color: ThemeColor().configurationText,
+              fontSize: ThemeSize.text(context)),
+        ),
+      ],
     );
   }
 
