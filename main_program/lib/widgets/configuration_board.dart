@@ -514,8 +514,9 @@ class ConfigurationBoard extends StatelessWidget {
             'Scroll velocity',
             style: TextStyle(color: Colors.white),
           ),
-          onTap: (selection) => preferences.hallOfFameScrollVelocity =
-              selection == PlusOrMinusSelection.plus ? -100 : 100,
+          onTap: (selection) => preferences.hallOfFameScrollVelocity.set(
+              preferences.hallOfFameScrollVelocity.value +
+                  (selection == PlusOrMinusSelection.plus ? -100 : 100)),
         ),
         SizedBox(height: padding),
         _buildStringSelectorTile(

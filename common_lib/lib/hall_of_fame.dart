@@ -31,7 +31,7 @@ class _HallOfFameState extends State<HallOfFame> {
 
     if (_status == _InitializationStatus.notInitiatialized) {
       final preferences = AppPreferences.of(context, listen: false);
-      _scrollVelocity = preferences.hallOfFameScrollVelocity;
+      _scrollVelocity = preferences.hallOfFameScrollVelocity.value;
 
       // Set the timer that advance the scroller
       Timer.periodic(const Duration(milliseconds: 1), (timer) {
@@ -65,7 +65,6 @@ class _HallOfFameState extends State<HallOfFame> {
   Widget build(BuildContext context) {
     final windowHeight = MediaQuery.of(context).size.height;
     final preferences = AppPreferences.of(context);
-    _scrollVelocity = preferences.hallOfFameScrollVelocity;
 
     final padding = ThemePadding.normal(context);
     final participants = Participants.of(context).all.map((e) => e).toList();

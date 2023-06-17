@@ -65,13 +65,7 @@ class AppPreferences with ChangeNotifier {
   PreferencedBool useHallOfFame;
   PreferencedBool mustFollowForFaming;
 
-  int _hallOfFameScrollVelocity;
-  int get hallOfFameScrollVelocity => _hallOfFameScrollVelocity;
-  set hallOfFameScrollVelocity(int value) {
-    _hallOfFameScrollVelocity += value;
-    if (_hallOfFameScrollVelocity <= 0) _hallOfFameScrollVelocity = 0;
-    _save();
-  }
+  PreferencedInt hallOfFameScrollVelocity;
 
   TextToChat textNewcomersGreetings;
   TextToChat textUserHasConnectedGreetings;
@@ -186,7 +180,7 @@ class AppPreferences with ChangeNotifier {
         saveToTextFile: PreferencedBool.deserialize(previousPreferences?['saveToTextFile'], false),
         useHallOfFame: PreferencedBool.deserialize(previousPreferences?['useHallOfFame'], true),
         mustFollowForFaming: PreferencedBool.deserialize(previousPreferences?['mustFollowForFaming'], true),
-        hallOfFameScrollVelocity: previousPreferences?['hallOfFameScrollVelocity'] ?? 2000,
+        hallOfFameScrollVelocity: PreferencedInt.deserialize(previousPreferences?['hallOfFameScrollVelocity'], 2000),
         textNewcomersGreetings: TextToChat.deserialize(previousPreferences?['textNewcomersGreetings'], r'Welcome to {username} who has joined for the first time!'),
         textUserHasConnectedGreetings: TextToChat.deserialize(previousPreferences?['textUserHasConnectedGreetings'], r'Welcome back to {username} who has joined us!'),
         textWhitelist: PreferencedText.deserialize(previousPreferences?['textWhitelist']),
@@ -222,7 +216,7 @@ class AppPreferences with ChangeNotifier {
     required this.saveToTextFile,
     required this.useHallOfFame,
     required this.mustFollowForFaming,
-    required int hallOfFameScrollVelocity,
+    required this.hallOfFameScrollVelocity,
     required this.textNewcomersGreetings,
     required this.textUserHasConnectedGreetings,
     required this.textWhitelist,
@@ -234,8 +228,7 @@ class AppPreferences with ChangeNotifier {
     required this.textHallOfFameAlltime,
     required this.textHallOfFameTotal,
   })  : _saveDirectory = directory,
-        _lastVisitedDirectory = lastVisitedDirectory,
-        _hallOfFameScrollVelocity = hallOfFameScrollVelocity {
+        _lastVisitedDirectory = lastVisitedDirectory {
     // Set the necessary callback
     nbSessions.onChanged = _save;
 
@@ -267,6 +260,7 @@ class AppPreferences with ChangeNotifier {
     useHallOfFame.onChanged = _save;
     mustFollowForFaming.onChanged = _save;
 
+    hallOfFameScrollVelocity.onChanged = _save;
     textNewcomersGreetings.onChanged = _save;
     textUserHasConnectedGreetings.onChanged = _save;
     textBlacklist.onChanged = _save;
@@ -315,7 +309,7 @@ class AppPreferences with ChangeNotifier {
         'saveToTextFile': saveToTextFile.serialize(),
         'useHallOfFame': useHallOfFame.serialize(),
         'mustFollowForFaming': mustFollowForFaming.serialize(),
-        'hallOfFameScrollVelocity': _hallOfFameScrollVelocity,
+        'hallOfFameScrollVelocity': hallOfFameScrollVelocity.serialize(),
         'textNewcomersGreetings': textNewcomersGreetings.serialize(),
         'textUserHasConnectedGreetings':
             textUserHasConnectedGreetings.serialize(),
@@ -342,12 +336,12 @@ class AppPreferences with ChangeNotifier {
     pauseBackgroundImage = PreferencedImageFile.deserialize(
         saveDirectory, map['pauseBackgroundImageFilename']);
 
-    endActiveSessionSound = PreferencedSoundFile(
+    endActiveSessionSound = PreferencedSoundFile.deserialize(
         saveDirectory, map['endActiveSessionSoundFilename']);
-    endPauseSessionSound =
-        PreferencedSoundFile(saveDirectory, map['endPauseSessionSound']);
+    endPauseSessionSound = PreferencedSoundFile.deserialize(
+        saveDirectory, map['endPauseSessionSound']);
     endWorkingSound =
-        PreferencedSoundFile(saveDirectory, map['endWorkingSound']);
+        PreferencedSoundFile.deserialize(saveDirectory, map['endWorkingSound']);
 
     backgroundColor = PreferencedColor.deserialize(map['backgroundColor']);
     backgroundColorHallOfFame =
@@ -363,10 +357,12 @@ class AppPreferences with ChangeNotifier {
         TextOnPomodoro.deserialize(map['textDuringPauseSession']);
     textDuringPause = TextOnPomodoro.deserialize(map['textDuringPause']);
     textDone = TextOnPomodoro.deserialize(map['textDone']);
-    saveToTextFile = PreferencedBool(map['saveToTextFile']);
-    useHallOfFame = PreferencedBool(map['useHallOfFame']);
-    mustFollowForFaming = PreferencedBool(map['mustFollowForFaming']);
-    hallOfFameScrollVelocity = map['hallOfFameScrollVelocity'];
+    saveToTextFile = PreferencedBool.deserialize(map['saveToTextFile']);
+    useHallOfFame = PreferencedBool.deserialize(map['useHallOfFame']);
+    mustFollowForFaming =
+        PreferencedBool.deserialize(map['mustFollowForFaming']);
+    hallOfFameScrollVelocity =
+        PreferencedInt.deserialize(map['hallOfFameScrollVelocity']);
     textNewcomersGreetings =
         TextToChat.deserialize(map['textNewcomersGreetings']);
     textUserHasConnectedGreetings =
