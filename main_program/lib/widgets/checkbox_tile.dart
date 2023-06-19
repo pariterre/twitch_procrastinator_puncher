@@ -1,5 +1,6 @@
 import 'package:common_lib/models/app_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:twitch_procastinator_puncher/widgets/info_tooltip.dart';
 
 class CheckboxTile extends StatefulWidget {
   const CheckboxTile({
@@ -42,11 +43,7 @@ class _CheckboxTileState extends State<CheckboxTile> {
               ),
               if (widget.tooltipMessage != null) SizedBox(width: padding),
               if (widget.tooltipMessage != null)
-                Tooltip(
-                  message: widget.tooltipMessage,
-                  child: Icon(Icons.info,
-                      color: Colors.white, size: ThemeSize.icon(context)),
-                )
+                InfoTooltip(message: widget.tooltipMessage)
             ],
           ),
           Container(

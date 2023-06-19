@@ -1,6 +1,7 @@
 import 'package:common_lib/models/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:twitch_procastinator_puncher/widgets/info_tooltip.dart';
 
 void pickColorDialog(context,
     {required Color currentColor,
@@ -31,11 +32,13 @@ class ColorSelectorTile extends StatefulWidget {
   const ColorSelectorTile({
     super.key,
     required this.title,
+    this.tooltipMessage,
     required this.currentColor,
     required this.onChanged,
   });
 
   final String title;
+  final String? tooltipMessage;
   final Color currentColor;
   final Function(Color) onChanged;
 
@@ -55,13 +58,17 @@ class _ColorSelectorTileState extends State<ColorSelectorTile> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          SizedBox(
-            width: windowHeight * 0.3,
-            child: Text(widget.title,
-                style: TextStyle(
-                    color: ThemeColor().configurationText,
-                    fontWeight: FontWeight.bold,
-                    fontSize: ThemeSize.text(context))),
+          Row(
+            children: [
+              Text(widget.title,
+                  style: TextStyle(
+                      color: ThemeColor().configurationText,
+                      fontWeight: FontWeight.bold,
+                      fontSize: ThemeSize.text(context))),
+              if (widget.tooltipMessage != null) SizedBox(width: padding),
+              if (widget.tooltipMessage != null)
+                InfoTooltip(message: widget.tooltipMessage),
+            ],
           ),
           InkWell(
             onTap: () => pickColorDialog(context,

@@ -1,5 +1,6 @@
 import 'package:common_lib/models/app_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:twitch_procastinator_puncher/widgets/info_tooltip.dart';
 import 'package:twitch_procastinator_puncher/widgets/plus_or_minus.dart';
 
 class PlusOrMinusTile extends StatelessWidget {
@@ -33,12 +34,7 @@ class PlusOrMinusTile extends StatelessWidget {
                     color: Colors.white, fontSize: ThemeSize.text(context)),
               ),
               if (tooltipMessage != null) SizedBox(width: padding),
-              if (tooltipMessage != null)
-                Tooltip(
-                  message: tooltipMessage,
-                  child: Icon(Icons.info,
-                      color: Colors.white, size: ThemeSize.icon(context)),
-                )
+              if (tooltipMessage != null) InfoTooltip(message: tooltipMessage)
             ],
           ),
           PlusOrMinus(onTap: onTap),

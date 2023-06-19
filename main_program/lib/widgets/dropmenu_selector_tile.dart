@@ -23,7 +23,7 @@ class DropMenuSelectorTile<T> extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          'Font',
+          title,
           style: TextStyle(
               color: ThemeColor().configurationText,
               fontWeight: FontWeight.bold,

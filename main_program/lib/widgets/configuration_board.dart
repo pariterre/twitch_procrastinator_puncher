@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:twitch_procastinator_puncher/models/twitch_status.dart';
 import 'package:twitch_procastinator_puncher/widgets/checkbox_tile.dart';
 import 'package:twitch_procastinator_puncher/widgets/color_selector_tile.dart';
+import 'package:twitch_procastinator_puncher/widgets/info_tooltip.dart';
 import 'package:twitch_procastinator_puncher/widgets/dropmenu_selector_tile.dart';
 import 'package:twitch_procastinator_puncher/widgets/file_selector_tile.dart';
 import 'package:twitch_procastinator_puncher/widgets/int_selector_tile.dart';
@@ -69,7 +70,6 @@ class ConfigurationBoard extends StatelessWidget {
                     _buildTimerConfiguration(context),
                     const Divider(),
                     _buildImageSelectors(context),
-                    const Divider(),
                     _buildColorPickers(context),
                     const Divider(),
                     _buildTextOnImage(context),
@@ -95,7 +95,7 @@ class ConfigurationBoard extends StatelessWidget {
         const LanguageSelector(),
         Center(
           child: Text(
-            preferences.texts.mainTitle,
+            preferences.texts.titleMain,
             style: TextStyle(
                 color: ThemeColor().configurationText,
                 fontSize: ThemeSize.text(context) * 1.20,
@@ -107,15 +107,11 @@ class ConfigurationBoard extends StatelessWidget {
   }
 
   Widget _buildInformation(BuildContext context) {
+    final preferences = AppPreferences.of(context);
+
     return Wrap(
       children: [
-        Text(
-            'This is the configuration software for the timer of the '
-            'Procrastinator Puncher! To import it into your streaming platform, '
-            'you have two options:\n'
-            '\n'
-            '    1. Grab the current window.\n'
-            '    2. Add a browser source that points to ',
+        Text(preferences.texts.titleDescription1,
             style: TextStyle(
                 color: ThemeColor().configurationText,
                 fontSize: ThemeSize.text(context))),
@@ -131,9 +127,7 @@ class ConfigurationBoard extends StatelessWidget {
                   decoration: TextDecoration.underline),
             )),
         Text(
-          '\n'
-          'Please note that you still need to have the configuration software '
-          'up and running in order to connect to the web client.',
+          preferences.texts.titleDescription2,
           style: TextStyle(
               color: ThemeColor().configurationText,
               fontSize: ThemeSize.text(context)),
@@ -146,19 +140,21 @@ class ConfigurationBoard extends StatelessWidget {
     final preferences = AppPreferences.of(context);
 
     return ColorSelectorTile(
-        title: 'Background color',
+        title: preferences.texts.miscBackgroundColor,
+        tooltipMessage: preferences.texts.miscBackgroundColorTooltip,
         currentColor: preferences.backgroundColor.value,
         onChanged: (color) => preferences.backgroundColor.set(color));
   }
 
   Widget _buildController(context) {
+    final preferences = AppPreferences.of(context);
     final pomodoro = PomodoroStatus.of(context, listen: false);
     final padding = ThemePadding.normal(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Pomodoro controller',
+        Text(preferences.texts.controllerTitle,
             style: TextStyle(
                 color: ThemeColor().configurationText,
                 fontWeight: FontWeight.bold,
@@ -176,10 +172,10 @@ class ConfigurationBoard extends StatelessWidget {
               style: ThemeButton.elevated,
               child: Text(
                 pomodoro.stopWatchStatus == StopWatchStatus.initializing
-                    ? 'Start timer'
+                    ? preferences.texts.controllerStartTimer
                     : pomodoro.stopWatchStatus == StopWatchStatus.paused
-                        ? 'Resume timer'
-                        : 'Pause timer',
+                        ? preferences.texts.controllerResumeTimer
+                        : preferences.texts.controllerPauseTimer,
                 style: TextStyle(
                     color: Colors.black, fontSize: ThemeSize.text(context)),
               ),
@@ -188,7 +184,7 @@ class ConfigurationBoard extends StatelessWidget {
               onPressed: resetTimerCallback,
               style: ThemeButton.elevated,
               child: Text(
-                'Reset timer',
+                preferences.texts.controllerResetTimer,
                 style: TextStyle(
                     color: Colors.black, fontSize: ThemeSize.text(context)),
               ),
@@ -205,8 +201,8 @@ class ConfigurationBoard extends StatelessWidget {
                 style: ThemeButton.elevated,
                 child: Text(
                     twitchStatus == TwitchStatus.connected
-                        ? 'Reconnect to Twitch'
-                        : 'Connect to Twitch',
+                        ? preferences.texts.controllerReconnectTwitch
+                        : preferences.texts.controllerConnectTwitch,
                     style: TextStyle(
                         color: Colors.black,
                         fontSize: ThemeSize.text(context))),
@@ -218,12 +214,13 @@ class ConfigurationBoard extends StatelessWidget {
   }
 
   Widget _buildTimerConfiguration(BuildContext context) {
+    final preferences = AppPreferences.of(context);
     final padding = ThemePadding.normal(context);
 
     return Column(
       children: [
         IntSelectorTile(
-          title: 'Number of sessions',
+          title: preferences.texts.controllerNumberOfSession,
           initialValue: AppPreferences.of(context, listen: false).nbSessions,
           onValidChange: (value) {
             AppPreferences.of(context, listen: false).nbSessions.set(value);
@@ -232,7 +229,7 @@ class ConfigurationBoard extends StatelessWidget {
         ),
         SizedBox(height: padding),
         TimeSelectorTile(
-          title: 'Session duration (mm:ss)',
+          title: preferences.texts.controllerSessionDuration,
           initialValue:
               AppPreferences.of(context, listen: false).sessionDuration,
           onValidChange: (value) {
@@ -245,7 +242,7 @@ class ConfigurationBoard extends StatelessWidget {
         ),
         SizedBox(height: padding),
         TimeSelectorTile(
-          title: 'Pause duration (mm:ss)',
+          title: preferences.texts.controllerPauseDuration,
           initialValue: AppPreferences.of(context, listen: false).pauseDuration,
           onValidChange: (value) {
             AppPreferences.of(context, listen: false).pauseDuration.set(value);
@@ -258,56 +255,56 @@ class ConfigurationBoard extends StatelessWidget {
   }
 
   Widget _buildImageSelectors(BuildContext context) {
-    final appPreferences = AppPreferences.of(context);
+    final preferences = AppPreferences.of(context);
     final padding = ThemePadding.normal(context);
 
     return Column(
       children: [
         FileSelectorTile(
-          title: 'Active image',
-          file: appPreferences.activeBackgroundImage,
+          title: preferences.texts.filesActiveImage,
+          file: preferences.activeBackgroundImage,
           selectFileCallback: (filename) async =>
-              await appPreferences.activeBackgroundImage.setFile(filename),
+              await preferences.activeBackgroundImage.setFile(filename),
           onSizeChanged: (direction) {
             if (direction == PlusOrMinusSelection.plus) {
-              appPreferences.activeBackgroundImage.size += 0.1;
+              preferences.activeBackgroundImage.size += 0.1;
             } else {
-              appPreferences.activeBackgroundImage.size -= 0.1;
+              preferences.activeBackgroundImage.size -= 0.1;
             }
           },
         ),
         SizedBox(height: padding * 0.5),
         FileSelectorTile(
-          title: 'Paused image',
-          file: appPreferences.pauseBackgroundImage,
+          title: preferences.texts.filesPauseImage,
+          file: preferences.pauseBackgroundImage,
           selectFileCallback: (filename) async =>
-              await appPreferences.pauseBackgroundImage.setFile(filename),
+              await preferences.pauseBackgroundImage.setFile(filename),
           onSizeChanged: (direction) {
             if (direction == PlusOrMinusSelection.plus) {
-              appPreferences.pauseBackgroundImage.size += 0.05;
+              preferences.pauseBackgroundImage.size += 0.05;
             } else {
-              appPreferences.pauseBackgroundImage.size -= 0.05;
+              preferences.pauseBackgroundImage.size -= 0.05;
             }
           },
         ),
         SizedBox(height: padding * 0.5),
         FileSelectorTile(
-            title: 'Alarm end of active session',
-            file: appPreferences.endActiveSessionSound,
+            title: preferences.texts.filesEndActiveSound,
+            file: preferences.endActiveSessionSound,
             selectFileCallback: (filename) async =>
-                await appPreferences.endActiveSessionSound.setFile(filename)),
+                await preferences.endActiveSessionSound.setFile(filename)),
         SizedBox(height: padding * 0.5),
         FileSelectorTile(
-            title: 'Alarm end of pause',
-            file: appPreferences.endPauseSessionSound,
+            title: preferences.texts.filesEndPauseSound,
+            file: preferences.endPauseSessionSound,
             selectFileCallback: (filename) async =>
-                await appPreferences.endPauseSessionSound.setFile(filename)),
+                await preferences.endPauseSessionSound.setFile(filename)),
         SizedBox(height: padding * 0.5),
         FileSelectorTile(
-            title: 'Alarm end of working',
-            file: appPreferences.endWorkingSound,
+            title: preferences.texts.filesEndWorkingSound,
+            file: preferences.endWorkingSound,
             selectFileCallback: (filename) async =>
-                await appPreferences.endWorkingSound.setFile(filename)),
+                await preferences.endWorkingSound.setFile(filename)),
       ],
     );
   }
@@ -339,30 +336,18 @@ class ConfigurationBoard extends StatelessWidget {
       children: [
         Row(children: [
           Text(
-            'Text to print on the images',
+            preferences.texts.timerTextsTitle,
             style: TextStyle(
                 color: ThemeColor().configurationText,
                 fontWeight: FontWeight.bold,
                 fontSize: ThemeSize.text(context)),
           ),
           SizedBox(width: padding),
-          Tooltip(
-            message:
-                'The following tag can be used to access some interesting\n'
-                'information to display:\n'
-                '    {currentSession} is the current session\n'
-                '    {maxSessions} is the max sessions\n'
-                '    {timer} is the timer\n'
-                '    {sessionDuration} is the time of the focus sessions\n'
-                '    {pauseDuration} is the time of the pauses\n'
-                '    \\n is a linebreak',
-            child: Icon(Icons.info,
-                color: Colors.white, size: ThemeSize.icon(context)),
-          ),
+          InfoTooltip(message: preferences.texts.timerTextsTitleTooltip),
         ]),
         SizedBox(height: padding),
         DropMenuSelectorTile<AppFonts>(
-            title: 'Font',
+            title: preferences.texts.miscFont,
             value: preferences.fontPomodoro,
             items: AppFonts.values
                 .map<DropdownMenuItem<AppFonts>>(
@@ -375,9 +360,10 @@ class ConfigurationBoard extends StatelessWidget {
                 .toList(),
             onChanged: (value) => preferences.fontPomodoro = value!),
         SizedBox(height: padding),
+        // TODO: Add text starting/end of sessions and end of working
         _buildStringSelectorTile(
           context,
-          title: 'Text during initialization',
+          title: preferences.texts.timerTextsIntroduction,
           plainText: preferences.textDuringInitialization,
           focus: StopWatchStatus.initializing,
           initialColor: preferences.textDuringInitialization.color,
@@ -386,7 +372,7 @@ class ConfigurationBoard extends StatelessWidget {
         ),
         _buildStringSelectorTile(
           context,
-          title: 'Text during focus sessions',
+          title: preferences.texts.timerTextsSessions,
           plainText: preferences.textDuringActiveSession,
           focus: StopWatchStatus.inSession,
           initialColor: preferences.textDuringActiveSession.color,
@@ -395,7 +381,7 @@ class ConfigurationBoard extends StatelessWidget {
         ),
         _buildStringSelectorTile(
           context,
-          title: 'Text during pause sessions',
+          title: preferences.texts.timerTextsPauses,
           plainText: preferences.textDuringPauseSession,
           focus: StopWatchStatus.inPauseSession,
           initialColor: preferences.textDuringPauseSession.color,
@@ -404,7 +390,7 @@ class ConfigurationBoard extends StatelessWidget {
         ),
         _buildStringSelectorTile(
           context,
-          title: 'Text during pauses',
+          title: preferences.texts.timerTextsTimerPauses,
           plainText: preferences.textDuringPause,
           focus: StopWatchStatus.paused,
           initialColor: preferences.textDuringPause.color,
@@ -412,7 +398,7 @@ class ConfigurationBoard extends StatelessWidget {
         ),
         _buildStringSelectorTile(
           context,
-          title: 'Text when done',
+          title: preferences.texts.timerTextsAllDone,
           plainText: preferences.textDone,
           focus: StopWatchStatus.done,
           initialColor: preferences.textDone.color,
@@ -420,13 +406,8 @@ class ConfigurationBoard extends StatelessWidget {
         ),
         SizedBox(height: padding),
         CheckboxTile(
-          title: 'Export to a file',
-          tooltipMessage:
-              'If this is ticked, then a file with the printed message\n'
-              'on the imsage is updated too.\n'
-              'This allows to access the current state of the timer outside\n'
-              'of this software. The file is in:\n'
-              '${appDirectory.path}/$textExportFilename',
+          title: preferences.texts.timerTextsExport,
+          tooltipMessage: preferences.texts.timerTextsExportTooltip,
           value: preferences.saveToTextFile.value,
           onChanged: (value) {
             preferences.saveToTextFile.set(value!);
@@ -447,50 +428,26 @@ class ConfigurationBoard extends StatelessWidget {
         Row(
           children: [
             Text(
-              'Hall of fame',
+              preferences.texts.hallOfFameTitle,
               style: TextStyle(
                   color: ThemeColor().configurationText,
                   fontWeight: FontWeight.bold,
                   fontSize: ThemeSize.text(context)),
             ),
             SizedBox(width: padding),
-            Tooltip(
-              message:
-                  'The Hall of fame necessitate that you connected to Twitch.\n\n'
-                  'To personalize the message that are sent to the chat,\n'
-                  'you can use these tags:\n'
-                  '    {username} is the name of a user\n'
-                  '    {total} number of sessions previously done\n'
-                  '    \\n is a linebreak',
-              child: Icon(
-                Icons.info,
-                color: Colors.white,
-                size: ThemeSize.icon(context),
-              ),
-            ),
+            InfoTooltip(message: preferences.texts.hallOfFameTitleTooltip),
           ],
         ),
         SizedBox(height: padding),
         CheckboxTile(
-          title: 'Use hall of fame',
+          title: preferences.texts.hallOfFameUsage,
           value: preferences.useHallOfFame.value,
           onChanged: (value) => preferences.useHallOfFame.set(value!),
         ),
         SizedBox(height: padding),
         CheckboxTile(
-          title: 'Must be a follower to register',
-          tooltipMessage:
-              'If the users must be a follower of your channel to be \n'
-              'added to the current worker list.\n'
-              'Warning, setting this to false can result in a lot of\n'
-              'users being added due to the large amount of bots\n'
-              'navigating on Twitch.\n\n'
-              'The white and black list can be used to bypass the\n'
-              'must follow requirements.\n'
-              '    Whitelisted users will be added in all cases\n'
-              '    Blacklisted users won\'t be added even if they are\n'
-              'followers (typically, you want to add all your chatbots\n'
-              'to that list).',
+          title: preferences.texts.hallOfFameMustFollow,
+          tooltipMessage: preferences.texts.hallOfFameMustFollowTooltip,
           value: preferences.mustFollowForFaming.value,
           onChanged: (value) {
             preferences.mustFollowForFaming.set(value!);

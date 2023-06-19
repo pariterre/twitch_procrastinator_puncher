@@ -6,6 +6,7 @@ import 'package:common_lib/models/preferenced_element.dart';
 import 'package:common_lib/providers/app_preferences.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:twitch_procastinator_puncher/widgets/info_tooltip.dart';
 import 'package:twitch_procastinator_puncher/widgets/plus_or_minus.dart';
 
 class FileSelectorTile extends StatelessWidget {
@@ -55,6 +56,7 @@ class FileSelectorTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final preferences = AppPreferences.of(context);
     final windowHeight = MediaQuery.of(context).size.height;
     final padding = ThemePadding.normal(context);
 
@@ -75,20 +77,13 @@ class FileSelectorTile extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                           fontSize: ThemeSize.text(context))),
                   if (tooltipText != null) SizedBox(width: padding),
-                  if (tooltipText != null)
-                    Tooltip(
-                      message: tooltipText,
-                      child: const Icon(
-                        Icons.info,
-                        color: Colors.white,
-                      ),
-                    ),
+                  if (tooltipText != null) InfoTooltip(message: tooltipText),
                 ],
               ),
               Padding(
                 padding: EdgeInsets.only(left: padding),
                 child: Text(
-                  file.filename ?? 'None selected',
+                  file.filename ?? preferences.texts.filesNoneSelected,
                   style: TextStyle(
                       color: ThemeColor().configurationText,
                       fontSize: ThemeSize.smallText(context)),
