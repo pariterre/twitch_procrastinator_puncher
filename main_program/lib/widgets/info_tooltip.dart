@@ -13,7 +13,7 @@ class InfoTooltip extends StatelessWidget {
     return Tooltip(
       message: message,
       margin: EdgeInsets.only(
-          left: windowHeight * 0.26, right: windowHeight * 1.05),
+          left: windowHeight * 0.26, right: windowHeight * 0.85),
       child:
           Icon(Icons.info, color: Colors.white, size: ThemeSize.icon(context)),
     );

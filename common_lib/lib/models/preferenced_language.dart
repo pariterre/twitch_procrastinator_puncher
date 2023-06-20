@@ -365,19 +365,9 @@ class PreferencedLanguage extends PreferencedElement {
   String get hallOfFameTitleTooltip {
     switch (_current) {
       case Language.english:
-        return 'The Hall of Fame requires you to be connected to Twitch.\n\n'
-            'To personalize the messages sent to the chat, you can use '
-            'the following tags:\n'
-            '    {username} - the name of a user\n'
-            '    {total} - the number of sessions previously completed\n'
-            '    \\n - adds a linebreak';
+        return 'The Hall of Fame requires you to be connected to Twitch.';
       case Language.french:
-        return 'The Tableau d\'honneur nécessite que vous soyez connecté à Twitch.\n\n'
-            'Pour personnaliser les messages envoyés dans le chat, vous pouvez '
-            'utiliser les balises suivantes :\n'
-            '    {username} - le nom de l\'utilisateur\n'
-            '    {total} - le nombre de sessions précédemment effectuées\n'
-            '    \\n - ajoute un saut de ligne';
+        return 'Le Tableau d\'honneur nécessite que vous soyez connecté à Twitch.';
     }
   }
 
@@ -430,6 +420,144 @@ class PreferencedLanguage extends PreferencedElement {
             'Veuillez noter qu\'en tant que streamer, vous ne suivez pas votre '
             'propre chaîne. Si vous souhaitez que vos sessions soient prises en '
             'compte, envisagez de vous ajouter à la liste blanche.';
+    }
+  }
+
+  String get hallOfFameWhiteListed {
+    switch (_current) {
+      case Language.english:
+        return 'Whitelisted users (semicolon separated)';
+      case Language.french:
+        return 'Utilisateurs sur la liste blanche (séparés par un point-virgule)';
+    }
+  }
+
+  String get hallOfFameBlackListed {
+    switch (_current) {
+      case Language.english:
+        return 'Blacklisted users (semicolon separated)';
+      case Language.french:
+        return 'Utilisateurs sur la liste noire (séparés par un point-virgule)';
+    }
+  }
+
+  String get hallOfFameBackgroundColor {
+    switch (_current) {
+      case Language.english:
+        return 'Background color of the hall of fame';
+      case Language.french:
+        return 'Couleur de fond du tableau d\'honneur';
+    }
+  }
+
+  String get hallOfFameTextColor {
+    switch (_current) {
+      case Language.english:
+        return 'Text color of the hall of fame';
+      case Language.french:
+        return 'Couleur du texte du tableau d\'honneur';
+    }
+  }
+
+  String get hallOfFameScollingSpeed {
+    switch (_current) {
+      case Language.english:
+        return 'Scroll velocity';
+      case Language.french:
+        return 'Vitesse de défilement';
+    }
+  }
+
+  String get hallOfFameTextTitleMain {
+    switch (_current) {
+      case Language.english:
+        return 'Main title';
+      case Language.french:
+        return 'Titre du tableau';
+    }
+  }
+
+  String get hallOfFameTextTitleViewers {
+    switch (_current) {
+      case Language.english:
+        return 'Viewers names title';
+      case Language.french:
+        return 'Titre des utilisateurs';
+    }
+  }
+
+  String get hallOfFameTextTitleToday {
+    switch (_current) {
+      case Language.english:
+        return 'Today title';
+      case Language.french:
+        return 'Titre aujourd\'hui';
+    }
+  }
+
+  String get hallOfFameTextTitleInAll {
+    switch (_current) {
+      case Language.english:
+        return 'All time title';
+      case Language.french:
+        return 'Titre en tout';
+    }
+  }
+
+  String get hallOfFameTextTitleGrandTotal {
+    switch (_current) {
+      case Language.english:
+        return 'Grand total';
+      case Language.french:
+        return 'Grand total';
+    }
+  }
+
+  String get chatTitle {
+    switch (_current) {
+      case Language.english:
+        return 'Chat messages';
+      case Language.french:
+        return 'Messages de clavardage';
+    }
+  }
+
+  String get chatTitleTooltip {
+    switch (_current) {
+      case Language.english:
+        return 'These are all the message that the chatbot will automatically send '
+            'when certain events occur. This option necessitate that you are '
+            'connected to Twitch.\n\n'
+            'To personalize the messages sent to the chat, you can use '
+            'the following tags:\n'
+            '    {username} - the name of a user\n'
+            '    {total} - the number of sessions previously completed';
+      case Language.french:
+        return 'Messages automatiquement envoyés par le chatbot lorsque certains '
+            'événements ont lieus. Cette option nécessite d\'être connecté '
+            'à Twitch.\n\n'
+            'Pour personnaliser les messages envoyés dans le chat, vous pouvez '
+            'utiliser les balises suivantes :\n'
+            '    {username} - le nom de l\'utilisateur\n'
+            '    {total} - le nombre de sessions précédemment effectuées';
+    }
+  }
+
+  String get chatNewcomerGreetings {
+    switch (_current) {
+      case Language.english:
+        return 'Newcomer greetings';
+      case Language.french:
+        return 'Bienvenue aux nouveaux';
+    }
+  }
+
+  String get chatUserHasConnected {
+    switch (_current) {
+      case Language.english:
+        return 'User has connected';
+      case Language.french:
+        return 'Connexion d\'un utilisateur';
     }
   }
 }

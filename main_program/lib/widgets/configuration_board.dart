@@ -74,7 +74,9 @@ class ConfigurationBoard extends StatelessWidget {
                     const Divider(),
                     _buildTextOnImage(context),
                     const Divider(),
-                    _buildHallOfFame(context),
+                    _buildChatMessages(context),
+                    const Divider(),
+                    _buildHallOfFameOptions(context),
                   ],
                 ),
               ),
@@ -417,9 +419,123 @@ class ConfigurationBoard extends StatelessWidget {
     );
   }
 
-  Widget _buildHallOfFame(BuildContext context) {
+  Widget _buildHallOfFameOptions(BuildContext context) {
     final preferences = AppPreferences.of(context);
     final participants = Participants.of(context);
+    final padding = ThemePadding.normal(context);
+
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Row(
+        children: [
+          Text(
+            preferences.texts.hallOfFameTitle,
+            style: TextStyle(
+                color: ThemeColor().configurationText,
+                fontWeight: FontWeight.bold,
+                fontSize: ThemeSize.text(context)),
+          ),
+          SizedBox(width: padding),
+          InfoTooltip(message: preferences.texts.hallOfFameTitleTooltip),
+        ],
+      ),
+      SizedBox(height: padding),
+      CheckboxTile(
+        title: preferences.texts.hallOfFameUsage,
+        value: preferences.useHallOfFame.value,
+        onChanged: (value) => preferences.useHallOfFame.set(value!),
+      ),
+      SizedBox(height: padding),
+      CheckboxTile(
+        title: preferences.texts.hallOfFameMustFollow,
+        tooltipMessage: preferences.texts.hallOfFameMustFollowTooltip,
+        value: preferences.mustFollowForFaming.value,
+        onChanged: (value) {
+          preferences.mustFollowForFaming.set(value!);
+          participants.mustFollowForFaming = value;
+        },
+      ),
+      SizedBox(height: padding),
+      _buildStringSelectorTile(
+        context,
+        title: preferences.texts.hallOfFameWhiteListed,
+        plainText: preferences.textWhitelist,
+        onTextComplete: () =>
+            participants.whitelist = preferences.textWhitelist.text,
+      ),
+      _buildStringSelectorTile(
+        context,
+        title: preferences.texts.hallOfFameBlackListed,
+        plainText: preferences.textBlacklist,
+        onTextComplete: () =>
+            participants.blacklist = preferences.textBlacklist.text,
+      ),
+      SizedBox(height: padding),
+      SizedBox(height: padding),
+      ColorSelectorTile(
+          title: preferences.texts.hallOfFameBackgroundColor,
+          currentColor: preferences.backgroundColorHallOfFame.value,
+          onChanged: (color) =>
+              preferences.backgroundColorHallOfFame.set(color)),
+      SizedBox(height: padding),
+      DropMenuSelectorTile<AppFonts>(
+          title: preferences.texts.miscFont,
+          value: preferences.fontHallOfFame,
+          items: AppFonts.values
+              .map<DropdownMenuItem<AppFonts>>(
+                  (e) => DropdownMenuItem<AppFonts>(
+                      value: e,
+                      child: Padding(
+                        padding: EdgeInsets.only(left: padding),
+                        child: Text(
+                          e.name,
+                          style: e.style(),
+                        ),
+                      )))
+              .toList(),
+          onChanged: (value) => preferences.fontHallOfFame = value!),
+      SizedBox(height: padding),
+      ColorSelectorTile(
+          title: preferences.texts.hallOfFameTextColor,
+          currentColor: preferences.textColorHallOfFame,
+          onChanged: (color) => preferences.textColorHallOfFame = color),
+      SizedBox(height: padding),
+      PlusOrMinusTile(
+        title: preferences.texts.hallOfFameScollingSpeed,
+        onTap: (selection) => preferences.hallOfFameScrollVelocity.set(
+            preferences.hallOfFameScrollVelocity.value +
+                (selection == PlusOrMinusSelection.plus ? -100 : 100)),
+      ),
+      SizedBox(height: padding),
+      _buildStringSelectorTile(
+        context,
+        title: preferences.texts.hallOfFameTextTitleMain,
+        plainText: preferences.textHallOfFameTitle,
+      ),
+      _buildStringSelectorTile(
+        context,
+        title: preferences.texts.hallOfFameTextTitleViewers,
+        plainText: preferences.textHallOfFameName,
+      ),
+      _buildStringSelectorTile(
+        context,
+        title: preferences.texts.hallOfFameTextTitleToday,
+        plainText: preferences.textHallOfFameToday,
+      ),
+      _buildStringSelectorTile(
+        context,
+        title: preferences.texts.hallOfFameTextTitleInAll,
+        plainText: preferences.textHallOfFameAlltime,
+      ),
+      _buildStringSelectorTile(
+        context,
+        title: preferences.texts.hallOfFameTextTitleGrandTotal,
+        plainText: preferences.textHallOfFameTotal,
+      ),
+    ]);
+  }
+
+  Widget _buildChatMessages(BuildContext context) {
+    final preferences = AppPreferences.of(context);
     final padding = ThemePadding.normal(context);
 
     return Column(
@@ -428,123 +544,26 @@ class ConfigurationBoard extends StatelessWidget {
         Row(
           children: [
             Text(
-              preferences.texts.hallOfFameTitle,
+              preferences.texts.chatTitle,
               style: TextStyle(
                   color: ThemeColor().configurationText,
                   fontWeight: FontWeight.bold,
                   fontSize: ThemeSize.text(context)),
             ),
             SizedBox(width: padding),
-            InfoTooltip(message: preferences.texts.hallOfFameTitleTooltip),
+            InfoTooltip(message: preferences.texts.chatTitleTooltip),
           ],
         ),
         SizedBox(height: padding),
-        CheckboxTile(
-          title: preferences.texts.hallOfFameUsage,
-          value: preferences.useHallOfFame.value,
-          onChanged: (value) => preferences.useHallOfFame.set(value!),
-        ),
-        SizedBox(height: padding),
-        CheckboxTile(
-          title: preferences.texts.hallOfFameMustFollow,
-          tooltipMessage: preferences.texts.hallOfFameMustFollowTooltip,
-          value: preferences.mustFollowForFaming.value,
-          onChanged: (value) {
-            preferences.mustFollowForFaming.set(value!);
-            participants.mustFollowForFaming = value;
-          },
-        ),
         _buildStringSelectorTile(
           context,
-          title: 'Newcomer greetings',
+          title: preferences.texts.chatNewcomerGreetings,
           plainText: preferences.textNewcomersGreetings,
         ),
-        SizedBox(height: padding),
         _buildStringSelectorTile(
           context,
-          title: 'User has connected',
+          title: preferences.texts.chatUserHasConnected,
           plainText: preferences.textUserHasConnectedGreetings,
-        ),
-        SizedBox(height: padding),
-        _buildStringSelectorTile(
-          context,
-          title: 'Whitelisted users (semicolon separated)',
-          plainText: preferences.textWhitelist,
-          onTextComplete: () =>
-              participants.whitelist = preferences.textWhitelist.text,
-        ),
-        SizedBox(height: padding),
-        _buildStringSelectorTile(
-          context,
-          title: 'Blacklisted users (semicolon separated)',
-          plainText: preferences.textBlacklist,
-          onTextComplete: () =>
-              participants.blacklist = preferences.textBlacklist.text,
-        ),
-        SizedBox(height: padding),
-        ColorSelectorTile(
-            title: 'Color of the hall of fame',
-            currentColor: preferences.backgroundColorHallOfFame.value,
-            onChanged: (color) =>
-                preferences.backgroundColorHallOfFame.set(color)),
-        SizedBox(height: padding),
-        DropMenuSelectorTile<AppFonts>(
-            title: 'Font',
-            value: preferences.fontHallOfFame,
-            items: AppFonts.values
-                .map<DropdownMenuItem<AppFonts>>(
-                    (e) => DropdownMenuItem<AppFonts>(
-                        value: e,
-                        child: Padding(
-                          padding: EdgeInsets.only(left: padding),
-                          child: Text(
-                            e.name,
-                            style: e.style(),
-                          ),
-                        )))
-                .toList(),
-            onChanged: (value) => preferences.fontHallOfFame = value!),
-        SizedBox(height: padding),
-        ColorSelectorTile(
-            title: 'Text color on the hall of fame',
-            currentColor: preferences.textColorHallOfFame,
-            onChanged: (color) => preferences.textColorHallOfFame = color),
-        SizedBox(height: padding),
-        PlusOrMinusTile(
-          title: 'Scroll velocity',
-          onTap: (selection) => preferences.hallOfFameScrollVelocity.set(
-              preferences.hallOfFameScrollVelocity.value +
-                  (selection == PlusOrMinusSelection.plus ? -100 : 100)),
-        ),
-        SizedBox(height: padding),
-        _buildStringSelectorTile(
-          context,
-          title: 'Main title',
-          plainText: preferences.textHallOfFameTitle,
-        ),
-        SizedBox(height: padding),
-        _buildStringSelectorTile(
-          context,
-          title: 'Viewers names title',
-          plainText: preferences.textHallOfFameName,
-        ),
-        SizedBox(height: padding),
-        _buildStringSelectorTile(
-          context,
-          title: 'Today title',
-          plainText: preferences.textHallOfFameToday,
-        ),
-        SizedBox(height: padding),
-        _buildStringSelectorTile(
-          context,
-          title: 'All time title',
-          plainText: preferences.textHallOfFameAlltime,
-        ),
-        SizedBox(height: padding),
-        _buildStringSelectorTile(
-          context,
-          title: 'Total done',
-          plainText: preferences.textHallOfFameTotal,
         ),
       ],
     );
