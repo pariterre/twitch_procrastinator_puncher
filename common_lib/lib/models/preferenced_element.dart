@@ -4,6 +4,7 @@ import 'package:common_lib/models/app_fonts.dart';
 import 'package:common_lib/models/config.dart';
 import 'package:common_lib/models/helpers.dart';
 import 'package:common_lib/models/participant.dart';
+import 'package:common_lib/providers/participants.dart';
 import 'package:common_lib/providers/pomodoro_status.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -307,7 +308,24 @@ class TextToChat extends PreferencedText {
   String formattedText(BuildContext context, Participant participant) {
     return text
         .replaceAll('{username}', participant.username)
+        .replaceAll('{totalToday}', participant.doneToday.toString())
         .replaceAll('{total}', participant.doneInAll.toString())
+        .replaceAll(r'\n', '\n');
+  }
+
+  String formattedTextAll(BuildContext context, Participants participants) {
+    // TODO Merge ALL and participants?
+    return text
+        .replaceAll(
+            '{totalToday}',
+            participants.all
+                .fold<int>(0, (prev, e) => prev + e.doneToday)
+                .toString())
+        .replaceAll(
+            '{total}',
+            participants.all
+                .fold<int>(0, (prev, e) => prev + e.doneInAll)
+                .toString())
         .replaceAll(r'\n', '\n');
   }
 

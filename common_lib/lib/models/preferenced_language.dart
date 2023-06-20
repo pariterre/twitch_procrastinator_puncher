@@ -543,6 +543,42 @@ class PreferencedLanguage extends PreferencedElement {
     }
   }
 
+  String get chatTimerHasStarted {
+    switch (_current) {
+      case Language.english:
+        return 'Timer has started';
+      case Language.french:
+        return 'Le minuteur a commencé';
+    }
+  }
+
+  String get chatTimerSessionHasEnded {
+    switch (_current) {
+      case Language.english:
+        return 'A session has ended';
+      case Language.french:
+        return 'Une session s\'est terminée';
+    }
+  }
+
+  String get chatTimerPauseHasEnded {
+    switch (_current) {
+      case Language.english:
+        return 'A pause has ended';
+      case Language.french:
+        return 'Une pause s\'est terminée';
+    }
+  }
+
+  String get chatTimerWorkingHasEnded {
+    switch (_current) {
+      case Language.english:
+        return 'Working has ended';
+      case Language.french:
+        return 'Le travail s\'est terminé';
+    }
+  }
+
   String get chatNewcomerGreetings {
     switch (_current) {
       case Language.english:

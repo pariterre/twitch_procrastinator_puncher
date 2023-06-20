@@ -362,7 +362,6 @@ class ConfigurationBoard extends StatelessWidget {
                 .toList(),
             onChanged: (value) => preferences.fontPomodoro = value!),
         SizedBox(height: padding),
-        // TODO: Add text starting/end of sessions and end of working
         _buildStringSelectorTile(
           context,
           title: preferences.texts.timerTextsIntroduction,
@@ -555,6 +554,26 @@ class ConfigurationBoard extends StatelessWidget {
           ],
         ),
         SizedBox(height: padding),
+        _buildStringSelectorTile(
+          context,
+          title: preferences.texts.chatTimerHasStarted,
+          plainText: preferences.textTimerHasStarted,
+        ),
+        _buildStringSelectorTile(
+          context,
+          title: preferences.texts.chatTimerSessionHasEnded,
+          plainText: preferences.textTimerActiveSessionHasEnded,
+        ),
+        _buildStringSelectorTile(
+          context,
+          title: preferences.texts.chatTimerPauseHasEnded,
+          plainText: preferences.textTimerPauseHasEnded,
+        ),
+        _buildStringSelectorTile(
+          context,
+          title: preferences.texts.chatTimerWorkingHasEnded,
+          plainText: preferences.textTimerWorkingHasEnded,
+        ),
         _buildStringSelectorTile(
           context,
           title: preferences.texts.chatNewcomerGreetings,

@@ -14,6 +14,7 @@ class PomodoroStatus with ChangeNotifier {
     notifyListeners();
   }
 
+  bool _firstSessionStarted = false;
   int _currentSession = 0;
   int get currentSession => _currentSession;
 
@@ -46,18 +47,6 @@ class PomodoroStatus with ChangeNotifier {
   }
 
   ///
-  /// Callback that announces that an active session has finished
-  Future<void> Function()? activeSessionHasFinishedGuiCallback;
-
-  ///
-  /// Callback that announces that a pause session has finished
-  Future<void> Function()? pauseHasFinishedGuiCallback;
-
-  ///
-  /// Callback that announces that we arrived at the end
-  Future<void> Function()? finishedWorkingGuiCallback;
-
-  ///
   /// Start the counter if it is not done
   void start() {
     if (_stopWatchStatus == StopWatchStatus.done) return;
@@ -88,6 +77,7 @@ class PomodoroStatus with ChangeNotifier {
   }) {
     // Reset all the internal states
     _nbSessions = nbSessions.value;
+    _firstSessionStarted = false;
     _currentSession = 0;
     _focusSessionDuration = focusSessionDuration.value;
     _pauseSessionDuration = pauseSessionDuration.value;
@@ -126,9 +116,30 @@ class PomodoroStatus with ChangeNotifier {
   // TIMER CALLBACK
   Function() sessionHasFinishedCallback;
 
+  ///
+  /// Callback that announces that an active session has finished
+  Future<void> Function()? timerHasStartedCallback;
+
+  ///
+  /// Callback that announces that an active session has finished
+  Future<void> Function()? activeSessionHasFinishedGuiCallback;
+
+  ///
+  /// Callback that announces that a pause session has finished
+  Future<void> Function()? pauseHasFinishedGuiCallback;
+
+  ///
+  /// Callback that announces that we arrived at the end
+  Future<void> Function()? finishedWorkingGuiCallback;
+
   // This method is automatically called every seconds
   void _updateCounter() {
     if (_stopWatchStatus == StopWatchStatus.inSession) {
+      if (!_firstSessionStarted) {
+        if (timerHasStartedCallback != null) timerHasStartedCallback!();
+        _firstSessionStarted = true;
+      }
+
       // Decrement the counter, if it gets to zeros advance the session
       int newTimerValue = _timer.inSeconds - 1;
       if (newTimerValue <= 0) {

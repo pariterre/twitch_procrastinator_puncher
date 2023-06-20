@@ -70,6 +70,10 @@ class AppPreferences with ChangeNotifier {
 
   PreferencedInt hallOfFameScrollVelocity;
 
+  TextToChat textTimerHasStarted;
+  TextToChat textTimerActiveSessionHasEnded;
+  TextToChat textTimerPauseHasEnded;
+  TextToChat textTimerWorkingHasEnded;
   TextToChat textNewcomersGreetings;
   TextToChat textUserHasConnectedGreetings;
 
@@ -136,6 +140,7 @@ class AppPreferences with ChangeNotifier {
     }
 
     // Call the real constructor
+    // TODO Add a reset button
     return AppPreferences._(
         lastVisitedDirectory:
             Directory(previousPreferences?['lastVisitedDirectory'] ?? ''),
@@ -175,6 +180,10 @@ class AppPreferences with ChangeNotifier {
         useHallOfFame: PreferencedBool.deserialize(previousPreferences?['useHallOfFame'], true),
         mustFollowForFaming: PreferencedBool.deserialize(previousPreferences?['mustFollowForFaming'], true),
         hallOfFameScrollVelocity: PreferencedInt.deserialize(previousPreferences?['hallOfFameScrollVelocity'], 2000),
+        textTimerHasStarted: TextToChat.deserialize(previousPreferences?['textTimerHasStarted'], r'The session has started! Have a good work!'),
+        textTimerActiveSessionHasEnded: TextToChat.deserialize(previousPreferences?['textTimerActiveSessionHasEnded'], r'The session {session} is done! Well done :)'),
+        textTimerPauseHasEnded: TextToChat.deserialize(previousPreferences?['textTimerPauseHasEnded'], 'A new session has started, let\'s get back to work!'),
+        textTimerWorkingHasEnded: TextToChat.deserialize(previousPreferences?['textTimerWorkingHasEnded'], r'We are done! Good job everyone, we have done {totalToday} sessions today, for a grand total of {total}!'),
         textNewcomersGreetings: TextToChat.deserialize(previousPreferences?['textNewcomersGreetings'], r'Welcome to {username} who has joined for the first time!'),
         textUserHasConnectedGreetings: TextToChat.deserialize(previousPreferences?['textUserHasConnectedGreetings'], r'Welcome back to {username} who has joined us!'),
         textWhitelist: PreferencedText.deserialize(previousPreferences?['textWhitelist']),
@@ -211,6 +220,10 @@ class AppPreferences with ChangeNotifier {
     required this.useHallOfFame,
     required this.mustFollowForFaming,
     required this.hallOfFameScrollVelocity,
+    required this.textTimerHasStarted,
+    required this.textTimerActiveSessionHasEnded,
+    required this.textTimerPauseHasEnded,
+    required this.textTimerWorkingHasEnded,
     required this.textNewcomersGreetings,
     required this.textUserHasConnectedGreetings,
     required this.textWhitelist,
@@ -254,11 +267,15 @@ class AppPreferences with ChangeNotifier {
     useHallOfFame.onChanged = _save;
     mustFollowForFaming.onChanged = _save;
 
-    hallOfFameScrollVelocity.onChanged = _save;
+    textTimerHasStarted.onChanged = _save;
+    textTimerActiveSessionHasEnded.onChanged = _save;
+    textTimerPauseHasEnded.onChanged = _save;
+    textTimerWorkingHasEnded.onChanged = _save;
     textNewcomersGreetings.onChanged = _save;
     textUserHasConnectedGreetings.onChanged = _save;
     textBlacklist.onChanged = _save;
 
+    hallOfFameScrollVelocity.onChanged = _save;
     textHallOfFameTitle.onChanged = _save;
     textHallOfFameName.onChanged = _save;
     textHallOfFameToday.onChanged = _save;
@@ -304,6 +321,11 @@ class AppPreferences with ChangeNotifier {
         'useHallOfFame': useHallOfFame.serialize(),
         'mustFollowForFaming': mustFollowForFaming.serialize(),
         'hallOfFameScrollVelocity': hallOfFameScrollVelocity.serialize(),
+        'textTimerHasStarted': textTimerHasStarted.serialize(),
+        'textTimerActiveSessionHasEnded':
+            textTimerActiveSessionHasEnded.serialize(),
+        'textTimerPauseHasEnded': textTimerPauseHasEnded.serialize(),
+        'textTimerWorkingHasEnded': textTimerWorkingHasEnded.serialize(),
         'textNewcomersGreetings': textNewcomersGreetings.serialize(),
         'textUserHasConnectedGreetings':
             textUserHasConnectedGreetings.serialize(),

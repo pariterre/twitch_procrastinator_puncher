@@ -43,6 +43,7 @@ class _MainScreenState extends State<MainScreen> {
 
     // Connect the callback of the timer
     final pomodoro = PomodoroStatus.of(context, listen: false);
+    pomodoro.timerHasStartedCallback = _startWorking;
     pomodoro.activeSessionHasFinishedGuiCallback = _activeSessionDone;
     pomodoro.pauseHasFinishedGuiCallback = _pauseSessionDone;
     pomodoro.finishedWorkingGuiCallback = _workingDone;
@@ -73,6 +74,13 @@ class _MainScreenState extends State<MainScreen> {
     setState(() {});
   }
 
+  Future<void> _startWorking() async {
+    final preferences = AppPreferences.of(context, listen: false);
+    final participants = Participants.of(context, listen: false);
+    _twitchManager!.irc.send(preferences.textTimerHasStarted
+        .formattedTextAll(context, participants));
+  }
+
   Future<void> _activeSessionDone() async {
     final preferences = AppPreferences.of(context, listen: false);
 
@@ -82,6 +90,8 @@ class _MainScreenState extends State<MainScreen> {
       final player = AudioPlayer();
       await player.play(DeviceFileSource(filepath));
     }
+
+    _twitchManager!.irc.send(preferences.textTimerActiveSessionHasEnded.text);
   }
 
   Future<void> _pauseSessionDone() async {
@@ -93,6 +103,8 @@ class _MainScreenState extends State<MainScreen> {
       final player = AudioPlayer();
       await player.play(DeviceFileSource(filepath));
     }
+
+    _twitchManager!.irc.send(preferences.textTimerPauseHasEnded.text);
   }
 
   Future<void> _workingDone() async {
@@ -104,6 +116,8 @@ class _MainScreenState extends State<MainScreen> {
       final player = AudioPlayer();
       await player.play(DeviceFileSource(filepath));
     }
+
+    _twitchManager!.irc.send(preferences.textTimerWorkingHasEnded.text);
   }
 
   void _greetNewComers(Participant participant) {
