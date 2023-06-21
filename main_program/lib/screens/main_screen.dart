@@ -84,10 +84,9 @@ class _MainScreenState extends State<MainScreen> {
     final preferences = AppPreferences.of(context, listen: false);
 
     if (preferences.endActiveSessionSound.filename != null) {
-      final filepath =
-          '${appDirectory.path}/${preferences.endWorkingSound.filename!}';
       final player = AudioPlayer();
-      await player.play(DeviceFileSource(filepath));
+      await player
+          .play(BytesSource(preferences.endWorkingSound.playableSource!));
     }
 
     _twitchManager!.irc.send(preferences.textTimerActiveSessionHasEnded.text);
@@ -97,10 +96,9 @@ class _MainScreenState extends State<MainScreen> {
     final preferences = AppPreferences.of(context, listen: false);
 
     if (preferences.endPauseSessionSound.filename != null) {
-      final filepath =
-          '${appDirectory.path}/${preferences.endWorkingSound.filename!}';
       final player = AudioPlayer();
-      await player.play(DeviceFileSource(filepath));
+      await player
+          .play(BytesSource(preferences.endPauseSessionSound.playableSource!));
     }
 
     _twitchManager!.irc.send(preferences.textTimerPauseHasEnded.text);
@@ -110,10 +108,9 @@ class _MainScreenState extends State<MainScreen> {
     final preferences = AppPreferences.of(context, listen: false);
 
     if (preferences.endWorkingSound.filename != null) {
-      final filepath =
-          '${appDirectory.path}/${preferences.endWorkingSound.filename!}';
       final player = AudioPlayer();
-      await player.play(DeviceFileSource(filepath));
+      await player
+          .play(BytesSource(preferences.endWorkingSound.playableSource!));
     }
 
     _twitchManager!.irc.send(preferences.textTimerWorkingHasEnded.text);

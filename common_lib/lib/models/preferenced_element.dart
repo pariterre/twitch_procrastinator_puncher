@@ -244,6 +244,8 @@ class PreferencedSoundFile extends PreferencedFile {
   @override
   FileType get fileType => FileType.sound;
 
+  Uint8List? get playableSource => _file;
+
   static PreferencedSoundFile deserialize(map) => PreferencedSoundFile.fromRaw(
         map?['rawFile'] != null
             ? Uint8List.fromList((map?['rawFile'] as List).cast<int>())
