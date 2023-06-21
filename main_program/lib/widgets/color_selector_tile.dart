@@ -70,17 +70,20 @@ class _ColorSelectorTileState extends State<ColorSelectorTile> {
                 InfoTooltip(message: widget.tooltipMessage),
             ],
           ),
-          InkWell(
-            onTap: () => pickColorDialog(context,
-                currentColor: widget.currentColor,
-                onColorChanged: (color) =>
-                    setState(() => widget.onChanged(color))),
-            child: Container(
-              decoration: BoxDecoration(
-                  color: widget.currentColor,
-                  border: Border.all(color: Colors.black)),
-              width: windowHeight * 0.05,
-              height: windowHeight * 0.05,
+          Container(
+            decoration: const BoxDecoration(color: Colors.white),
+            child: InkWell(
+              onTap: () => pickColorDialog(context,
+                  currentColor: widget.currentColor,
+                  onColorChanged: (color) =>
+                      setState(() => widget.onChanged(color))),
+              child: Container(
+                decoration: BoxDecoration(
+                    color: widget.currentColor,
+                    border: Border.all(color: Colors.black)),
+                width: windowHeight * 0.05,
+                height: windowHeight * 0.05,
+              ),
             ),
           ),
         ],

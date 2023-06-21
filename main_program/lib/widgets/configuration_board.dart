@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:arrow_pad/arrow_pad.dart';
 import 'package:common_lib/models/app_theme.dart';
 import 'package:common_lib/models/config.dart';
@@ -5,6 +7,7 @@ import 'package:common_lib/models/preferenced_element.dart';
 import 'package:common_lib/providers/app_preferences.dart';
 import 'package:common_lib/providers/participants.dart';
 import 'package:common_lib/providers/pomodoro_status.dart';
+import 'package:common_lib/widgets/are_you_sure_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:twitch_procastinator_puncher/models/twitch_status.dart';
 import 'package:twitch_procastinator_puncher/widgets/checkbox_tile.dart';
@@ -77,6 +80,8 @@ class ConfigurationBoard extends StatelessWidget {
                     _buildChatMessages(context),
                     const Divider(),
                     _buildHallOfFameOptions(context),
+                    const Divider(),
+                    _buildReset(context),
                   ],
                 ),
               ),
@@ -88,13 +93,44 @@ class ConfigurationBoard extends StatelessWidget {
   }
 
   Widget _buildTitle(BuildContext context) {
+    final windowHeight = MediaQuery.of(context).size.height;
+    final padding = ThemePadding.normal(context);
     final preferences = AppPreferences.of(context);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        const LanguageSelector(),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const LanguageSelector(),
+            SizedBox(width: padding * 2),
+            Container(
+              decoration:
+                  BoxDecoration(border: Border.all(color: Colors.white)),
+              padding: EdgeInsets.symmetric(
+                  horizontal: padding / 4, vertical: padding / 5),
+              child: InkWell(
+                onTap: () async {
+                  final answer = await showDialog<bool>(
+                      context: context,
+                      builder: (context) => AreYouSureDialog(
+                          title: preferences.texts.miscQuitTitle,
+                          content: preferences.texts.miscQuitContent));
+                  if (answer == null || !answer) return;
+
+                  exit(0);
+                },
+                child: Icon(
+                  Icons.close,
+                  color: Colors.white,
+                  size: windowHeight * 0.02,
+                ),
+              ),
+            ),
+          ],
+        ),
         Center(
           child: Text(
             preferences.texts.titleMain,
@@ -199,7 +235,19 @@ class ConfigurationBoard extends StatelessWidget {
             child: Padding(
               padding: EdgeInsets.only(top: padding),
               child: ElevatedButton(
-                onPressed: connectToTwitch,
+                onPressed: () async {
+                  final answer = await showDialog<bool>(
+                      context: context,
+                      builder: (context) => AreYouSureDialog(
+                            title: preferences
+                                .texts.controllerReconnectTwitchConfirm,
+                            content: preferences
+                                .texts.controllerReconnectTwitchContent,
+                          ));
+                  if (answer == null || !answer) return;
+
+                  connectToTwitch!();
+                },
                 style: ThemeButton.elevated,
                 child: Text(
                     twitchStatus == TwitchStatus.connected
@@ -530,6 +578,32 @@ class ConfigurationBoard extends StatelessWidget {
         plainText: preferences.textHallOfFameTotal,
       ),
     ]);
+  }
+
+  Widget _buildReset(BuildContext context) {
+    final preferences = AppPreferences.of(context);
+
+    return Center(
+      child: ElevatedButton(
+        onPressed: () async {
+          final answer = await showDialog<bool>(
+            context: context,
+            builder: (context) => AreYouSureDialog(
+              title: preferences.texts.miscResetConfirmTitle,
+              content: preferences.texts.miscResetConfirm,
+            ),
+          );
+          if (answer == null || !answer) return;
+          preferences.reset();
+        },
+        style: ThemeButton.elevated,
+        child: Text(
+          preferences.texts.miscReset,
+          style:
+              TextStyle(color: Colors.black, fontSize: ThemeSize.text(context)),
+        ),
+      ),
+    );
   }
 
   Widget _buildChatMessages(BuildContext context) {

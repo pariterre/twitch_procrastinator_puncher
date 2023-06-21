@@ -133,6 +133,24 @@ class PreferencedLanguage extends PreferencedElement {
     }
   }
 
+  String get controllerReconnectTwitchConfirm {
+    switch (_current) {
+      case Language.english:
+        return 'Reconnecting to Twitch';
+      case Language.french:
+        return 'Reconnexion à Twitch';
+    }
+  }
+
+  String get controllerReconnectTwitchContent {
+    switch (_current) {
+      case Language.english:
+        return 'Are you sure you want to reconnect to Twitch?';
+      case Language.french:
+        return 'Êtes-vous certain de vouloir reconnecter à Twitch?';
+    }
+  }
+
   String get controllerNumberOfSession {
     switch (_current) {
       case Language.english:
@@ -247,6 +265,71 @@ class PreferencedLanguage extends PreferencedElement {
         return 'Font';
       case Language.french:
         return 'Police d\'écriture';
+    }
+  }
+
+  String get miscReset {
+    switch (_current) {
+      case Language.english:
+        return 'Reset configuration';
+      case Language.french:
+        return 'Réinitialiser la configuration';
+    }
+  }
+
+  String get miscResetConfirmTitle {
+    switch (_current) {
+      case Language.english:
+        return 'Resetting configuration';
+      case Language.french:
+        return 'Réinitialiation de la configuration';
+    }
+  }
+
+  String get miscResetConfirm {
+    switch (_current) {
+      case Language.english:
+        return 'Are you sure you wat to reset the configuration to their '
+            'original values?';
+      case Language.french:
+        return 'Êtes-vous certains de vouloir réinitialiser la configuration '
+            'aux valeurs d\'origine?';
+    }
+  }
+
+  String get miscCancel {
+    switch (_current) {
+      case Language.english:
+        return 'Cancel';
+      case Language.french:
+        return 'Annuler';
+    }
+  }
+
+  String get miscConfirm {
+    switch (_current) {
+      case Language.english:
+        return 'Confirm';
+      case Language.french:
+        return 'Confirmer';
+    }
+  }
+
+  String get miscQuitTitle {
+    switch (_current) {
+      case Language.english:
+        return 'Exit';
+      case Language.french:
+        return 'Quitter';
+    }
+  }
+
+  String get miscQuitContent {
+    switch (_current) {
+      case Language.english:
+        return 'Are you sure you want to quit the Procrastinator Puncher?';
+      case Language.french:
+        return 'Êtes-vous sûr de vouloir quitter le Chasseur de Procrastination?';
     }
   }
 
@@ -542,8 +625,8 @@ class PreferencedLanguage extends PreferencedElement {
             '    {done} - is the number of sessions collectively done\n'
             '    {doneToday} - is the number of sessions collectively done today\n'
             '    *{username} - the name of a user\n'
-            '    *{userDone} - the number of completed sessions by the user'
-            '    *{userDoneToday} - the number of sessions completed today by the user'
+            '    *{userDone} - the number of completed sessions by the user\n'
+            '    *{userDoneToday} - the number of sessions completed today by the user\n'
             '* Only for the fields marked with a star';
       case Language.french:
         return 'Messages automatiquement envoyés par le chatbot lorsque certains '
@@ -559,8 +642,8 @@ class PreferencedLanguage extends PreferencedElement {
             '    {done} - le nombre de sessions collectivement réalisées\n'
             '    {doneToday} - le nombre de sessions collectivement réalisées aujourd\'hui\n'
             '    *{username} - le nom de l\'utilisateur\n'
-            '    *{userDone} - le nombre de sessions réalisées par l\'utilisateur'
-            '    *{userDoneToday} - le nombre de sessions réalisées par l\'utilisateur aujourd\'hui'
+            '    *{userDone} - le nombre de sessions réalisées par l\'utilisateur\n'
+            '    *{userDoneToday} - le nombre de sessions réalisées par l\'utilisateur aujourd\'hui\n'
             '* Seulement pour les champs marqués d\'une étoile';
     }
   }

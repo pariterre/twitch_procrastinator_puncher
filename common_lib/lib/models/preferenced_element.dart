@@ -369,9 +369,9 @@ class TextOnPomodoro extends PreferencedText {
   static TextOnPomodoro deserialize(Map<String, dynamic>? map,
       [String defaultValue = '']) {
     final text = map?['text'] ?? defaultValue;
-    final offset = map?['offset'] ?? [0.0, 0.0];
+    final offset = map?['offset'] ?? [0.0, 150.0];
     final size = map?['size'] ?? 1.0;
-    final color = Color(map?['color'] ?? 0xFFFFFFFF);
+    final color = Color(map?['color'] ?? 0xFF000000);
     return TextOnPomodoro(text,
         offset: Offset(offset[0], offset[1]), size: size, color: color);
   }
