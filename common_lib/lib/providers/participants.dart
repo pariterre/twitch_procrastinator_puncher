@@ -48,11 +48,11 @@ class Participants extends ChangeNotifier {
   /// If any change occurred, web client should be notified
   bool shouldSendToWebClient = false;
 
-  void addPomodoroToAllConnected() {
+  void addSessionDoneToAllConnected() {
     for (final user in all) {
       if (user.isConnected) {
-        user.doneToday += 1;
-        user.doneInAll += 1;
+        user.sessionsDoneToday += 1;
+        user.sessionsDone += 1;
       }
     }
     disconnectAll(); // They will be reconnected automatically
@@ -66,6 +66,15 @@ class Participants extends ChangeNotifier {
       user.disconnect();
     }
   }
+
+  ///
+  /// Number of sessions done all time
+  int get sessionsDone => all.fold<int>(0, (prev, e) => prev + e.sessionsDone);
+
+  ///
+  /// Number of sessions done today
+  int get sessionsDoneToday =>
+      all.fold<int>(0, (prev, e) => prev + e.sessionsDoneToday);
 
   ///
   /// The blacklist removes specific users from the all list (and prevent them
@@ -138,7 +147,8 @@ class Participants extends ChangeNotifier {
       // If the user was not connected, connect them
       if (!participant.isConnected) {
         // Greet them if it the first connexion today but is not a newcomer
-        if (!participant.wasPreviouslyConnected && participant.doneInAll > 0) {
+        if (!participant.wasPreviouslyConnected &&
+            participant.sessionsDone > 0) {
           if (greetUserHasConnectedCallback != null) {
             greetUserHasConnectedCallback!(participant);
           }

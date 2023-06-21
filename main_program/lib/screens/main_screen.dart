@@ -76,9 +76,8 @@ class _MainScreenState extends State<MainScreen> {
 
   Future<void> _startWorking() async {
     final preferences = AppPreferences.of(context, listen: false);
-    final participants = Participants.of(context, listen: false);
-    _twitchManager!.irc.send(preferences.textTimerHasStarted
-        .formattedTextAll(context, participants));
+    _twitchManager!.irc
+        .send(preferences.textTimerHasStarted.formattedText(context));
   }
 
   Future<void> _activeSessionDone() async {

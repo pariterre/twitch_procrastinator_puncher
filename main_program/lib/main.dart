@@ -34,7 +34,7 @@ void main() async {
       ChangeNotifierProvider(
           create: (context) => PomodoroStatus(
               sessionHasFinishedCallback:
-                  participants.addPomodoroToAllConnected)),
+                  participants.addSessionDoneToAllConnected)),
     ],
     child: MaterialApp(
       initialRoute: MainScreen.route,

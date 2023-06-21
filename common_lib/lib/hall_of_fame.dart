@@ -69,7 +69,7 @@ class _HallOfFameState extends State<HallOfFame> {
     final padding = ThemePadding.normal(context);
     final participants = Participants.of(context).all.map((e) => e).toList();
 
-    participants.sort((a, b) => b.doneInAll - a.doneInAll);
+    participants.sort((a, b) => b.sessionsDone - a.sessionsDone);
     _status =
         participants.isEmpty ? _status : _InitializationStatus.scrollerAttached;
 
@@ -126,8 +126,9 @@ class _HallOfFameState extends State<HallOfFame> {
                               final participant = participants[index];
                               return _FameTile(
                                 name: participant.username,
-                                doneToday: participant.doneToday.toString(),
-                                doneInAll: participant.doneInAll.toString(),
+                                doneToday:
+                                    participant.sessionsDoneToday.toString(),
+                                doneInAll: participant.sessionsDone.toString(),
                                 fontWeight: FontWeight.normal,
                                 color: preferences.textColorHallOfFame,
                               );
@@ -147,10 +148,10 @@ class _HallOfFameState extends State<HallOfFame> {
               child: _FameTile(
                 name: preferences.textHallOfFameTotal.text,
                 doneToday: participants
-                    .fold<int>(0, (prev, e) => prev + e.doneToday)
+                    .fold<int>(0, (prev, e) => prev + e.sessionsDoneToday)
                     .toString(),
                 doneInAll: participants
-                    .fold<int>(0, (prev, e) => prev + e.doneInAll)
+                    .fold<int>(0, (prev, e) => prev + e.sessionsDone)
                     .toString(),
                 fontWeight: FontWeight.bold,
                 color: preferences.textHallOfFameTotal.color,

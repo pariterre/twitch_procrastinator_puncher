@@ -264,20 +264,24 @@ class PreferencedLanguage extends PreferencedElement {
       case Language.english:
         return 'The following tags can be used to print some interesting\n'
             'information:\n'
-            '    {currentSession} - the current session\n'
-            '    {maxSessions} the maximum number of sessions\n'
+            '    {session} - the current session\n'
+            '    {nbSessions} the maximum number of sessions\n'
             '    {timer} - the current value of the timer\n'
-            '    {sessionDuration} - is the maximum time of the sessions\n'
-            '    {pauseDuration} - is the maximum time of the pauses\n'
+            '    {sessionTime} - is the maximum time of the sessions\n'
+            '    {pauseTime} - is the maximum time of the pauses\n'
+            '    {done} - is the number of sessions collectively done\n'
+            '    {doneToday} - is the number of sessions collectively done today\n'
             '    \\n - adds a linebreak';
       case Language.french:
         return 'Les balises suivantes peuvent être utilisées pour afficher des '
             'informations intéressantes :\n'
-            '    {currentSession} - la session en cours\n'
-            '    {maxSessions} - le nombre maximum de sessions\n'
+            '    {session} - la session en cours\n'
+            '    {nbSessions} - le nombre maximum de sessions\n'
             '    {timer} - la valeur actuelle du minuteur\n'
-            '    {sessionDuration} - la durée des sessions\n'
-            '    {pauseDuration} - la durée des pauses\n'
+            '    {sessionTime} - la durée des sessions\n'
+            '    {pauseTime} - la durée des pauses\n'
+            '    {done} - le nombre de sessions collectivement réalisées\n'
+            '    {doneToday} - le nombre de sessions collectivement réalisées aujourd\'hui\n'
             '    \\n - ajoute un saut de ligne';
     }
   }
@@ -332,7 +336,7 @@ class PreferencedLanguage extends PreferencedElement {
       case Language.english:
         return 'Export texts to a file';
       case Language.french:
-        return 'Exporter le text dans un fichier';
+        return 'Exporter le texte dans un fichier';
     }
   }
 
@@ -530,16 +534,34 @@ class PreferencedLanguage extends PreferencedElement {
             'connected to Twitch.\n\n'
             'To personalize the messages sent to the chat, you can use '
             'the following tags:\n'
-            '    {username} - the name of a user\n'
-            '    {total} - the number of sessions previously completed';
+            '    {session} - the current session\n'
+            '    {nbSessions} the maximum number of sessions\n'
+            '    {timer} - the current value of the timer\n'
+            '    {sessionTime} - is the maximum time of the sessions\n'
+            '    {pauseTime} - is the maximum time of the pauses\n'
+            '    {done} - is the number of sessions collectively done\n'
+            '    {doneToday} - is the number of sessions collectively done today\n'
+            '    *{username} - the name of a user\n'
+            '    *{userDone} - the number of completed sessions by the user'
+            '    *{userDoneToday} - the number of sessions completed today by the user'
+            '* Only for the fields marked with a star';
       case Language.french:
         return 'Messages automatiquement envoyés par le chatbot lorsque certains '
             'événements ont lieus. Cette option nécessite d\'être connecté '
             'à Twitch.\n\n'
             'Pour personnaliser les messages envoyés dans le chat, vous pouvez '
             'utiliser les balises suivantes :\n'
-            '    {username} - le nom de l\'utilisateur\n'
-            '    {total} - le nombre de sessions précédemment effectuées';
+            '    {session} - la session en cours\n'
+            '    {nbSessions} - le nombre maximum de sessions\n'
+            '    {timer} - la valeur actuelle du minuteur\n'
+            '    {sessionTime} - la durée des sessions\n'
+            '    {pauseTime} - la durée des pauses\n'
+            '    {done} - le nombre de sessions collectivement réalisées\n'
+            '    {doneToday} - le nombre de sessions collectivement réalisées aujourd\'hui\n'
+            '    *{username} - le nom de l\'utilisateur\n'
+            '    *{userDone} - le nombre de sessions réalisées par l\'utilisateur'
+            '    *{userDoneToday} - le nombre de sessions réalisées par l\'utilisateur aujourd\'hui'
+            '* Seulement pour les champs marqués d\'une étoile';
     }
   }
 
@@ -582,18 +604,18 @@ class PreferencedLanguage extends PreferencedElement {
   String get chatNewcomerGreetings {
     switch (_current) {
       case Language.english:
-        return 'Newcomer greetings';
+        return '* Newcomer greetings';
       case Language.french:
-        return 'Bienvenue aux nouveaux';
+        return '* Bienvenue aux nouveaux';
     }
   }
 
   String get chatUserHasConnected {
     switch (_current) {
       case Language.english:
-        return 'User has connected';
+        return '* User has connected';
       case Language.french:
-        return 'Connexion d\'un utilisateur';
+        return '* Connexion d\'un utilisateur';
     }
   }
 }

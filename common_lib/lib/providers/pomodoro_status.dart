@@ -19,8 +19,8 @@ class PomodoroStatus with ChangeNotifier {
   int get currentSession => _currentSession;
 
   Duration _focusSessionDuration = const Duration();
-  Duration get focusSessionDuration => _focusSessionDuration;
-  set focusSessionDuration(Duration duration) {
+  Duration get sessionDuration => _focusSessionDuration;
+  set sessionDuration(Duration duration) {
     _focusSessionDuration = duration;
     if (_stopWatchStatus == StopWatchStatus.initializing) {
       _timer = duration;
@@ -98,7 +98,7 @@ class PomodoroStatus with ChangeNotifier {
   Map<String, dynamic> serialize() => {
         'nbSessions': nbSessions,
         'currentSession': currentSession,
-        'focusSessionDuration': focusSessionDuration.inSeconds,
+        'focusSessionDuration': sessionDuration.inSeconds,
         'pauseSessionDuration': pauseSessionDuration.inSeconds,
         'stopWatchStatus': stopWatchStatus.index,
         'timer': timer.inSeconds
@@ -107,7 +107,7 @@ class PomodoroStatus with ChangeNotifier {
   void updateWebClient(map) {
     nbSessions = map['nbSessions'];
     _currentSession = map['currentSession'];
-    focusSessionDuration = Duration(seconds: map['focusSessionDuration']);
+    sessionDuration = Duration(seconds: map['focusSessionDuration']);
     pauseSessionDuration = Duration(seconds: map['pauseSessionDuration']);
     _stopWatchStatus = StopWatchStatus.values[map['stopWatchStatus']];
     timer = Duration(seconds: map['timer']);

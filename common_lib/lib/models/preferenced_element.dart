@@ -267,6 +267,31 @@ class PreferencedText extends PreferencedElement {
     if (onChanged != null) onChanged!();
   }
 
+  String formattedText(BuildContext context, [Participant? participant]) {
+    final pomodoro = PomodoroStatus.of(context, listen: false);
+    final participants = Participants.of(context, listen: false);
+
+    var out = text
+        .replaceAll('{session}', (pomodoro.currentSession + 1).toString())
+        .replaceAll('{nbSessions}', pomodoro.nbSessions.toString())
+        .replaceAll('{timer}', durationAsString(pomodoro.timer))
+        .replaceAll('{sessionTime}', durationAsString(pomodoro.sessionDuration))
+        .replaceAll(
+            '{pauseTime}', durationAsString(pomodoro.pauseSessionDuration))
+        .replaceAll('{done}', participants.sessionsDone.toString())
+        .replaceAll('{doneToday}', participants.sessionsDoneToday.toString())
+        .replaceAll(r'\n', '\n');
+
+    if (participant != null) {
+      out = out
+          .replaceAll('{username}', participant.username)
+          .replaceAll('{userDone}', participant.sessionsDone.toString())
+          .replaceAll(
+              '{userDoneToday}', participant.sessionsDoneToday.toString());
+    }
+    return out;
+  }
+
   PreferencedText(
     String text, {
     super.onChanged,
@@ -305,30 +330,6 @@ class PreferencedText extends PreferencedElement {
 class TextToChat extends PreferencedText {
   TextToChat(String text) : super(text, color: Colors.white);
 
-  String formattedText(BuildContext context, Participant participant) {
-    return text
-        .replaceAll('{username}', participant.username)
-        .replaceAll('{totalToday}', participant.doneToday.toString())
-        .replaceAll('{total}', participant.doneInAll.toString())
-        .replaceAll(r'\n', '\n');
-  }
-
-  String formattedTextAll(BuildContext context, Participants participants) {
-    // TODO Merge ALL and participants?
-    return text
-        .replaceAll(
-            '{totalToday}',
-            participants.all
-                .fold<int>(0, (prev, e) => prev + e.doneToday)
-                .toString())
-        .replaceAll(
-            '{total}',
-            participants.all
-                .fold<int>(0, (prev, e) => prev + e.doneInAll)
-                .toString())
-        .replaceAll(r'\n', '\n');
-  }
-
   static TextToChat deserialize(Map<String, dynamic>? map,
       [String defaultValue = '']) {
     final text = map?['text'] ?? defaultValue;
@@ -349,21 +350,6 @@ class TextOnPomodoro extends PreferencedText {
   })  : _offset = offset,
         _size = size,
         super(text);
-
-  // Foreground text during active session
-  String formattedText(BuildContext context) {
-    final pomodoro = PomodoroStatus.of(context, listen: false);
-    return text
-        .replaceAll(
-            '{currentSession}', (pomodoro.currentSession + 1).toString())
-        .replaceAll('{maxSessions}', pomodoro.nbSessions.toString())
-        .replaceAll('{timer}', durationAsString(pomodoro.timer))
-        .replaceAll('{sessionDuration}',
-            durationAsString(pomodoro.focusSessionDuration))
-        .replaceAll(
-            '{pauseDuration}', durationAsString(pomodoro.pauseSessionDuration))
-        .replaceAll(r'\n', '\n');
-  }
 
   // Offset of the text on the screen
   Offset get offset => _offset;

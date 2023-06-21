@@ -238,8 +238,7 @@ class ConfigurationBoard extends StatelessWidget {
             AppPreferences.of(context, listen: false)
                 .sessionDuration
                 .set(value);
-            PomodoroStatus.of(context, listen: false).focusSessionDuration =
-                value;
+            PomodoroStatus.of(context, listen: false).sessionDuration = value;
           },
         ),
         SizedBox(height: padding),
@@ -348,20 +347,6 @@ class ConfigurationBoard extends StatelessWidget {
           InfoTooltip(message: preferences.texts.timerTextsTitleTooltip),
         ]),
         SizedBox(height: padding),
-        DropMenuSelectorTile<AppFonts>(
-            title: preferences.texts.miscFont,
-            value: preferences.fontPomodoro,
-            items: AppFonts.values
-                .map<DropdownMenuItem<AppFonts>>(
-                    (e) => DropdownMenuItem<AppFonts>(
-                        value: e,
-                        child: Padding(
-                          padding: EdgeInsets.only(left: padding),
-                          child: Text(e.name, style: e.style()),
-                        )))
-                .toList(),
-            onChanged: (value) => preferences.fontPomodoro = value!),
-        SizedBox(height: padding),
         _buildStringSelectorTile(
           context,
           title: preferences.texts.timerTextsIntroduction,
@@ -405,6 +390,20 @@ class ConfigurationBoard extends StatelessWidget {
           initialColor: preferences.textDone.color,
           onColorChanged: (color) => preferences.textDone.color = color,
         ),
+        SizedBox(height: padding),
+        DropMenuSelectorTile<AppFonts>(
+            title: preferences.texts.miscFont,
+            value: preferences.fontPomodoro,
+            items: AppFonts.values
+                .map<DropdownMenuItem<AppFonts>>(
+                    (e) => DropdownMenuItem<AppFonts>(
+                        value: e,
+                        child: Padding(
+                          padding: EdgeInsets.only(left: padding),
+                          child: Text(e.name, style: e.style()),
+                        )))
+                .toList(),
+            onChanged: (value) => preferences.fontPomodoro = value!),
         SizedBox(height: padding),
         CheckboxTile(
           title: preferences.texts.timerTextsExport,

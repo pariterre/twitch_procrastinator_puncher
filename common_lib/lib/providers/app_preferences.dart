@@ -172,7 +172,7 @@ class AppPreferences with ChangeNotifier {
         textDuringInitialization: TextOnPomodoro.deserialize(
             previousPreferences?['textDuringInitialization'], 'Welcome!'),
         textDuringActiveSession: TextOnPomodoro.deserialize(
-            previousPreferences?['textDuringActiveSession'], r'Session {currentSession}/{maxSessions}\n{timer}!'),
+            previousPreferences?['textDuringActiveSession'], r'Session {session}/{nbSessions}\n{timer}!'),
         textDuringPauseSession: TextOnPomodoro.deserialize(previousPreferences?['textDuringPauseSession'], r'Pause\n{timer}!'),
         textDuringPause: TextOnPomodoro.deserialize(previousPreferences?['textDuringPause'], r'Pause!'),
         textDone: TextOnPomodoro.deserialize(previousPreferences?['textDone'], r'Congratulation!'),
@@ -183,7 +183,7 @@ class AppPreferences with ChangeNotifier {
         textTimerHasStarted: TextToChat.deserialize(previousPreferences?['textTimerHasStarted'], r'The session has started! Have a good work!'),
         textTimerActiveSessionHasEnded: TextToChat.deserialize(previousPreferences?['textTimerActiveSessionHasEnded'], r'The session {session} is done! Well done :)'),
         textTimerPauseHasEnded: TextToChat.deserialize(previousPreferences?['textTimerPauseHasEnded'], 'A new session has started, let\'s get back to work!'),
-        textTimerWorkingHasEnded: TextToChat.deserialize(previousPreferences?['textTimerWorkingHasEnded'], r'We are done! Good job everyone, we have done {totalToday} sessions today, for a grand total of {total}!'),
+        textTimerWorkingHasEnded: TextToChat.deserialize(previousPreferences?['textTimerWorkingHasEnded'], r'We are done! Good job everyone, we have done {doneToday} sessions today, for a grand total of {done}!'),
         textNewcomersGreetings: TextToChat.deserialize(previousPreferences?['textNewcomersGreetings'], r'Welcome to {username} who has joined for the first time!'),
         textUserHasConnectedGreetings: TextToChat.deserialize(previousPreferences?['textUserHasConnectedGreetings'], r'Welcome back to {username} who has joined us!'),
         textWhitelist: PreferencedText.deserialize(previousPreferences?['textWhitelist']),

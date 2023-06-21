@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 class Participant {
   String username;
-  int doneInAll;
-  int doneToday;
+  int sessionsDone;
+  int sessionsDoneToday;
   bool _wasPreviouslyConnected = false;
   bool get wasPreviouslyConnected => _wasPreviouslyConnected;
   bool _isConnected = false;
@@ -12,8 +12,8 @@ class Participant {
 
   Participant({
     required this.username,
-    this.doneInAll = 0,
-    this.doneToday = 0,
+    this.sessionsDone = 0,
+    this.sessionsDoneToday = 0,
   });
 
   void connect() {
@@ -28,10 +28,10 @@ class Participant {
   }
 
   static Participant deserialize(map) =>
-      Participant(username: map['username'], doneInAll: map['sessionDone']);
+      Participant(username: map['username'], sessionsDone: map['sessionDone']);
 
   Map<String, dynamic> serialize() => {
         'username': username,
-        'sessionDone': doneInAll,
+        'sessionDone': sessionsDone,
       };
 }
