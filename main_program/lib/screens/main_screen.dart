@@ -82,38 +82,38 @@ class _MainScreenState extends State<MainScreen> {
 
   Future<void> _activeSessionDone() async {
     final preferences = AppPreferences.of(context, listen: false);
+    _twitchManager!.irc.send(
+        preferences.textTimerActiveSessionHasEnded.formattedText(context));
 
     if (preferences.endActiveSessionSound.filename != null) {
       final player = AudioPlayer();
       await player
-          .play(BytesSource(preferences.endWorkingSound.playableSource!));
+          .play(BytesSource(preferences.endActiveSessionSound.playableSource!));
     }
-
-    _twitchManager!.irc.send(preferences.textTimerActiveSessionHasEnded.text);
   }
 
   Future<void> _pauseSessionDone() async {
     final preferences = AppPreferences.of(context, listen: false);
+    _twitchManager!.irc
+        .send(preferences.textTimerPauseHasEnded.formattedText(context));
 
     if (preferences.endPauseSessionSound.filename != null) {
       final player = AudioPlayer();
       await player
           .play(BytesSource(preferences.endPauseSessionSound.playableSource!));
     }
-
-    _twitchManager!.irc.send(preferences.textTimerPauseHasEnded.text);
   }
 
   Future<void> _workingDone() async {
     final preferences = AppPreferences.of(context, listen: false);
+    _twitchManager!.irc
+        .send(preferences.textTimerWorkingHasEnded.formattedText(context));
 
     if (preferences.endWorkingSound.filename != null) {
       final player = AudioPlayer();
       await player
           .play(BytesSource(preferences.endWorkingSound.playableSource!));
     }
-
-    _twitchManager!.irc.send(preferences.textTimerWorkingHasEnded.text);
   }
 
   void _greetNewComers(Participant participant) {

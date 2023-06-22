@@ -46,14 +46,16 @@ class PreferencedLanguage extends PreferencedElement {
             'you have two options:\n'
             '\n'
             '    1. Grab the current window\n'
-            '    2. Add a browser source that points to ';
+            '    2. Add a browser source with a resolution fixed at 1920x1080 '
+            'that points to ';
       case Language.french:
         return 'Ceci est le logiciel de configuration pour le minuteur du '
             'Chasseur de Procrastination ! Pour l\'importer dans votre '
             'plateforme de diffusion en continu, vous avez deux options :\n'
             '\n'
             '    1. Capturez la fenêtre actuelle\n'
-            '    2. Ajoutez une source de navigateur qui pointe vers ';
+            '    2. Ajoutez une source de navigateur avec la résolution '
+            '1920x1080 qui pointe vers ';
     }
   }
 
