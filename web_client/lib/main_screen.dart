@@ -38,6 +38,8 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   bool isInitialized = false;
+
+  // TODO fix sound for the web interface
   final _audioPlayer = AudioPlayer();
 
   @override

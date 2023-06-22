@@ -120,6 +120,7 @@ class ConfigurationBoard extends StatelessWidget {
                           content: preferences.texts.miscQuitContent));
                   if (answer == null || !answer) return;
 
+                  // TODO add a minimize button (for web application)
                   exit(0);
                 },
                 child: Icon(

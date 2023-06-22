@@ -26,7 +26,7 @@ Future<void> declareAppDirectory() async {
   }
 }
 
-const webClientSite = 'https://procrastinator_puncher.pariterre.net';
+const webClientSite = 'https://procrastinatorpuncher.pariterre.net:8443';
 const preferencesFilename = 'preferences.json';
 const textExportFilename = 'timer.txt';
 const twitchAppName = 'ProcrastinatorPuncher';
