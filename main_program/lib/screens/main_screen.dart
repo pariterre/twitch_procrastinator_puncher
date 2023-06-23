@@ -87,8 +87,8 @@ class _MainScreenState extends State<MainScreen> {
 
     if (preferences.endActiveSessionSound.filename != null) {
       final player = AudioPlayer();
-      await player
-          .play(BytesSource(preferences.endActiveSessionSound.playableSource!));
+      await player.play(DeviceFileSource(
+          '${appDirectory.path}/${preferences.endActiveSessionSound.filename!}'));
     }
   }
 
@@ -99,8 +99,8 @@ class _MainScreenState extends State<MainScreen> {
 
     if (preferences.endPauseSessionSound.filename != null) {
       final player = AudioPlayer();
-      await player
-          .play(BytesSource(preferences.endPauseSessionSound.playableSource!));
+      await player.play(DeviceFileSource(
+          '${appDirectory.path}/${preferences.endPauseSessionSound.filename!}'));
     }
   }
 
@@ -111,8 +111,8 @@ class _MainScreenState extends State<MainScreen> {
 
     if (preferences.endWorkingSound.filename != null) {
       final player = AudioPlayer();
-      await player
-          .play(BytesSource(preferences.endWorkingSound.playableSource!));
+      await player.play(DeviceFileSource(
+          '${appDirectory.path}/${preferences.endWorkingSound.filename!}'));
     }
   }
 

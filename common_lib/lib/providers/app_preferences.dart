@@ -152,7 +152,8 @@ class AppPreferences with ChangeNotifier {
   void _save() async {
     if (!kIsWeb) {
       final file = File(_savepath);
-      await file.writeAsString(json.encode(serialize()));
+      const encoder = JsonEncoder.withIndent('\t');
+      await file.writeAsString(encoder.convert(serialize()));
     }
     notifyListeners();
   }

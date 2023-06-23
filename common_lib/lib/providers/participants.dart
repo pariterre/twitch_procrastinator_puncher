@@ -257,7 +257,8 @@ class Participants extends ChangeNotifier {
   Future<void> _save() async {
     if (!kIsWeb) {
       final file = File(_savePath);
-      await file.writeAsString(json.encode(serialize()));
+      const encoder = JsonEncoder.withIndent('\t');
+      await file.writeAsString(encoder.convert(serialize()));
     }
     notifyListeners();
   }
