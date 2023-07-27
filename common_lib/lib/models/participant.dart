@@ -27,11 +27,14 @@ class Participant {
     connectedSince = null;
   }
 
-  static Participant deserialize(map) =>
-      Participant(username: map['username'], sessionsDone: map['sessionDone']);
+  static Participant deserialize(map) => Participant(
+      username: map['username'],
+      sessionsDone: map['sessionDone'],
+      sessionsDoneToday: map['sessionsDoneToday'] ?? 0);
 
   Map<String, dynamic> serialize() => {
         'username': username,
         'sessionDone': sessionsDone,
+        'sessionsDoneToday': sessionsDoneToday,
       };
 }
