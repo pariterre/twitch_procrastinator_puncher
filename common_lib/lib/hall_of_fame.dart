@@ -23,7 +23,13 @@ class _HallOfFameState extends State<HallOfFame> {
   int _scrollVelocity = 2000;
   final _scrollController = InfiniteScrollController();
   _InitializationStatus _status = _InitializationStatus.notInitiatialized;
-  int _currentItem = -1;
+  bool _isMoving = false;
+
+  Future<void> _delay() async {
+    _isMoving = true;
+    await Future.delayed(Duration(milliseconds: _scrollVelocity));
+    _isMoving = false;
+  }
 
   @override
   void didChangeDependencies() {
@@ -40,15 +46,14 @@ class _HallOfFameState extends State<HallOfFame> {
           timer.cancel();
           return;
         }
-
-        if (_status == _InitializationStatus.scrollerAttached &&
-            _currentItem != _scrollController.selectedItem) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_status == _InitializationStatus.scrollerAttached) {
+          if (!_isMoving) {
+            _delay();
             _scrollController.nextItem(
                 duration: Duration(milliseconds: _scrollVelocity),
                 curve: Curves.linear);
-            _currentItem = _scrollController.selectedItem;
-          });
+          }
+          ;
         }
       });
       _status = _InitializationStatus.timerInitialized;
