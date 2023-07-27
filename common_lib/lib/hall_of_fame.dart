@@ -53,7 +53,6 @@ class _HallOfFameState extends State<HallOfFame> {
                 duration: Duration(milliseconds: _scrollVelocity),
                 curve: Curves.linear);
           }
-          ;
         }
       });
       _status = _InitializationStatus.timerInitialized;
