@@ -205,11 +205,16 @@ class Participants extends ChangeNotifier {
       }
     }
 
+    final participants = (savedParticipants?['participants'] as List?)
+            ?.map<Participant>((map) => Participant.deserialize(map))
+            .toList() ??
+        [];
+    for (final participant in participants) {
+      participant.sessionsDoneToday = 0;
+    }
+
     return Participants._(
-      all: savedParticipants?['participants']
-              .map<Participant>((map) => Participant.deserialize(map))
-              .toList() ??
-          [],
+      all: participants,
       saveDir: saveDir.path,
       mustFollowForFaming: mustFollowForFaming,
       whitelist: whitelist,
