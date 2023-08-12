@@ -8,6 +8,7 @@ import 'package:common_lib/providers/app_preferences.dart';
 import 'package:common_lib/providers/participants.dart';
 import 'package:common_lib/providers/pomodoro_status.dart';
 import 'package:common_lib/widgets/web_socket_holders.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:twitch_manager/twitch_manager.dart';
 import 'package:twitch_procastinator_puncher/models/twitch_status.dart';
@@ -29,6 +30,8 @@ class _MainScreenState extends State<MainScreen> {
     twitchAppId: twitchAppId,
     redirectAddress: twitchRedirect,
     scope: twitchScope,
+    useAuthenticationService: kIsWeb,
+    authenticationServiceAddress: authenticationServiceAddress,
   );
   final _twitchMockOptions = const TwitchMockOptions(isActive: false);
   late Future<TwitchManager> managerFactory = _twitchMockOptions.isActive
@@ -78,14 +81,18 @@ class _MainScreenState extends State<MainScreen> {
 
   Future<void> _startWorking() async {
     final preferences = AppPreferences.of(context, listen: false);
-    _twitchManager!.irc
-        .send(preferences.textTimerHasStarted.formattedText(context));
+    if (_twitchManager!.isConnected) {
+      _twitchManager!.irc
+          .send(preferences.textTimerHasStarted.formattedText(context));
+    }
   }
 
   Future<void> _activeSessionDone() async {
     final preferences = AppPreferences.of(context, listen: false);
-    _twitchManager!.irc.send(
-        preferences.textTimerActiveSessionHasEnded.formattedText(context));
+    if (_twitchManager!.isConnected) {
+      _twitchManager!.irc.send(
+          preferences.textTimerActiveSessionHasEnded.formattedText(context));
+    }
 
     if (preferences.endActiveSessionSound.filename != null) {
       final player = AudioPlayer();
@@ -96,8 +103,10 @@ class _MainScreenState extends State<MainScreen> {
 
   Future<void> _pauseSessionDone() async {
     final preferences = AppPreferences.of(context, listen: false);
-    _twitchManager!.irc
-        .send(preferences.textTimerPauseHasEnded.formattedText(context));
+    if (_twitchManager!.isConnected) {
+      _twitchManager!.irc
+          .send(preferences.textTimerPauseHasEnded.formattedText(context));
+    }
 
     if (preferences.endPauseSessionSound.filename != null) {
       final player = AudioPlayer();
@@ -108,8 +117,10 @@ class _MainScreenState extends State<MainScreen> {
 
   Future<void> _workingDone() async {
     final preferences = AppPreferences.of(context, listen: false);
-    _twitchManager!.irc
-        .send(preferences.textTimerWorkingHasEnded.formattedText(context));
+    if (_twitchManager!.isConnected) {
+      _twitchManager!.irc
+          .send(preferences.textTimerWorkingHasEnded.formattedText(context));
+    }
 
     if (preferences.endWorkingSound.filename != null) {
       final player = AudioPlayer();
@@ -120,15 +131,19 @@ class _MainScreenState extends State<MainScreen> {
 
   void _greetNewComers(Participant participant) {
     final preferences = AppPreferences.of(context, listen: false);
-    _twitchManager!.irc.send(
-        preferences.textNewcomersGreetings.formattedText(context, participant));
+    if (_twitchManager!.isConnected) {
+      _twitchManager!.irc.send(preferences.textNewcomersGreetings
+          .formattedText(context, participant));
+    }
     setState(() {});
   }
 
   void _greetUserHasConnected(Participant participant) {
     final preferences = AppPreferences.of(context, listen: false);
-    _twitchManager!.irc.send(preferences.textUserHasConnectedGreetings
-        .formattedText(context, participant));
+    if (_twitchManager!.isConnected) {
+      _twitchManager!.irc.send(preferences.textUserHasConnectedGreetings
+          .formattedText(context, participant));
+    }
     setState(() {});
   }
 

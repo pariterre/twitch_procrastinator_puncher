@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:common_lib/providers/app_preferences.dart';
 import 'package:common_lib/providers/participants.dart';
 import 'package:common_lib/providers/pomodoro_status.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:web_socket_client/web_socket_client.dart' as ws;
 
@@ -71,6 +72,8 @@ class _WebSocketServerHolderState extends State<WebSocketServerHolder> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
+    if (kIsWeb) return;
     _initializedWebSocket();
   }
 

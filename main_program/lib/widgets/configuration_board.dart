@@ -8,6 +8,7 @@ import 'package:common_lib/providers/app_preferences.dart';
 import 'package:common_lib/providers/participants.dart';
 import 'package:common_lib/providers/pomodoro_status.dart';
 import 'package:common_lib/widgets/are_you_sure_dialog.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:twitch_procastinator_puncher/models/twitch_status.dart';
 import 'package:twitch_procastinator_puncher/widgets/checkbox_tile.dart';
@@ -454,14 +455,15 @@ class ConfigurationBoard extends StatelessWidget {
                 .toList(),
             onChanged: (value) => preferences.fontPomodoro = value!),
         SizedBox(height: padding),
-        CheckboxTile(
-          title: preferences.texts.timerTextsExport,
-          tooltipMessage: preferences.texts.timerTextsExportTooltip,
-          value: preferences.saveToTextFile.value,
-          onChanged: (value) {
-            preferences.saveToTextFile.set(value!);
-          },
-        ),
+        if (!kIsWeb)
+          CheckboxTile(
+            title: preferences.texts.timerTextsExport,
+            tooltipMessage: preferences.texts.timerTextsExportTooltip,
+            value: preferences.saveToTextFile.value,
+            onChanged: (value) {
+              preferences.saveToTextFile.set(value!);
+            },
+          ),
       ],
     );
   }

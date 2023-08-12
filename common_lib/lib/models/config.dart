@@ -31,7 +31,11 @@ const preferencesFilename = 'preferences.json';
 const textExportFilename = 'timer.txt';
 const twitchAppName = 'ProcrastinatorPuncher';
 const twitchAppId = 'mcysoxq3vitdjwcqn71f8opz11cyex';
-const twitchRedirect = 'http://localhost:3000';
+const twitchRedirect = kIsWeb
+    ? 'https://twitchauthentication.pariterre.net:3000'
+    : 'http://localhost:3000';
+const authenticationServiceAddress =
+    kIsWeb ? 'wss://twitchauthentication.pariterre.net:3002' : null;
 const twitchScope = [
   TwitchScope.chatRead,
   TwitchScope.chatEdit,
