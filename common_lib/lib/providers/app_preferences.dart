@@ -8,6 +8,7 @@ import 'package:common_lib/models/preferenced_language.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 export 'package:common_lib/models/app_fonts.dart';
 
@@ -150,7 +151,10 @@ class AppPreferences with ChangeNotifier {
   ///
   /// Save the current preferences to a file
   void _save() async {
-    if (!kIsWeb) {
+    if (kIsWeb) {
+      final prefs = await SharedPreferences.getInstance();
+      prefs.setString(preferencesFilename, jsonEncode(serialize()));
+    } else {
       final file = File(_savepath);
       const encoder = JsonEncoder.withIndent('\t');
       await file.writeAsString(encoder.convert(serialize()));
@@ -169,18 +173,24 @@ class AppPreferences with ChangeNotifier {
   /// Main constructor of the AppPreferences. If [reload] is false, then the
   /// previously saved folder is ignored
   static Future<AppPreferences> factory({reload = true}) async {
-    Map<String, dynamic>? previousPreferences;
-    if (!kIsWeb) {
+    Future<String?> readPreferences() async {
       // Read the previously saved preference file if it exists
-      final preferencesFile = File(_savepath);
+      if (kIsWeb) {
+        final prefs = await SharedPreferences.getInstance();
+        return prefs.getString(preferencesFilename);
+      } else {
+        final preferencesFile = File(_savepath);
+        return await preferencesFile.readAsString();
+      }
+    }
 
-      if (reload && await preferencesFile.exists()) {
-        try {
-          previousPreferences =
-              jsonDecode(await preferencesFile.readAsString());
-        } catch (_) {
-          previousPreferences = null;
-        }
+    final preferencesAsString = await readPreferences();
+    Map<String, dynamic>? previousPreferences;
+    if (reload && preferencesAsString != null) {
+      try {
+        previousPreferences = jsonDecode(preferencesAsString);
+      } catch (_) {
+        previousPreferences = null;
       }
     }
 

@@ -73,7 +73,7 @@ class ConfigurationBoard extends StatelessWidget {
                     const Divider(),
                     _buildTimerConfiguration(context),
                     const Divider(),
-                    _buildImageSelectors(context),
+                    if (!kIsWeb) _buildImageSelectors(context),
                     _buildColorPickers(context),
                     const Divider(),
                     _buildTextOnImage(context),
@@ -107,30 +107,30 @@ class ConfigurationBoard extends StatelessWidget {
           children: [
             const LanguageSelector(),
             SizedBox(width: padding * 2),
-            Container(
-              decoration:
-                  BoxDecoration(border: Border.all(color: Colors.white)),
-              padding: EdgeInsets.symmetric(
-                  horizontal: padding / 4, vertical: padding / 5),
-              child: InkWell(
-                onTap: () async {
-                  final answer = await showDialog<bool>(
-                      context: context,
-                      builder: (context) => AreYouSureDialog(
-                          title: preferences.texts.miscQuitTitle,
-                          content: preferences.texts.miscQuitContent));
-                  if (answer == null || !answer) return;
+            if (!kIsWeb)
+              Container(
+                decoration:
+                    BoxDecoration(border: Border.all(color: Colors.white)),
+                padding: EdgeInsets.symmetric(
+                    horizontal: padding / 4, vertical: padding / 5),
+                child: InkWell(
+                  onTap: () async {
+                    final answer = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AreYouSureDialog(
+                            title: preferences.texts.miscQuitTitle,
+                            content: preferences.texts.miscQuitContent));
+                    if (answer == null || !answer) return;
 
-                  // TODO add a minimize button (for web application)
-                  exit(0);
-                },
-                child: Icon(
-                  Icons.close,
-                  color: Colors.white,
-                  size: windowHeight * 0.02,
+                    exit(0);
+                  },
+                  child: Icon(
+                    Icons.close,
+                    color: Colors.white,
+                    size: windowHeight * 0.02,
+                  ),
                 ),
               ),
-            ),
           ],
         ),
         Center(

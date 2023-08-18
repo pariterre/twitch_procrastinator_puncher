@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:twitch_manager/twitch_manager.dart';
 
 List<String> _extractUsersFromString(String value) {
@@ -170,7 +171,11 @@ class Participants extends ChangeNotifier {
   List<Participant> get connected =>
       all.map((e) => e.isConnected ? e : null).nonNulls.toList();
 
-  final String _saveDir;
+  static Future<Directory> get _saveDir async {
+    final documentDirectory = await getApplicationDocumentsDirectory();
+    return Directory('${documentDirectory.path}/$twitchAppName');
+  }
+
   static const _saveFilename = 'participants.json';
   String get _savePath => '$_saveDir/$_saveFilename';
 
@@ -183,25 +188,28 @@ class Participants extends ChangeNotifier {
     required String whitelist,
     required String blacklist,
   }) async {
-    Map<String, dynamic>? savedParticipants;
-    late final Directory saveDir;
-    if (kIsWeb) {
-      saveDir = Directory('');
-    } else {
-      final documentDirectory = await getApplicationDocumentsDirectory();
-      saveDir = Directory('${documentDirectory.path}/$twitchAppName');
-      if (!(await saveDir.exists())) {
-        await saveDir.create(recursive: true);
-      }
-
-      final savedFile = File('${saveDir.path}/$_saveFilename');
-
-      if (reload && await savedFile.exists()) {
-        try {
-          savedParticipants = jsonDecode(await savedFile.readAsString());
-        } catch (_) {
-          savedParticipants = null;
+    Future<String?> readParticipantFromDisk() async {
+      if (kIsWeb) {
+        final prefs = await SharedPreferences.getInstance();
+        return prefs.getString(_saveFilename);
+      } else {
+        final saveDir = await _saveDir;
+        if (!(await saveDir.exists())) {
+          await saveDir.create(recursive: true);
         }
+
+        final savedFile = File('${saveDir.path}/$_saveFilename');
+        return await savedFile.readAsString();
+      }
+    }
+
+    final participantsAsString = await readParticipantFromDisk();
+    Map<String, dynamic>? savedParticipants;
+    if (reload && participantsAsString != null) {
+      try {
+        savedParticipants = jsonDecode(participantsAsString);
+      } catch (_) {
+        savedParticipants = null;
       }
     }
 
@@ -215,7 +223,6 @@ class Participants extends ChangeNotifier {
 
     return Participants._(
       all: participants,
-      saveDir: saveDir.path,
       mustFollowForFaming: mustFollowForFaming,
       whitelist: whitelist,
       blacklist: blacklist,
@@ -227,12 +234,10 @@ class Participants extends ChangeNotifier {
 
   Participants._({
     required this.all,
-    required String saveDir,
     required this.mustFollowForFaming,
     required String whitelist,
     required String blacklist,
-  })  : _saveDir = saveDir,
-        _whitelist = [],
+  })  : _whitelist = [],
         _blacklist = [] {
     this.whitelist = whitelist; // Fill the whitelist
     this.blacklist = blacklist; // Fill the blacklist
@@ -260,7 +265,10 @@ class Participants extends ChangeNotifier {
   ///
   /// Save the current participants list to a file
   Future<void> _save() async {
-    if (!kIsWeb) {
+    if (kIsWeb) {
+      final prefs = await SharedPreferences.getInstance();
+      prefs.setString(_saveFilename, jsonEncode(serialize()));
+    } else {
       final file = File(_savePath);
       const encoder = JsonEncoder.withIndent('\t');
       await file.writeAsString(encoder.convert(serialize()));

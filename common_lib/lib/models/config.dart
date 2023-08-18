@@ -14,15 +14,12 @@ Directory get appDirectory {
 }
 
 Future<void> declareAppDirectory() async {
-  if (kIsWeb) {
-    _appDirectory = Directory('');
-    return;
-  }
-
-  final appDir = await getApplicationDocumentsDirectory();
-  _appDirectory = Directory('${appDir.path}/$twitchAppName');
-  if (!(await _appDirectory!.exists())) {
-    await _appDirectory!.create(recursive: true);
+  if (!kIsWeb) {
+    final appDir = await getApplicationDocumentsDirectory();
+    _appDirectory = Directory('${appDir.path}/$twitchAppName');
+    if (!(await _appDirectory!.exists())) {
+      await _appDirectory!.create(recursive: true);
+    }
   }
 }
 
