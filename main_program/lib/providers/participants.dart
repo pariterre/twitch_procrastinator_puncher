@@ -2,14 +2,14 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:common_lib/models/config.dart';
-import 'package:common_lib/models/participant.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:twitch_manager/twitch_manager.dart';
+import 'package:twitch_procastinator_puncher/models/config.dart';
+import 'package:twitch_procastinator_puncher/models/participant.dart';
 
 List<String> _extractUsersFromString(String value) {
   final List<String> out = value.split(';');
@@ -45,10 +45,6 @@ class Participants extends ChangeNotifier {
   /// If the participant must be a follower to be counted
   bool mustFollowForFaming;
 
-  ///
-  /// If any change occurred, web client should be notified
-  bool shouldSendToWebClient = false;
-
   void addSessionDoneToAllConnected() {
     for (final user in all) {
       if (user.isConnected) {
@@ -57,7 +53,6 @@ class Participants extends ChangeNotifier {
       }
     }
     disconnectAll(); // They will be reconnected automatically
-    shouldSendToWebClient = true;
     _save();
     notifyListeners();
   }
@@ -162,7 +157,6 @@ class Participants extends ChangeNotifier {
 
     if (hasChanged) {
       notifyListeners();
-      shouldSendToWebClient = true;
     }
   }
 
@@ -245,13 +239,6 @@ class Participants extends ChangeNotifier {
 
   Map<String, dynamic> serialize() =>
       {'participants': all.map((e) => e.serialize()).toList()};
-
-  Map<String, dynamic> serializeForWebClient(bool initial) {
-    final out =
-        shouldSendToWebClient || initial ? serialize() : {'participants': null};
-    shouldSendToWebClient = false;
-    return out;
-  }
 
   void updateWebClient(map) {
     if (map['participants'] == null) return;

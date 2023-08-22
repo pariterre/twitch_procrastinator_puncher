@@ -1,6 +1,6 @@
 import 'package:arrow_pad/arrow_pad.dart';
-import 'package:common_lib/models/app_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:twitch_procastinator_puncher/models/app_theme.dart';
 import 'package:twitch_procastinator_puncher/widgets/color_selector_tile.dart';
 import 'package:twitch_procastinator_puncher/widgets/plus_or_minus.dart';
 

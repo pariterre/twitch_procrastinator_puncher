@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:common_lib/models/preferenced_element.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:twitch_procastinator_puncher/models/preferenced_element.dart';
 
 enum StopWatchStatus { initializing, inSession, inPauseSession, paused, done }
 

@@ -1,7 +1,7 @@
-import 'package:common_lib/models/app_theme.dart';
-import 'package:common_lib/models/preferenced_language.dart';
-import 'package:common_lib/providers/app_preferences.dart';
 import 'package:flutter/material.dart';
+import 'package:twitch_procastinator_puncher/models/app_theme.dart';
+import 'package:twitch_procastinator_puncher/models/preferenced_language.dart';
+import 'package:twitch_procastinator_puncher/providers/app_preferences.dart';
 
 class LanguageSelector extends StatelessWidget {
   const LanguageSelector({super.key});

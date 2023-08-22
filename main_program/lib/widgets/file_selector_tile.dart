@@ -1,11 +1,11 @@
 import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
-import 'package:common_lib/models/app_theme.dart';
-import 'package:common_lib/models/preferenced_element.dart';
-import 'package:common_lib/providers/app_preferences.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:twitch_procastinator_puncher/models/app_theme.dart';
+import 'package:twitch_procastinator_puncher/models/preferenced_element.dart';
+import 'package:twitch_procastinator_puncher/providers/app_preferences.dart';
 import 'package:twitch_procastinator_puncher/widgets/info_tooltip.dart';
 import 'package:twitch_procastinator_puncher/widgets/plus_or_minus.dart';
 

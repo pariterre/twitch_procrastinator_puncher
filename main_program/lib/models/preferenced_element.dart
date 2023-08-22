@@ -1,21 +1,20 @@
 import 'dart:io';
 
-import 'package:common_lib/models/app_fonts.dart';
-import 'package:common_lib/models/config.dart';
-import 'package:common_lib/models/helpers.dart';
-import 'package:common_lib/models/participant.dart';
-import 'package:common_lib/providers/participants.dart';
-import 'package:common_lib/providers/pomodoro_status.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
+import 'package:twitch_procastinator_puncher/models/app_fonts.dart';
+import 'package:twitch_procastinator_puncher/models/config.dart';
+import 'package:twitch_procastinator_puncher/models/helpers.dart';
+import 'package:twitch_procastinator_puncher/models/participant.dart';
+import 'package:twitch_procastinator_puncher/providers/participants.dart';
+import 'package:twitch_procastinator_puncher/providers/pomodoro_status.dart';
 
 enum FileType { image, sound }
 
 abstract class PreferencedElement {
   PreferencedElement({this.onChanged});
 
-  bool shouldSendToWebClient = false;
   Function()? onChanged;
 
   static PreferencedElement deserialize() => throw UnimplementedError();
@@ -40,7 +39,6 @@ class PreferencedInt extends PreferencedElement {
   int get value => _value;
   set value(int value) {
     _value = value;
-    shouldSendToWebClient = true;
     if (onChanged != null) onChanged!();
   }
 
@@ -69,7 +67,6 @@ class PreferencedBool extends PreferencedElement {
   bool get value => _value;
   set value(bool value) {
     _value = value;
-    shouldSendToWebClient = true;
     if (onChanged != null) onChanged!();
   }
 
@@ -98,7 +95,6 @@ class PreferencedColor extends PreferencedElement {
   Color get value => _value;
   set value(Color value) {
     _value = value;
-    shouldSendToWebClient = true;
     if (onChanged != null) onChanged!();
   }
 
@@ -127,7 +123,6 @@ class PreferencedDuration extends PreferencedElement {
   Duration get value => _value;
   set value(Duration value) {
     _value = value;
-    shouldSendToWebClient = true;
     if (onChanged != null) onChanged!();
   }
 
@@ -160,16 +155,24 @@ abstract class PreferencedFile extends PreferencedElement {
     };
   }
 
+  bool get hasFile => _file != null;
+
   String? _filename;
   String? get filename => _filename;
 
   Uint8List? _file;
+  Future<void> setFileFromRaw(Uint8List? bytes) async {
+    // Contrary to [setFile], it does not copy the original file anywhere
+    _file = bytes;
+    _filename = null;
+    if (onChanged != null) onChanged!();
+  }
+
   Future<void> setFile(File? originalFile) async {
     _file = originalFile == null
         ? null
         : await (await _copyFile(originalFile)).readAsBytes();
     _filename = originalFile == null ? null : basename(originalFile.path);
-    shouldSendToWebClient = true;
     if (onChanged != null) onChanged!();
     if (originalFile != null && lastVisitedFolderCallback != null) {
       lastVisitedFolderCallback!(originalFile.parent);
@@ -198,10 +201,16 @@ class PreferencedImageFile extends PreferencedFile {
       : _size = size ?? 1,
         _image = rawFile != null
             ? Image.memory(rawFile)
-            : filename != null && !kIsWeb
+            : filename != null
                 ? Image.file(File('${appDirectory.path}/$filename'))
                 : null,
         super.fromRaw(rawFile, filename: filename);
+
+  @override
+  Future<void> setFileFromRaw(Uint8List? bytes) {
+    _image = bytes == null ? null : Image.memory(bytes);
+    return super.setFileFromRaw(bytes);
+  }
 
   @override
   Future<void> setFile(File? originalFile) async {
@@ -216,7 +225,6 @@ class PreferencedImageFile extends PreferencedFile {
   double get size => _size;
   set size(double value) {
     _size = value;
-    shouldSendToWebClient = true;
     if (onChanged != null) onChanged!();
   }
 
@@ -265,7 +273,6 @@ class PreferencedText extends PreferencedElement {
   String get text => _text;
   set text(String value) {
     _text = value;
-    shouldSendToWebClient = true;
     if (onChanged != null) onChanged!();
   }
 
@@ -306,14 +313,12 @@ class PreferencedText extends PreferencedElement {
   Color get color => _color;
   set color(Color value) {
     _color = value;
-    shouldSendToWebClient = true;
     if (onChanged != null) onChanged!();
   }
 
   AppFonts get font => _font;
   set font(AppFonts value) {
     _font = value;
-    shouldSendToWebClient = true;
     if (onChanged != null) onChanged!();
   }
 
@@ -357,14 +362,12 @@ class TextOnPomodoro extends PreferencedText {
   Offset get offset => _offset;
   void addToOffset(Offset offset) {
     _offset += offset;
-    shouldSendToWebClient = true;
     if (onChanged != null) onChanged!();
   }
 
   double get size => _size;
   void increaseSize(double value) {
     _size += value;
-    shouldSendToWebClient = true;
     if (onChanged != null) onChanged!();
   }
 

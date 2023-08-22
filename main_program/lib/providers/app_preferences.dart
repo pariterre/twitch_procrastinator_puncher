@@ -1,16 +1,16 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:common_lib/models/app_fonts.dart';
-import 'package:common_lib/models/config.dart';
-import 'package:common_lib/models/preferenced_element.dart';
-import 'package:common_lib/models/preferenced_language.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:twitch_procastinator_puncher/models/app_fonts.dart';
+import 'package:twitch_procastinator_puncher/models/config.dart';
+import 'package:twitch_procastinator_puncher/models/preferenced_element.dart';
+import 'package:twitch_procastinator_puncher/models/preferenced_language.dart';
 
-export 'package:common_lib/models/app_fonts.dart';
+export 'package:twitch_procastinator_puncher/models/app_fonts.dart';
 
 String get rootPath => Platform.isWindows ? r'C:\' : '/';
 
@@ -348,109 +348,6 @@ class AppPreferences with ChangeNotifier {
         'textHallOfFameAlltime': textHallOfFameAlltime.serialize(),
         'textHallOfFameTotal': textHallOfFameTotal.serialize(),
       };
-
-  ///
-  /// Serialize all the values
-  Map<String, dynamic> serializeForWebClient(bool initial) {
-    final out = <String, dynamic>{};
-    if (initial || nbSessions.shouldSendToWebClient) {
-      out['nbSessions'] = nbSessions.serialize();
-      nbSessions.shouldSendToWebClient = false;
-    }
-    if (initial || sessionDuration.shouldSendToWebClient) {
-      out['sessionDuration'] = sessionDuration.serialize();
-      sessionDuration.shouldSendToWebClient = false;
-    }
-    if (initial || pauseDuration.shouldSendToWebClient) {
-      out['pauseDuration'] = pauseDuration.serialize();
-      pauseDuration.shouldSendToWebClient = false;
-    }
-    if (initial || activeBackgroundImage.shouldSendToWebClient) {
-      out['activeBackgroundImage'] =
-          activeBackgroundImage.serialize(withRawFile: true);
-      activeBackgroundImage.shouldSendToWebClient = false;
-    }
-    if (initial || pauseBackgroundImage.shouldSendToWebClient) {
-      out['pauseBackgroundImage'] =
-          pauseBackgroundImage.serialize(withRawFile: true);
-      pauseBackgroundImage.shouldSendToWebClient = false;
-    }
-    if (initial || endActiveSessionSound.shouldSendToWebClient) {
-      out['endActiveSessionSound'] =
-          endActiveSessionSound.serialize(withRawFile: true);
-      endActiveSessionSound.shouldSendToWebClient = false;
-    }
-    if (initial || endPauseSessionSound.shouldSendToWebClient) {
-      out['endPauseSessionSound'] =
-          endPauseSessionSound.serialize(withRawFile: true);
-      endPauseSessionSound.shouldSendToWebClient = false;
-    }
-    if (initial || endWorkingSound.shouldSendToWebClient) {
-      out['endWorkingSound'] = endWorkingSound.serialize(withRawFile: true);
-      endWorkingSound.shouldSendToWebClient = false;
-    }
-    if (initial || backgroundColor.shouldSendToWebClient) {
-      out['backgroundColor'] = backgroundColor.serialize();
-      backgroundColor.shouldSendToWebClient = false;
-    }
-    if (initial || backgroundColorHallOfFame.shouldSendToWebClient) {
-      out['backgroundColorHallOfFame'] = backgroundColorHallOfFame.serialize();
-      backgroundColorHallOfFame.shouldSendToWebClient = false;
-    }
-    out['fontPomodoro'] = fontPomodoro.index;
-    out['textColorHallOfFame'] = textColorHallOfFame.value;
-    if (initial || textDuringInitialization.shouldSendToWebClient) {
-      out['textDuringInitialization'] = textDuringInitialization.serialize();
-      textDuringInitialization.shouldSendToWebClient = false;
-    }
-    if (initial || textDuringActiveSession.shouldSendToWebClient) {
-      out['textDuringActiveSession'] = textDuringActiveSession.serialize();
-      textDuringActiveSession.shouldSendToWebClient = false;
-    }
-    if (initial || textDuringPauseSession.shouldSendToWebClient) {
-      out['textDuringPauseSession'] = textDuringPauseSession.serialize();
-      textDuringPauseSession.shouldSendToWebClient = false;
-    }
-    if (initial || textDuringPause.shouldSendToWebClient) {
-      out['textDuringPause'] = textDuringPause.serialize();
-      textDuringPause.shouldSendToWebClient = false;
-    }
-    if (initial || textDone.shouldSendToWebClient) {
-      out['textDone'] = textDone.serialize();
-      textDone.shouldSendToWebClient = false;
-    }
-    if (initial || useHallOfFame.shouldSendToWebClient) {
-      out['useHallOfFame'] = useHallOfFame.serialize();
-      useHallOfFame.shouldSendToWebClient = false;
-    }
-    if (initial || hallOfFameScrollVelocity.shouldSendToWebClient) {
-      out['hallOfFameScrollVelocity'] = hallOfFameScrollVelocity.serialize();
-      hallOfFameScrollVelocity.shouldSendToWebClient = false;
-    }
-    out['fontHallOfFame'] = fontHallOfFame.index;
-    if (initial || textHallOfFameTitle.shouldSendToWebClient) {
-      out['textHallOfFameTitle'] = textHallOfFameTitle.serialize();
-      textHallOfFameTitle.shouldSendToWebClient = false;
-    }
-    if (initial || textHallOfFameName.shouldSendToWebClient) {
-      out['textHallOfFameName'] = textHallOfFameName.serialize();
-      textHallOfFameName.shouldSendToWebClient = false;
-    }
-    if (initial || textHallOfFameToday.shouldSendToWebClient) {
-      out['textHallOfFameToday'] = textHallOfFameToday.serialize();
-      textHallOfFameToday.shouldSendToWebClient = false;
-    }
-    if (initial || textHallOfFameAlltime.shouldSendToWebClient) {
-      out['textHallOfFameAlltime'] = textHallOfFameAlltime.serialize();
-      textHallOfFameAlltime.shouldSendToWebClient = false;
-    }
-    if (initial || textHallOfFameTotal.shouldSendToWebClient) {
-      out['textHallOfFameTotal'] = textHallOfFameTotal.serialize();
-      textHallOfFameTotal.shouldSendToWebClient = false;
-    }
-
-    return out;
-  }
 
   void updateWebClient(map) {
     if (map?['nbSessions'] != null) {

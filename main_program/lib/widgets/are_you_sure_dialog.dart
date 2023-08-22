@@ -1,5 +1,5 @@
-import 'package:common_lib/providers/app_preferences.dart';
 import 'package:flutter/material.dart';
+import 'package:twitch_procastinator_puncher/providers/app_preferences.dart';
 
 class AreYouSureDialog extends StatelessWidget {
   const AreYouSureDialog({

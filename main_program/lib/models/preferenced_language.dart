@@ -1,5 +1,5 @@
-import 'package:common_lib/models/config.dart';
-import 'package:common_lib/models/preferenced_element.dart';
+import 'package:twitch_procastinator_puncher/models/config.dart';
+import 'package:twitch_procastinator_puncher/models/preferenced_element.dart';
 
 enum Language {
   english,

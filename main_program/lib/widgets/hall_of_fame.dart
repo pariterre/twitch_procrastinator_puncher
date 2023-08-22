@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:common_lib/models/app_theme.dart';
-import 'package:common_lib/providers/app_preferences.dart';
-import 'package:common_lib/providers/participants.dart';
 import 'package:flutter/material.dart';
 import 'package:infinite_carousel/infinite_carousel.dart';
+import 'package:twitch_procastinator_puncher/models/app_theme.dart';
+import 'package:twitch_procastinator_puncher/providers/app_preferences.dart';
+import 'package:twitch_procastinator_puncher/providers/participants.dart';
 
 enum _InitializationStatus {
   notInitiatialized,
@@ -20,14 +20,15 @@ class HallOfFame extends StatefulWidget {
 }
 
 class _HallOfFameState extends State<HallOfFame> {
-  int _scrollVelocity = 2000;
   final _scrollController = InfiniteScrollController();
   _InitializationStatus _status = _InitializationStatus.notInitiatialized;
   bool _isMoving = false;
 
   Future<void> _delay() async {
     _isMoving = true;
-    await Future.delayed(Duration(milliseconds: _scrollVelocity));
+    final preferences = AppPreferences.of(context, listen: false);
+    await Future.delayed(
+        Duration(milliseconds: preferences.hallOfFameScrollVelocity.value));
     _isMoving = false;
   }
 
@@ -35,10 +36,9 @@ class _HallOfFameState extends State<HallOfFame> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    if (_status == _InitializationStatus.notInitiatialized) {
-      final preferences = AppPreferences.of(context, listen: false);
-      _scrollVelocity = preferences.hallOfFameScrollVelocity.value;
+    final preferences = AppPreferences.of(context, listen: false);
 
+    if (_status == _InitializationStatus.notInitiatialized) {
       // Set the timer that advance the scroller
       Timer.periodic(const Duration(milliseconds: 10), (timer) {
         if (!preferences.useHallOfFame.value) {
@@ -50,7 +50,8 @@ class _HallOfFameState extends State<HallOfFame> {
           if (!_isMoving) {
             _delay();
             _scrollController.nextItem(
-                duration: Duration(milliseconds: _scrollVelocity),
+                duration: Duration(
+                    milliseconds: preferences.hallOfFameScrollVelocity.value),
                 curve: Curves.linear);
           }
         }

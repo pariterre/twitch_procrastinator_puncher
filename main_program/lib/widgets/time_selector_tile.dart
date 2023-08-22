@@ -1,8 +1,8 @@
-import 'package:common_lib/models/app_theme.dart';
-import 'package:common_lib/models/helpers.dart';
-import 'package:common_lib/models/preferenced_element.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:twitch_procastinator_puncher/models/app_theme.dart';
+import 'package:twitch_procastinator_puncher/models/helpers.dart';
+import 'package:twitch_procastinator_puncher/models/preferenced_element.dart';
 
 class _TimeOnly extends TextInputFormatter {
   static final _reg = RegExp(r'^(\d*)(:(\d{0,2}))?$'); // Any format mm:ss or mm

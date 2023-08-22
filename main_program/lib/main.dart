@@ -1,10 +1,10 @@
-import 'package:common_lib/models/config.dart';
-import 'package:common_lib/providers/app_preferences.dart';
-import 'package:common_lib/providers/participants.dart';
-import 'package:common_lib/providers/pomodoro_status.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:twitch_procastinator_puncher/models/config.dart';
+import 'package:twitch_procastinator_puncher/providers/app_preferences.dart';
+import 'package:twitch_procastinator_puncher/providers/participants.dart';
+import 'package:twitch_procastinator_puncher/providers/pomodoro_status.dart';
 import 'package:twitch_procastinator_puncher/screens/main_screen.dart';
 import 'package:window_manager/window_manager.dart';
 

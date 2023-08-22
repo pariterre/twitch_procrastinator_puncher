@@ -1,18 +1,16 @@
 import 'package:audioplayers/audioplayers.dart';
-import 'package:common_lib/hall_of_fame.dart';
-import 'package:common_lib/models/app_theme.dart';
-import 'package:common_lib/models/config.dart';
-import 'package:common_lib/models/participant.dart';
-import 'package:common_lib/pomodoro_timer.dart';
-import 'package:common_lib/providers/app_preferences.dart';
-import 'package:common_lib/providers/participants.dart';
-import 'package:common_lib/providers/pomodoro_status.dart';
-import 'package:common_lib/widgets/web_socket_holders.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:twitch_manager/twitch_manager.dart';
+import 'package:twitch_procastinator_puncher/models/app_theme.dart';
+import 'package:twitch_procastinator_puncher/models/config.dart';
+import 'package:twitch_procastinator_puncher/models/participant.dart';
 import 'package:twitch_procastinator_puncher/models/twitch_status.dart';
+import 'package:twitch_procastinator_puncher/providers/app_preferences.dart';
+import 'package:twitch_procastinator_puncher/providers/participants.dart';
+import 'package:twitch_procastinator_puncher/providers/pomodoro_status.dart';
 import 'package:twitch_procastinator_puncher/widgets/configuration_board.dart';
+import 'package:twitch_procastinator_puncher/widgets/hall_of_fame.dart';
+import 'package:twitch_procastinator_puncher/widgets/pomodoro_timer.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -30,10 +28,10 @@ class _MainScreenState extends State<MainScreen> {
     twitchAppId: twitchAppId,
     redirectAddress: twitchRedirect,
     scope: twitchScope,
-    useAuthenticationService: kIsWeb,
+    useAuthenticationService: true,
     authenticationServiceAddress: authenticationServiceAddress,
   );
-  final _twitchMockOptions = const TwitchMockOptions(isActive: false);
+  final _twitchMockOptions = const TwitchMockOptions(isActive: true);
   late Future<TwitchManager> managerFactory = _twitchMockOptions.isActive
       ? TwitchManagerMock.factory(
           appInfo: twitchAppInfo, mockOptions: _twitchMockOptions)
@@ -181,56 +179,53 @@ class _MainScreenState extends State<MainScreen> {
     final padding = ThemePadding.normal(context);
 
     final widget = Scaffold(
-      body: WebSocketServerHolder(
-        child: Stack(
-          children: [
-            Container(
-              height: windowHeight,
-              width: MediaQuery.of(context).size.width,
-              decoration:
-                  BoxDecoration(color: preferences.backgroundColor.value),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  FutureBuilder(
-                      future: managerFactory,
-                      builder: (context, snapshot) {
-                        if (_twitchManager == null && snapshot.hasData) {
-                          _setTwitchManager(snapshot.data);
-                        }
+      body: Stack(
+        children: [
+          Container(
+            height: windowHeight,
+            width: MediaQuery.of(context).size.width,
+            decoration: BoxDecoration(color: preferences.backgroundColor.value),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                FutureBuilder(
+                    future: managerFactory,
+                    builder: (context, snapshot) {
+                      if (_twitchManager == null && snapshot.hasData) {
+                        _setTwitchManager(snapshot.data);
+                      }
 
-                        return ConfigurationBoard(
-                          startTimerCallback: _startTimer,
-                          pauseTimerCallback: _pauseTimer,
-                          resetTimerCallback: _resetTimer,
-                          gainFocusCallback: (hasFocus) {
-                            _statusWithFocus = hasFocus;
-                            if (isInitialized) setState(() {});
-                          },
-                          connectToTwitch: _connectToTwitch,
-                          twitchStatus: !snapshot.hasData
-                              ? TwitchStatus.initializing
-                              : _twitchManager != null &&
-                                      _twitchManager!.isConnected
-                                  ? TwitchStatus.connected
-                                  : TwitchStatus.notConnected,
-                        );
-                      }),
-                  Column(
-                    children: [
-                      SizedBox(height: padding),
-                      PomodoroTimer(textWithFocus: _statusWithFocus),
-                      SizedBox(height: padding),
-                      if (preferences.useHallOfFame.value) const HallOfFame(),
-                    ],
-                  ),
-                ],
-              ),
+                      return ConfigurationBoard(
+                        startTimerCallback: _startTimer,
+                        pauseTimerCallback: _pauseTimer,
+                        resetTimerCallback: _resetTimer,
+                        gainFocusCallback: (hasFocus) {
+                          _statusWithFocus = hasFocus;
+                          if (isInitialized) setState(() {});
+                        },
+                        connectToTwitch: _connectToTwitch,
+                        twitchStatus: !snapshot.hasData
+                            ? TwitchStatus.initializing
+                            : _twitchManager != null &&
+                                    _twitchManager!.isConnected
+                                ? TwitchStatus.connected
+                                : TwitchStatus.notConnected,
+                      );
+                    }),
+                Column(
+                  children: [
+                    SizedBox(height: padding),
+                    PomodoroTimer(textWithFocus: _statusWithFocus),
+                    SizedBox(height: padding),
+                    if (preferences.useHallOfFame.value) const HallOfFame(),
+                  ],
+                ),
+              ],
             ),
-            if (_twitchManager != null)
-              TwitchDebugPanel(manager: _twitchManager!),
-          ],
-        ),
+          ),
+          if (_twitchManager != null)
+            TwitchDebugPanel(manager: _twitchManager!),
+        ],
       ),
     );
     isInitialized = true; // Prevent from calling setState on gainFocus

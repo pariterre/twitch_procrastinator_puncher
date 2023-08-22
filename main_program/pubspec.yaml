@@ -18,10 +18,11 @@ dependencies:
   audioplayers: ^4.1.0
   twitch_manager:
     path: ../plugins/twitch_manager
-  common_lib:
-    path: ../common_lib
   window_manager: ^0.3.4
   url_launcher: ^6.1.11
+  google_fonts: ^4.0.4
+  infinite_carousel: ^1.0.3
+  shared_preferences: ^2.2.0
 
 dev_dependencies:
   flutter_test:

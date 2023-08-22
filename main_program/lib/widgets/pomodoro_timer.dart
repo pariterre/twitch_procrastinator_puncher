@@ -1,10 +1,10 @@
 import 'dart:io';
 
-import 'package:common_lib/models/config.dart';
-import 'package:common_lib/models/preferenced_element.dart';
-import 'package:common_lib/providers/app_preferences.dart';
-import 'package:common_lib/providers/pomodoro_status.dart';
 import 'package:flutter/material.dart';
+import 'package:twitch_procastinator_puncher/models/config.dart';
+import 'package:twitch_procastinator_puncher/models/preferenced_element.dart';
+import 'package:twitch_procastinator_puncher/providers/app_preferences.dart';
+import 'package:twitch_procastinator_puncher/providers/pomodoro_status.dart';
 
 class PomodoroTimer extends StatelessWidget {
   const PomodoroTimer({
