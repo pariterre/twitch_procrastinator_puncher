@@ -73,7 +73,8 @@ class ConfigurationBoard extends StatelessWidget {
                     const Divider(),
                     _buildTimerConfiguration(context),
                     const Divider(),
-                    if (!kIsWeb) _buildImageSelectors(context),
+                    _buildImageSelectors(context),
+                    const Divider(),
                     _buildColorPickers(context),
                     const Divider(),
                     _buildTextOnImage(context),
@@ -314,8 +315,13 @@ class ConfigurationBoard extends StatelessWidget {
         FileSelectorTile(
           title: preferences.texts.filesActiveImage,
           file: preferences.activeBackgroundImage,
-          selectFileCallback: (filename) async =>
-              await preferences.activeBackgroundImage.setFile(filename),
+          selectFileCallback: (data) async {
+            if (kIsWeb) {
+              await preferences.activeBackgroundImage.setFileFromRaw(data);
+            } else {
+              await preferences.activeBackgroundImage.setFile(data);
+            }
+          },
           onSizeChanged: (direction) {
             if (direction == PlusOrMinusSelection.plus) {
               preferences.activeBackgroundImage.size += 0.1;
@@ -328,8 +334,13 @@ class ConfigurationBoard extends StatelessWidget {
         FileSelectorTile(
           title: preferences.texts.filesPauseImage,
           file: preferences.pauseBackgroundImage,
-          selectFileCallback: (filename) async =>
-              await preferences.pauseBackgroundImage.setFile(filename),
+          selectFileCallback: (data) async {
+            if (kIsWeb) {
+              await preferences.pauseBackgroundImage.setFileFromRaw(data);
+            } else {
+              await preferences.pauseBackgroundImage.setFile(data);
+            }
+          },
           onSizeChanged: (direction) {
             if (direction == PlusOrMinusSelection.plus) {
               preferences.pauseBackgroundImage.size += 0.05;
@@ -342,20 +353,35 @@ class ConfigurationBoard extends StatelessWidget {
         FileSelectorTile(
             title: preferences.texts.filesEndActiveSound,
             file: preferences.endActiveSessionSound,
-            selectFileCallback: (filename) async =>
-                await preferences.endActiveSessionSound.setFile(filename)),
+            selectFileCallback: (data) async {
+              if (kIsWeb) {
+                await preferences.endActiveSessionSound.setFileFromRaw(data);
+              } else {
+                await preferences.endActiveSessionSound.setFile(data);
+              }
+            }),
         SizedBox(height: padding * 0.5),
         FileSelectorTile(
             title: preferences.texts.filesEndPauseSound,
             file: preferences.endPauseSessionSound,
-            selectFileCallback: (filename) async =>
-                await preferences.endPauseSessionSound.setFile(filename)),
+            selectFileCallback: (data) async {
+              if (kIsWeb) {
+                await preferences.endPauseSessionSound.setFileFromRaw(data);
+              } else {
+                await preferences.endPauseSessionSound.setFile(data);
+              }
+            }),
         SizedBox(height: padding * 0.5),
         FileSelectorTile(
             title: preferences.texts.filesEndWorkingSound,
             file: preferences.endWorkingSound,
-            selectFileCallback: (filename) async =>
-                await preferences.endWorkingSound.setFile(filename)),
+            selectFileCallback: (data) async {
+              if (kIsWeb) {
+                await preferences.endWorkingSound.setFileFromRaw(data);
+              } else {
+                await preferences.endWorkingSound.setFile(data);
+              }
+            }),
       ],
     );
   }

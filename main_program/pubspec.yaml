@@ -23,6 +23,7 @@ dependencies:
   google_fonts: ^4.0.4
   infinite_carousel: ^1.0.3
   shared_preferences: ^2.2.0
+  file_picker: ^5.3.3
 
 dev_dependencies:
   flutter_test:

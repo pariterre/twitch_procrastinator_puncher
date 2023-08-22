@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:file_picker/file_picker.dart' as fp;
 import 'package:filesystem_picker/filesystem_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:twitch_procastinator_puncher/models/app_theme.dart';
 import 'package:twitch_procastinator_puncher/models/preferenced_element.dart';
@@ -22,7 +24,10 @@ class FileSelectorTile extends StatelessWidget {
   final String title;
   final PreferencedFile file;
   final String? tooltipText;
-  final Function(File?) selectFileCallback;
+
+  ///
+  /// [data] is either a Uint8List (if kIsWeb==True) or a File (otherwise)
+  final Function(dynamic data) selectFileCallback;
   final Function(PlusOrMinusSelection)? onSizeChanged;
 
   Future<void> _pickFile(context) async {
@@ -34,24 +39,36 @@ class FileSelectorTile extends StatelessWidget {
     }
 
     final appPreferences = AppPreferences.of(context, listen: false);
-    final path = await FilesystemPicker.open(
-      title: 'Open file',
-      context: context,
-      directory: appPreferences.lastVisitedDirectory,
-      rootDirectory: Directory(rootPath),
-      rootName: rootPath,
-      fsType: FilesystemType.file,
-      allowedExtensions: extensions,
-      fileTileSelectMode: FileTileSelectMode.wholeTile,
-    );
 
-    if (path == null) return;
-    selectFileCallback(File(path));
+    if (kIsWeb) {
+      final result = (await fp.FilePicker.platform.pickFiles());
+      if (result == null) return;
+      final bytes = result.files[0].bytes!;
+      selectFileCallback(bytes);
+    } else {
+      final path = await FilesystemPicker.open(
+        title: 'Open file',
+        context: context,
+        directory: appPreferences.lastVisitedDirectory,
+        rootDirectory: Directory(rootPath),
+        rootName: rootPath,
+        fsType: FilesystemType.file,
+        allowedExtensions: extensions,
+        fileTileSelectMode: FileTileSelectMode.wholeTile,
+      );
+      if (path == null) return;
+      selectFileCallback(File(path));
+    }
   }
 
   void _playSound() async {
     final player = AudioPlayer();
-    await player.play(DeviceFileSource(file.filename!));
+    if (kIsWeb) {
+      await player
+          .play(BytesSource((file as PreferencedSoundFile).playableSource!));
+    } else {
+      await player.play(DeviceFileSource(file.filename!));
+    }
   }
 
   @override
@@ -83,7 +100,10 @@ class FileSelectorTile extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.only(left: padding),
                 child: Text(
-                  file.filename ?? preferences.texts.filesNoneSelected,
+                  file.filename ??
+                      (file.hasFile && kIsWeb
+                          ? ''
+                          : preferences.texts.filesNoneSelected),
                   style: TextStyle(
                       color: ThemeColor().configurationText,
                       fontSize: ThemeSize.smallText(context)),
@@ -95,14 +115,14 @@ class FileSelectorTile extends StatelessWidget {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (file.fileType == FileType.image && file.filename != null)
+            if (file.fileType == FileType.image && file.hasFile)
               // Show a thumbnail
               SizedBox(
                   height: windowHeight * 0.045,
                   width: windowHeight * 0.045,
                   child: (file as PreferencedImageFile).image!),
             if (file.fileType == FileType.image &&
-                file.filename != null &&
+                file.hasFile &&
                 onSizeChanged != null)
               // Show a thumbnail
               SizedBox(
@@ -110,7 +130,7 @@ class FileSelectorTile extends StatelessWidget {
                   child: PlusOrMinus(
                     onTap: onSizeChanged!,
                   )),
-            if (file.fileType == FileType.sound && file.filename != null)
+            if (file.fileType == FileType.sound && file.hasFile)
               SizedBox(
                   height: windowHeight * 0.045,
                   width: windowHeight * 0.045,

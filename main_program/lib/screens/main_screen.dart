@@ -1,4 +1,5 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:twitch_manager/twitch_manager.dart';
 import 'package:twitch_procastinator_puncher/models/app_theme.dart';
@@ -94,8 +95,13 @@ class _MainScreenState extends State<MainScreen> {
 
     if (preferences.endActiveSessionSound.filename != null) {
       final player = AudioPlayer();
-      await player.play(DeviceFileSource(
-          '${appDirectory.path}/${preferences.endActiveSessionSound.filename!}'));
+      if (kIsWeb) {
+        await player.play(
+            BytesSource(preferences.endActiveSessionSound.playableSource!));
+      } else {
+        await player.play(DeviceFileSource(
+            '${appDirectory.path}/${preferences.endActiveSessionSound.filename!}'));
+      }
     }
   }
 
@@ -108,8 +114,13 @@ class _MainScreenState extends State<MainScreen> {
 
     if (preferences.endPauseSessionSound.filename != null) {
       final player = AudioPlayer();
-      await player.play(DeviceFileSource(
-          '${appDirectory.path}/${preferences.endPauseSessionSound.filename!}'));
+      if (kIsWeb) {
+        await player.play(
+            BytesSource(preferences.endPauseSessionSound.playableSource!));
+      } else {
+        await player.play(DeviceFileSource(
+            '${appDirectory.path}/${preferences.endPauseSessionSound.filename!}'));
+      }
     }
   }
 
@@ -122,8 +133,14 @@ class _MainScreenState extends State<MainScreen> {
 
     if (preferences.endWorkingSound.filename != null) {
       final player = AudioPlayer();
-      await player.play(DeviceFileSource(
-          '${appDirectory.path}/${preferences.endWorkingSound.filename!}'));
+
+      if (kIsWeb) {
+        await player
+            .play(BytesSource(preferences.endWorkingSound.playableSource!));
+      } else {
+        await player.play(DeviceFileSource(
+            '${appDirectory.path}/${preferences.endWorkingSound.filename!}'));
+      }
     }
   }
 
