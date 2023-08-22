@@ -152,7 +152,7 @@ class FileSelectorTile extends StatelessWidget {
                 ),
               ),
             ),
-            if (file.filename != null)
+            if (file.hasFile)
               SizedBox(
                 height: windowHeight * 0.045,
                 width: windowHeight * 0.045,
