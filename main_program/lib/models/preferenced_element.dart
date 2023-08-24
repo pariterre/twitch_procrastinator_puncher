@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
@@ -252,7 +253,16 @@ class PreferencedSoundFile extends PreferencedFile {
   @override
   FileType get fileType => FileType.sound;
 
-  Uint8List? get playableSource => _file;
+  Source? get playableSource {
+    if (_file == null) return null;
+
+    if (kIsWeb) {
+      return UrlSource(
+          Uri.dataFromBytes(_file!, mimeType: 'audio/mpeg').toString());
+    } else {
+      return DeviceFileSource('${appDirectory.path}/${filename!}');
+    }
+  }
 
   static PreferencedSoundFile deserialize(map) => PreferencedSoundFile.fromRaw(
         map?['rawFile'] != null

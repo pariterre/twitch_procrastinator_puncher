@@ -1,5 +1,4 @@
 import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:twitch_manager/twitch_manager.dart';
 import 'package:twitch_procastinator_puncher/models/app_theme.dart';
@@ -93,15 +92,10 @@ class _MainScreenState extends State<MainScreen> {
           preferences.textTimerActiveSessionHasEnded.formattedText(context));
     }
 
-    if (preferences.endActiveSessionSound.filename != null) {
+    final source = preferences.endActiveSessionSound.playableSource;
+    if (source != null) {
       final player = AudioPlayer();
-      if (kIsWeb) {
-        await player.play(
-            BytesSource(preferences.endActiveSessionSound.playableSource!));
-      } else {
-        await player.play(DeviceFileSource(
-            '${appDirectory.path}/${preferences.endActiveSessionSound.filename!}'));
-      }
+      await player.play(source);
     }
   }
 
@@ -112,15 +106,10 @@ class _MainScreenState extends State<MainScreen> {
           .send(preferences.textTimerPauseHasEnded.formattedText(context));
     }
 
-    if (preferences.endPauseSessionSound.filename != null) {
+    final source = preferences.endPauseSessionSound.playableSource;
+    if (source != null) {
       final player = AudioPlayer();
-      if (kIsWeb) {
-        await player.play(
-            BytesSource(preferences.endPauseSessionSound.playableSource!));
-      } else {
-        await player.play(DeviceFileSource(
-            '${appDirectory.path}/${preferences.endPauseSessionSound.filename!}'));
-      }
+      await player.play(source);
     }
   }
 
@@ -131,16 +120,10 @@ class _MainScreenState extends State<MainScreen> {
           .send(preferences.textTimerWorkingHasEnded.formattedText(context));
     }
 
-    if (preferences.endWorkingSound.filename != null) {
+    final source = preferences.endWorkingSound.playableSource;
+    if (source != null) {
       final player = AudioPlayer();
-
-      if (kIsWeb) {
-        await player
-            .play(BytesSource(preferences.endWorkingSound.playableSource!));
-      } else {
-        await player.play(DeviceFileSource(
-            '${appDirectory.path}/${preferences.endWorkingSound.filename!}'));
-      }
+      await player.play(source);
     }
   }
 

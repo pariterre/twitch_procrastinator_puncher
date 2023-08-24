@@ -63,12 +63,7 @@ class FileSelectorTile extends StatelessWidget {
 
   void _playSound() async {
     final player = AudioPlayer();
-    if (kIsWeb) {
-      await player
-          .play(BytesSource((file as PreferencedSoundFile).playableSource!));
-    } else {
-      await player.play(DeviceFileSource(file.filename!));
-    }
+    await player.play((file as PreferencedSoundFile).playableSource!);
   }
 
   @override
