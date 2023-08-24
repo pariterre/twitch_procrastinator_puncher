@@ -451,6 +451,44 @@ class PreferencedLanguage extends PreferencedElement {
     }
   }
 
+  String get hallOfFameExport {
+    switch (_current) {
+      case Language.english:
+        return 'Export participant\nlist';
+      case Language.french:
+        return 'Exporter une liste\nde participants';
+    }
+  }
+
+  String get hallOfFameImport {
+    switch (_current) {
+      case Language.english:
+        return 'Import participant\nlist';
+      case Language.french:
+        return 'Importer une liste\nde participants';
+    }
+  }
+
+  String get hallOfFameImportAreYouSureTitle {
+    switch (_current) {
+      case Language.english:
+        return 'Confirm importing';
+      case Language.french:
+        return 'Confimer l\'importation';
+    }
+  }
+
+  String get hallOfFameImportAreYouSureContent {
+    switch (_current) {
+      case Language.english:
+        return 'Are you sure you want to import data? This action will override '
+            'current data and is irreversible';
+      case Language.french:
+        return 'Êtes-vous certain de vouloir import les données? Ceci excrasera '
+            'les données existantes et est irréversible';
+    }
+  }
+
   String get hallOfFameTitleTooltip {
     switch (_current) {
       case Language.english:

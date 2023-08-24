@@ -513,6 +513,47 @@ class ConfigurationBoard extends StatelessWidget {
           InfoTooltip(message: preferences.texts.hallOfFameTitleTooltip),
         ],
       ),
+      if (kIsWeb)
+        Padding(
+          padding: const EdgeInsets.only(top: 4.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                  style: ThemeButton.elevated,
+                  onPressed: () =>
+                      Participants.of(context, listen: false).exportWeb(),
+                  child: Text(
+                    preferences.texts.hallOfFameExport,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: Colors.black, fontSize: ThemeSize.text(context)),
+                  )),
+              ElevatedButton(
+                style: ThemeButton.elevated,
+                onPressed: () async {
+                  final participants = Participants.of(context, listen: false);
+                  final answer = await showDialog<bool>(
+                      context: context,
+                      builder: (context) => AreYouSureDialog(
+                          title:
+                              preferences.texts.hallOfFameImportAreYouSureTitle,
+                          content: preferences
+                              .texts.hallOfFameImportAreYouSureContent));
+                  if (answer == null || !answer) return;
+
+                  participants.importWeb();
+                },
+                child: Text(
+                  preferences.texts.hallOfFameImport,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: Colors.black, fontSize: ThemeSize.text(context)),
+                ),
+              ),
+            ],
+          ),
+        ),
       SizedBox(height: padding),
       CheckboxTile(
         title: preferences.texts.hallOfFameUsage,
