@@ -25,6 +25,8 @@ class _HallOfFameState extends State<HallOfFame> {
   bool _isMoving = false;
 
   Future<void> _delay() async {
+    if (!mounted) return;
+
     _isMoving = true;
     final preferences = AppPreferences.of(context, listen: false);
     await Future.delayed(
@@ -41,7 +43,7 @@ class _HallOfFameState extends State<HallOfFame> {
     if (_status == _InitializationStatus.notInitiatialized) {
       // Set the timer that advance the scroller
       Timer.periodic(const Duration(milliseconds: 10), (timer) {
-        if (!preferences.useHallOfFame.value) {
+        if (!mounted || !preferences.useHallOfFame.value) {
           // Stop the timer if there is no hall of fame
           timer.cancel();
           return;

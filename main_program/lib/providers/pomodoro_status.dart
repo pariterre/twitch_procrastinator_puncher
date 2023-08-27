@@ -104,15 +104,6 @@ class PomodoroStatus with ChangeNotifier {
         'timer': timer.inSeconds
       };
 
-  void updateWebClient(map) {
-    nbSessions = map['nbSessions'];
-    _currentSession = map['currentSession'];
-    sessionDuration = Duration(seconds: map['focusSessionDuration']);
-    pauseSessionDuration = Duration(seconds: map['pauseSessionDuration']);
-    _stopWatchStatus = StopWatchStatus.values[map['stopWatchStatus']];
-    timer = Duration(seconds: map['timer']);
-  }
-
   // TIMER CALLBACK
   Function() sessionHasFinishedCallback;
 

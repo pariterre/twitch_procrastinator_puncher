@@ -270,7 +270,54 @@ class PreferencedLanguage extends PreferencedElement {
     }
   }
 
-  String get miscReset {
+  String get miscTitle {
+    switch (_current) {
+      case Language.english:
+        return 'All field configuration';
+      case Language.french:
+        return 'Configuration de tous les champs';
+    }
+  }
+
+  String get miscExportButton {
+    switch (_current) {
+      case Language.english:
+        return 'Export configuration';
+      case Language.french:
+        return 'Exporter la\nconfiguration';
+    }
+  }
+
+  String get miscImportButton {
+    switch (_current) {
+      case Language.english:
+        return 'Import configuration';
+      case Language.french:
+        return 'Importer la\nconfiguration';
+    }
+  }
+
+  String get miscImportAreYouSureTitle {
+    switch (_current) {
+      case Language.english:
+        return 'Confirm importing';
+      case Language.french:
+        return 'Confimer l\'importation';
+    }
+  }
+
+  String get micsImportAreYouSureContent {
+    switch (_current) {
+      case Language.english:
+        return 'Are you sure you want to import data? This action will override '
+            'current data and is irreversible';
+      case Language.french:
+        return 'Êtes-vous certain de vouloir import les données? Ceci excrasera '
+            'les données existantes et est irréversible';
+    }
+  }
+
+  String get miscResetButton {
     switch (_current) {
       case Language.english:
         return 'Reset configuration';

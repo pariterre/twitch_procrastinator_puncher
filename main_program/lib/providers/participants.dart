@@ -269,7 +269,7 @@ class Participants extends ChangeNotifier {
     final anchor = html.document.createElement('a') as html.AnchorElement
       ..href = url
       ..style.display = 'none'
-      ..download = 'some_name.txt';
+      ..download = _saveFilename;
     html.document.body!.children.add(anchor);
 
     // download

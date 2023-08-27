@@ -10,6 +10,7 @@ import 'package:twitch_procastinator_puncher/models/twitch_status.dart';
 import 'package:twitch_procastinator_puncher/providers/app_preferences.dart';
 import 'package:twitch_procastinator_puncher/providers/participants.dart';
 import 'package:twitch_procastinator_puncher/providers/pomodoro_status.dart';
+import 'package:twitch_procastinator_puncher/screens/main_screen.dart';
 import 'package:twitch_procastinator_puncher/widgets/are_you_sure_dialog.dart';
 import 'package:twitch_procastinator_puncher/widgets/checkbox_tile.dart';
 import 'package:twitch_procastinator_puncher/widgets/color_selector_tile.dart';
@@ -268,28 +269,26 @@ class ConfigurationBoard extends StatelessWidget {
 
   Widget _buildTimerConfiguration(BuildContext context) {
     final preferences = AppPreferences.of(context);
+    final pomodoro = PomodoroStatus.of(context, listen: false);
     final padding = ThemePadding.normal(context);
 
     return Column(
       children: [
         IntSelectorTile(
           title: preferences.texts.controllerNumberOfSession,
-          initialValue: AppPreferences.of(context, listen: false).nbSessions,
+          initialValue: preferences.nbSessions,
           onValidChange: (value) {
-            AppPreferences.of(context, listen: false).nbSessions.set(value);
-            PomodoroStatus.of(context, listen: false).nbSessions = value;
+            preferences.nbSessions.set(value);
+            pomodoro.nbSessions = value;
           },
         ),
         SizedBox(height: padding),
         TimeSelectorTile(
           title: preferences.texts.controllerSessionDuration,
-          initialValue:
-              AppPreferences.of(context, listen: false).sessionDuration,
+          initialValue: preferences.sessionDuration,
           onValidChange: (value) {
-            AppPreferences.of(context, listen: false)
-                .sessionDuration
-                .set(value);
-            PomodoroStatus.of(context, listen: false).sessionDuration = value;
+            preferences.sessionDuration.set(value);
+            pomodoro.sessionDuration = value;
           },
         ),
         SizedBox(height: padding),
@@ -297,9 +296,8 @@ class ConfigurationBoard extends StatelessWidget {
           title: preferences.texts.controllerPauseDuration,
           initialValue: AppPreferences.of(context, listen: false).pauseDuration,
           onValidChange: (value) {
-            AppPreferences.of(context, listen: false).pauseDuration.set(value);
-            PomodoroStatus.of(context, listen: false).pauseSessionDuration =
-                value;
+            preferences.pauseDuration.set(value);
+            pomodoro.pauseSessionDuration = value;
           },
         ),
       ],
@@ -653,26 +651,82 @@ class ConfigurationBoard extends StatelessWidget {
   Widget _buildReset(BuildContext context) {
     final preferences = AppPreferences.of(context);
 
-    return Center(
-      child: ElevatedButton(
-        onPressed: () async {
-          final answer = await showDialog<bool>(
-            context: context,
-            builder: (context) => AreYouSureDialog(
-              title: preferences.texts.miscResetConfirmTitle,
-              content: preferences.texts.miscResetConfirm,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(preferences.texts.miscTitle,
+            style: TextStyle(
+                color: ThemeColor().configurationText,
+                fontWeight: FontWeight.bold,
+                fontSize: ThemeSize.text(context))),
+        const SizedBox(height: 8),
+        if (kIsWeb)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                onPressed: () =>
+                    AppPreferences.of(context, listen: false).exportWeb(),
+                style: ThemeButton.elevated,
+                child: Text(
+                  textAlign: TextAlign.center,
+                  preferences.texts.miscExportButton,
+                  style: TextStyle(
+                      color: Colors.black, fontSize: ThemeSize.text(context)),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  final navigator = Navigator.of(context);
+                  final preferences = AppPreferences.of(context, listen: false);
+
+                  final answer = await showDialog<bool>(
+                      context: context,
+                      builder: (context) => AreYouSureDialog(
+                          title: preferences.texts.miscImportAreYouSureTitle,
+                          content:
+                              preferences.texts.micsImportAreYouSureContent));
+                  if (answer == null || !answer) return;
+
+                  await preferences.importWeb();
+
+                  navigator.pushReplacementNamed(MainScreen.route);
+                },
+                style: ThemeButton.elevated,
+                child: Text(
+                  textAlign: TextAlign.center,
+                  preferences.texts.miscImportButton,
+                  style: TextStyle(
+                      color: Colors.black, fontSize: ThemeSize.text(context)),
+                ),
+              ),
+            ],
+          ),
+        const SizedBox(height: 8),
+        Center(
+          child: ElevatedButton(
+            onPressed: () async {
+              final answer = await showDialog<bool>(
+                context: context,
+                builder: (context) => AreYouSureDialog(
+                  title: preferences.texts.miscResetConfirmTitle,
+                  content: preferences.texts.miscResetConfirm,
+                ),
+              );
+              if (answer == null || !answer) return;
+              preferences.reset();
+            },
+            style: ThemeButton.elevated,
+            child: Text(
+              preferences.texts.miscResetButton,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  color: Colors.black, fontSize: ThemeSize.text(context)),
             ),
-          );
-          if (answer == null || !answer) return;
-          preferences.reset();
-        },
-        style: ThemeButton.elevated,
-        child: Text(
-          preferences.texts.miscReset,
-          style:
-              TextStyle(color: Colors.black, fontSize: ThemeSize.text(context)),
+          ),
         ),
-      ),
+        const SizedBox(height: 12),
+      ],
     );
   }
 

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -9,6 +10,7 @@ import 'package:twitch_procastinator_puncher/models/app_fonts.dart';
 import 'package:twitch_procastinator_puncher/models/config.dart';
 import 'package:twitch_procastinator_puncher/models/preferenced_element.dart';
 import 'package:twitch_procastinator_puncher/models/preferenced_language.dart';
+import 'package:universal_html/html.dart' as html;
 
 export 'package:twitch_procastinator_puncher/models/app_fonts.dart';
 
@@ -160,6 +162,43 @@ class AppPreferences with ChangeNotifier {
       await file.writeAsString(encoder.convert(serialize()));
     }
     notifyListeners();
+  }
+
+  Future<void> exportWeb() async {
+    if (!kIsWeb) throw 'exportWeb only works on web-based interface';
+
+    const encoder = JsonEncoder.withIndent('\t');
+    final text = encoder.convert(serialize());
+
+    // prepare
+    final bytes = utf8.encode(text);
+    final blob = html.Blob([bytes]);
+    final url = html.Url.createObjectUrlFromBlob(blob);
+    final anchor = html.document.createElement('a') as html.AnchorElement
+      ..href = url
+      ..style.display = 'none'
+      ..download = preferencesFilename;
+    html.document.body!.children.add(anchor);
+
+    // download
+    anchor.click();
+
+    // cleanup
+    html.document.body!.children.remove(anchor);
+    html.Url.revokeObjectUrl(url);
+  }
+
+  Future<void> importWeb() async {
+    if (!kIsWeb) throw 'importWeb only works on web-based interface';
+
+    final result = await FilePicker.platform.pickFiles();
+    if (result == null) return;
+
+    final loadedPreferences =
+        json.decode(utf8.decode(result.files.first.bytes!));
+
+    updateFromSerialized(loadedPreferences);
+    _save();
   }
 
   // CONSTRUCTOR AND ACCESSORS
@@ -417,6 +456,63 @@ class AppPreferences with ChangeNotifier {
     fontHallOfFame = AppFonts.values[_defaultValues['fontHallOfFame']];
 
     _save();
+  }
+
+  ///
+  /// Reset the app configuration to their original values
+  void updateFromSerialized(map) async {
+    texts = PreferencedLanguage.deserialize(map['texts']);
+    nbSessions = PreferencedInt.deserialize(map['nbSessions']);
+    sessionDuration = PreferencedDuration.deserialize(map['sessionDuration']);
+    pauseDuration = PreferencedDuration.deserialize(map['pauseDuration']);
+    activeBackgroundImage =
+        PreferencedImageFile.deserialize(map['activeBackgroundImage']);
+    pauseBackgroundImage =
+        PreferencedImageFile.deserialize(map['pauseBackgroundImage']);
+    endActiveSessionSound =
+        PreferencedSoundFile.deserialize(map['endActiveSessionSound']);
+    endPauseSessionSound =
+        PreferencedSoundFile.deserialize(map['endPauseSessionSound']);
+    endWorkingSound = PreferencedSoundFile.deserialize(map['endWorkingSound']);
+    backgroundColor = PreferencedColor.deserialize(map['backgroundColor']);
+    backgroundColorHallOfFame =
+        PreferencedColor.deserialize(map['backgroundColorHallOfFame']);
+    textDuringInitialization =
+        TextOnPomodoro.deserialize(map['textDuringInitialization']);
+    textDuringActiveSession =
+        TextOnPomodoro.deserialize(map['textDuringActiveSession']);
+    textDuringPauseSession =
+        TextOnPomodoro.deserialize(map['textDuringPauseSession']);
+    textDuringPause = TextOnPomodoro.deserialize(map['textDuringPause']);
+    textDone = TextOnPomodoro.deserialize(map['textDone']);
+    saveToTextFile = PreferencedBool.deserialize(map['saveToTextFile']);
+    useHallOfFame = PreferencedBool.deserialize(map['useHallOfFame']);
+    mustFollowForFaming =
+        PreferencedBool.deserialize(map['mustFollowForFaming']);
+    hallOfFameScrollVelocity =
+        PreferencedInt.deserialize(map['hallOfFameScrollVelocity']);
+    textTimerHasStarted = TextToChat.deserialize(map['textTimerHasStarted']);
+    textTimerActiveSessionHasEnded =
+        TextToChat.deserialize(map['textTimerActiveSessionHasEnded']);
+    textTimerPauseHasEnded =
+        TextToChat.deserialize(map['textTimerPauseHasEnded']);
+    textTimerWorkingHasEnded =
+        TextToChat.deserialize(map['textTimerWorkingHasEnded']);
+    textNewcomersGreetings =
+        TextToChat.deserialize(map['textNewcomersGreetings']);
+    textUserHasConnectedGreetings =
+        TextToChat.deserialize(map['textUserHasConnectedGreetings']);
+    textWhitelist = PreferencedText.deserialize(map['textWhitelist']);
+    textBlacklist = PreferencedText.deserialize(map['textBlacklist']);
+    textHallOfFameTitle =
+        PreferencedText.deserialize(map['textHallOfFameTitle']);
+    textHallOfFameName = PreferencedText.deserialize(map['textHallOfFameName']);
+    textHallOfFameToday =
+        PreferencedText.deserialize(map['textHallOfFameToday']);
+    textHallOfFameAlltime =
+        PreferencedText.deserialize(map['textHallOfFameAlltime']);
+    textHallOfFameTotal =
+        PreferencedText.deserialize(map['textHallOfFameTotal']);
   }
 
   void _addAllCallbacks() {
