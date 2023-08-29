@@ -8,7 +8,6 @@ import 'package:twitch_procastinator_puncher/providers/pomodoro_status.dart';
 import 'package:twitch_procastinator_puncher/screens/main_screen.dart';
 import 'package:window_manager/window_manager.dart';
 
-// TODO add communication via Twitch chat
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (!kIsWeb) {

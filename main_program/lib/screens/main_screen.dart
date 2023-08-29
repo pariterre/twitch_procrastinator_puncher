@@ -31,7 +31,9 @@ class _MainScreenState extends State<MainScreen> {
     useAuthenticationService: true,
     authenticationServiceAddress: authenticationServiceAddress,
   );
-  final _twitchMockOptions = const TwitchMockOptions(isActive: true);
+  final _twitchMockOptions = const TwitchMockOptions(
+      isActive: true,
+      messagesModerators: ['!startTimer', '!pauseTimer', '!resetTimer']);
   late Future<TwitchManager> managerFactory = _twitchMockOptions.isActive
       ? TwitchManagerMock.factory(
           appInfo: twitchAppInfo, mockOptions: _twitchMockOptions)
@@ -167,9 +169,33 @@ class _MainScreenState extends State<MainScreen> {
 
     // Connect everything related to participants
     final participants = Participants.of(context, listen: false);
+    _twitchManager!.irc.messageCallback = _onMessageReceived;
     participants.twitchManager = _twitchManager!;
+    fetchModerators();
     participants.greetNewcomerCallback = _greetNewComers;
     participants.greetUserHasConnectedCallback = _greetUserHasConnected;
+  }
+
+  List<String>? _moderators;
+  Future<void> fetchModerators() async =>
+      _moderators = (await _twitchManager!.api.fetchModerators())!;
+
+  void _onMessageReceived(String sender, String message) async {
+    // If we are not done fetching, we are really early in the process, so we
+    // can afford waiting a bit.
+    if (_moderators == null || !_moderators!.contains(sender)) return;
+
+    switch (message) {
+      case '!startTimer':
+        _startTimer();
+        break;
+      case '!pauseTimer':
+        _pauseTimer();
+        break;
+      case '!resetTimer':
+        _resetTimer();
+        break;
+    }
   }
 
   @override
