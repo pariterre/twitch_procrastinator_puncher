@@ -16,7 +16,8 @@ class FileSelectorTile extends StatelessWidget {
     super.key,
     required this.title,
     required this.file,
-    required this.selectFileCallback,
+    required this.onFileSelected,
+    required this.onFileDeleted,
     this.tooltipText,
     this.onSizeChanged,
   });
@@ -27,7 +28,8 @@ class FileSelectorTile extends StatelessWidget {
 
   ///
   /// [data] is either a Uint8List (if kIsWeb==True) or a File (otherwise)
-  final Function(dynamic data) selectFileCallback;
+  final Function(dynamic data) onFileSelected;
+  final Function() onFileDeleted;
   final Function(PlusOrMinusSelection)? onSizeChanged;
 
   Future<void> _pickFile(context) async {
@@ -43,7 +45,7 @@ class FileSelectorTile extends StatelessWidget {
     if (kIsWeb) {
       final result = (await fp.FilePicker.platform.pickFiles());
       if (result == null) return;
-      selectFileCallback(result.files[0].bytes!);
+      onFileSelected(result.files[0].bytes!);
     } else {
       final path = await FilesystemPicker.open(
         title: 'Open file',
@@ -56,7 +58,7 @@ class FileSelectorTile extends StatelessWidget {
         fileTileSelectMode: FileTileSelectMode.wholeTile,
       );
       if (path == null) return;
-      selectFileCallback(File(path));
+      onFileSelected(File(path));
     }
   }
 
@@ -151,7 +153,7 @@ class FileSelectorTile extends StatelessWidget {
                 height: windowHeight * 0.045,
                 width: windowHeight * 0.045,
                 child: InkWell(
-                  onTap: () => selectFileCallback(null),
+                  onTap: onFileDeleted,
                   child: const Icon(
                     Icons.delete,
                     color: Colors.red,

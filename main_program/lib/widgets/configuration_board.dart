@@ -314,7 +314,7 @@ class ConfigurationBoard extends StatelessWidget {
         FileSelectorTile(
           title: preferences.texts.filesActiveImage,
           file: preferences.activeBackgroundImage,
-          selectFileCallback: (data) async {
+          onFileSelected: (data) async {
             if (data == null) return;
 
             if (kIsWeb) {
@@ -323,6 +323,7 @@ class ConfigurationBoard extends StatelessWidget {
               await preferences.activeBackgroundImage.setFile(data);
             }
           },
+          onFileDeleted: preferences.activeBackgroundImage.clear,
           onSizeChanged: (direction) {
             if (direction == PlusOrMinusSelection.plus) {
               preferences.activeBackgroundImage.size += 0.1;
@@ -335,13 +336,14 @@ class ConfigurationBoard extends StatelessWidget {
         FileSelectorTile(
           title: preferences.texts.filesPauseImage,
           file: preferences.pauseBackgroundImage,
-          selectFileCallback: (data) async {
+          onFileSelected: (data) async {
             if (kIsWeb) {
               await preferences.pauseBackgroundImage.setFileFromRaw(data);
             } else {
               await preferences.pauseBackgroundImage.setFile(data);
             }
           },
+          onFileDeleted: preferences.pauseBackgroundImage.clear,
           onSizeChanged: (direction) {
             if (direction == PlusOrMinusSelection.plus) {
               preferences.pauseBackgroundImage.size += 0.05;
@@ -352,37 +354,43 @@ class ConfigurationBoard extends StatelessWidget {
         ),
         SizedBox(height: padding * 0.5),
         FileSelectorTile(
-            title: preferences.texts.filesEndActiveSound,
-            file: preferences.endActiveSessionSound,
-            selectFileCallback: (data) async {
-              if (kIsWeb) {
-                await preferences.endActiveSessionSound.setFileFromRaw(data);
-              } else {
-                await preferences.endActiveSessionSound.setFile(data);
-              }
-            }),
+          title: preferences.texts.filesEndActiveSound,
+          file: preferences.endActiveSessionSound,
+          onFileSelected: (data) async {
+            if (kIsWeb) {
+              await preferences.endActiveSessionSound.setFileFromRaw(data);
+            } else {
+              await preferences.endActiveSessionSound.setFile(data);
+            }
+          },
+          onFileDeleted: preferences.endActiveSessionSound.clear,
+        ),
         SizedBox(height: padding * 0.5),
         FileSelectorTile(
-            title: preferences.texts.filesEndPauseSound,
-            file: preferences.endPauseSessionSound,
-            selectFileCallback: (data) async {
-              if (kIsWeb) {
-                await preferences.endPauseSessionSound.setFileFromRaw(data);
-              } else {
-                await preferences.endPauseSessionSound.setFile(data);
-              }
-            }),
+          title: preferences.texts.filesEndPauseSound,
+          file: preferences.endPauseSessionSound,
+          onFileSelected: (data) async {
+            if (kIsWeb) {
+              await preferences.endPauseSessionSound.setFileFromRaw(data);
+            } else {
+              await preferences.endPauseSessionSound.setFile(data);
+            }
+          },
+          onFileDeleted: preferences.endPauseSessionSound.clear,
+        ),
         SizedBox(height: padding * 0.5),
         FileSelectorTile(
-            title: preferences.texts.filesEndWorkingSound,
-            file: preferences.endWorkingSound,
-            selectFileCallback: (data) async {
-              if (kIsWeb) {
-                await preferences.endWorkingSound.setFileFromRaw(data);
-              } else {
-                await preferences.endWorkingSound.setFile(data);
-              }
-            }),
+          title: preferences.texts.filesEndWorkingSound,
+          file: preferences.endWorkingSound,
+          onFileSelected: (data) async {
+            if (kIsWeb) {
+              await preferences.endWorkingSound.setFileFromRaw(data);
+            } else {
+              await preferences.endWorkingSound.setFile(data);
+            }
+          },
+          onFileDeleted: preferences.endWorkingSound.clear,
+        ),
       ],
     );
   }
