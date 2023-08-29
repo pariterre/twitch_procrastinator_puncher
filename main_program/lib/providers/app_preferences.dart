@@ -168,7 +168,7 @@ class AppPreferences with ChangeNotifier {
     if (!kIsWeb) throw 'exportWeb only works on web-based interface';
 
     const encoder = JsonEncoder.withIndent('\t');
-    final text = encoder.convert(serialize());
+    final text = encoder.convert(serialize(skipBinaryFiles: true));
 
     // prepare
     final bytes = utf8.encode(text);
@@ -237,57 +237,57 @@ class AppPreferences with ChangeNotifier {
     return AppPreferences._(
         lastVisitedDirectory:
             Directory(previousPreferences?['lastVisitedDirectory'] ?? ''),
-        texts: PreferencedLanguage.deserialize(
+        texts: await PreferencedLanguage.deserialize(
             previousPreferences?['texts'], _defaultValues['texts']),
-        nbSessions: PreferencedInt.deserialize(
+        nbSessions: await PreferencedInt.deserialize(
             previousPreferences?['nbSessions'], _defaultValues['nbSessions']),
-        sessionDuration: PreferencedDuration.deserialize(
+        sessionDuration: await PreferencedDuration.deserialize(
             previousPreferences?['sessionDuration'],
             _defaultValues['sessionDuration']),
-        pauseDuration: PreferencedDuration.deserialize(
+        pauseDuration: await PreferencedDuration.deserialize(
             previousPreferences?['pauseDuration'],
             _defaultValues['pauseDuration']),
-        activeBackgroundImage: PreferencedImageFile.deserialize(
+        activeBackgroundImage: await PreferencedImageFile.deserialize(
             previousPreferences?['activeBackgroundImage']),
-        pauseBackgroundImage: PreferencedImageFile.deserialize(
+        pauseBackgroundImage: await PreferencedImageFile.deserialize(
             previousPreferences?['pauseBackgroundImage']),
-        endActiveSessionSound: PreferencedSoundFile.deserialize(
+        endActiveSessionSound: await PreferencedSoundFile.deserialize(
             previousPreferences?['endActiveSessionSound']),
-        endPauseSessionSound: PreferencedSoundFile.deserialize(
+        endPauseSessionSound: await PreferencedSoundFile.deserialize(
             previousPreferences?['endPauseSessionSound']),
-        endWorkingSound: PreferencedSoundFile.deserialize(
+        endWorkingSound: await PreferencedSoundFile.deserialize(
             previousPreferences?['endWorkingSound']),
-        backgroundColor: PreferencedColor.deserialize(
+        backgroundColor: await PreferencedColor.deserialize(
             previousPreferences?['backgroundColor'],
             _defaultValues['backgroundColor']),
-        backgroundColorHallOfFame: PreferencedColor.deserialize(
+        backgroundColorHallOfFame: await PreferencedColor.deserialize(
             previousPreferences?['backgroundColorHallOfFame'],
             _defaultValues['backgroundColorHallOfFame']),
         fontPomodoro: previousPreferences?['fontPomodoro'] ?? _defaultValues['fontPomodoro'],
         textColorHallOfFame: previousPreferences?['textColorHallOfFame'] ?? _defaultValues['textColorHallOfFame'],
-        textDuringInitialization: TextOnPomodoro.deserialize(previousPreferences?['textDuringInitialization'], _defaultValues['textDuringInitialization']),
-        textDuringActiveSession: TextOnPomodoro.deserialize(previousPreferences?['textDuringActiveSession'], _defaultValues['textDuringActiveSession']),
-        textDuringPauseSession: TextOnPomodoro.deserialize(previousPreferences?['textDuringPauseSession'], _defaultValues['textDuringPauseSession']),
-        textDuringPause: TextOnPomodoro.deserialize(previousPreferences?['textDuringPause'], _defaultValues['textDuringPause']),
-        textDone: TextOnPomodoro.deserialize(previousPreferences?['textDone'], _defaultValues['textDone']),
-        saveToTextFile: PreferencedBool.deserialize(previousPreferences?['saveToTextFile'], _defaultValues['saveToTextFile']),
-        useHallOfFame: PreferencedBool.deserialize(previousPreferences?['useHallOfFame'], _defaultValues['useHallOfFame']),
-        mustFollowForFaming: PreferencedBool.deserialize(previousPreferences?['mustFollowForFaming'], _defaultValues['mustFollowForFaming']),
-        hallOfFameScrollVelocity: PreferencedInt.deserialize(previousPreferences?['hallOfFameScrollVelocity'], _defaultValues['hallOfFameScrollVelocity']),
-        textTimerHasStarted: TextToChat.deserialize(previousPreferences?['textTimerHasStarted'], _defaultValues['textTimerHasStarted']),
-        textTimerActiveSessionHasEnded: TextToChat.deserialize(previousPreferences?['textTimerActiveSessionHasEnded'], _defaultValues['textTimerActiveSessionHasEnded']),
-        textTimerPauseHasEnded: TextToChat.deserialize(previousPreferences?['textTimerPauseHasEnded'], _defaultValues['textTimerPauseHasEnded']),
-        textTimerWorkingHasEnded: TextToChat.deserialize(previousPreferences?['textTimerWorkingHasEnded'], _defaultValues['textTimerWorkingHasEnded']),
-        textNewcomersGreetings: TextToChat.deserialize(previousPreferences?['textNewcomersGreetings'], _defaultValues['textNewcomersGreetings']),
-        textUserHasConnectedGreetings: TextToChat.deserialize(previousPreferences?['textUserHasConnectedGreetings'], _defaultValues['textUserHasConnectedGreetings']),
-        textWhitelist: PreferencedText.deserialize(previousPreferences?['textWhitelist']),
-        textBlacklist: PreferencedText.deserialize(previousPreferences?['textBlacklist']),
+        textDuringInitialization: await TextOnPomodoro.deserialize(previousPreferences?['textDuringInitialization'], _defaultValues['textDuringInitialization']),
+        textDuringActiveSession: await TextOnPomodoro.deserialize(previousPreferences?['textDuringActiveSession'], _defaultValues['textDuringActiveSession']),
+        textDuringPauseSession: await TextOnPomodoro.deserialize(previousPreferences?['textDuringPauseSession'], _defaultValues['textDuringPauseSession']),
+        textDuringPause: await TextOnPomodoro.deserialize(previousPreferences?['textDuringPause'], _defaultValues['textDuringPause']),
+        textDone: await TextOnPomodoro.deserialize(previousPreferences?['textDone'], _defaultValues['textDone']),
+        saveToTextFile: await PreferencedBool.deserialize(previousPreferences?['saveToTextFile'], _defaultValues['saveToTextFile']),
+        useHallOfFame: await PreferencedBool.deserialize(previousPreferences?['useHallOfFame'], _defaultValues['useHallOfFame']),
+        mustFollowForFaming: await PreferencedBool.deserialize(previousPreferences?['mustFollowForFaming'], _defaultValues['mustFollowForFaming']),
+        hallOfFameScrollVelocity: await PreferencedInt.deserialize(previousPreferences?['hallOfFameScrollVelocity'], _defaultValues['hallOfFameScrollVelocity']),
+        textTimerHasStarted: await TextToChat.deserialize(previousPreferences?['textTimerHasStarted'], _defaultValues['textTimerHasStarted']),
+        textTimerActiveSessionHasEnded: await TextToChat.deserialize(previousPreferences?['textTimerActiveSessionHasEnded'], _defaultValues['textTimerActiveSessionHasEnded']),
+        textTimerPauseHasEnded: await TextToChat.deserialize(previousPreferences?['textTimerPauseHasEnded'], _defaultValues['textTimerPauseHasEnded']),
+        textTimerWorkingHasEnded: await TextToChat.deserialize(previousPreferences?['textTimerWorkingHasEnded'], _defaultValues['textTimerWorkingHasEnded']),
+        textNewcomersGreetings: await TextToChat.deserialize(previousPreferences?['textNewcomersGreetings'], _defaultValues['textNewcomersGreetings']),
+        textUserHasConnectedGreetings: await TextToChat.deserialize(previousPreferences?['textUserHasConnectedGreetings'], _defaultValues['textUserHasConnectedGreetings']),
+        textWhitelist: await PreferencedText.deserialize(previousPreferences?['textWhitelist']),
+        textBlacklist: await PreferencedText.deserialize(previousPreferences?['textBlacklist']),
         fontHallOfFame: previousPreferences?['fontHallOfFame'] ?? _defaultValues['fontHallOfFame'],
-        textHallOfFameTitle: PreferencedText.deserialize(previousPreferences?['textHallOfFameTitle'], _defaultValues['textHallOfFameTitle']),
-        textHallOfFameName: PreferencedText.deserialize(previousPreferences?['textHallOfFameName'], _defaultValues['textHallOfFameName']),
-        textHallOfFameToday: PreferencedText.deserialize(previousPreferences?['textHallOfFameToday'], _defaultValues['textHallOfFameToday']),
-        textHallOfFameAlltime: PreferencedText.deserialize(previousPreferences?['textHallOfFameAlltime'], _defaultValues['textHallOfFameAlltime']),
-        textHallOfFameTotal: PreferencedText.deserialize(previousPreferences?['textHallOfFameTotal'], _defaultValues['textHallOfFameTotal']));
+        textHallOfFameTitle: await PreferencedText.deserialize(previousPreferences?['textHallOfFameTitle'], _defaultValues['textHallOfFameTitle']),
+        textHallOfFameName: await PreferencedText.deserialize(previousPreferences?['textHallOfFameName'], _defaultValues['textHallOfFameName']),
+        textHallOfFameToday: await PreferencedText.deserialize(previousPreferences?['textHallOfFameToday'], _defaultValues['textHallOfFameToday']),
+        textHallOfFameAlltime: await PreferencedText.deserialize(previousPreferences?['textHallOfFameAlltime'], _defaultValues['textHallOfFameAlltime']),
+        textHallOfFameTotal: await PreferencedText.deserialize(previousPreferences?['textHallOfFameTotal'], _defaultValues['textHallOfFameTotal']));
   }
 
   AppPreferences._({
@@ -346,17 +346,21 @@ class AppPreferences with ChangeNotifier {
 
   ///
   /// Serialize all the values
-  Map<String, dynamic> serialize() => {
+  Map<String, dynamic> serialize({bool skipBinaryFiles = false}) => {
         'lastVisitedDirectory': _lastVisitedDirectory.path,
         'texts': texts.serialize(),
         'nbSessions': nbSessions.serialize(),
         'sessionDuration': sessionDuration.serialize(),
         'pauseDuration': pauseDuration.serialize(),
-        'activeBackgroundImage': activeBackgroundImage.serialize(),
-        'pauseBackgroundImage': pauseBackgroundImage.serialize(),
-        'endActiveSessionSound': endActiveSessionSound.serialize(),
-        'endPauseSessionSound': endPauseSessionSound.serialize(),
-        'endWorkingSound': endWorkingSound.serialize(),
+        'activeBackgroundImage':
+            skipBinaryFiles ? null : activeBackgroundImage.serialize(),
+        'pauseBackgroundImage':
+            skipBinaryFiles ? null : pauseBackgroundImage.serialize(),
+        'endActiveSessionSound':
+            skipBinaryFiles ? null : endActiveSessionSound.serialize(),
+        'endPauseSessionSound':
+            skipBinaryFiles ? null : endPauseSessionSound.serialize(),
+        'endWorkingSound': skipBinaryFiles ? null : endWorkingSound.serialize(),
         'backgroundColor': backgroundColor.serialize(),
         'backgroundColorHallOfFame': backgroundColorHallOfFame.serialize(),
         'fontPomodoro': fontPomodoro.index,
@@ -391,61 +395,64 @@ class AppPreferences with ChangeNotifier {
   ///
   /// Reset the app configuration to their original values
   void reset() async {
-    texts = PreferencedLanguage.deserialize(null, _defaultValues['texts']);
-    nbSessions = PreferencedInt.deserialize(null, _defaultValues['nbSessions']);
-    sessionDuration = PreferencedDuration.deserialize(
+    texts =
+        await PreferencedLanguage.deserialize(null, _defaultValues['texts']);
+    nbSessions =
+        await PreferencedInt.deserialize(null, _defaultValues['nbSessions']);
+    sessionDuration = await PreferencedDuration.deserialize(
         null, _defaultValues['sessionDuration']);
-    pauseDuration =
-        PreferencedDuration.deserialize(null, _defaultValues['pauseDuration']);
-    activeBackgroundImage = PreferencedImageFile.deserialize(null);
-    pauseBackgroundImage = PreferencedImageFile.deserialize(null);
-    endActiveSessionSound = PreferencedSoundFile.deserialize(null);
-    endPauseSessionSound = PreferencedSoundFile.deserialize(null);
-    endWorkingSound = PreferencedSoundFile.deserialize(null);
-    backgroundColor =
-        PreferencedColor.deserialize(null, _defaultValues['backgroundColor']);
-    backgroundColorHallOfFame = PreferencedColor.deserialize(
+    pauseDuration = await PreferencedDuration.deserialize(
+        null, _defaultValues['pauseDuration']);
+    activeBackgroundImage = await PreferencedImageFile.deserialize(null);
+    pauseBackgroundImage = await PreferencedImageFile.deserialize(null);
+    endActiveSessionSound = await PreferencedSoundFile.deserialize(null);
+    endPauseSessionSound = await PreferencedSoundFile.deserialize(null);
+    endWorkingSound = await PreferencedSoundFile.deserialize(null);
+    backgroundColor = await PreferencedColor.deserialize(
+        null, _defaultValues['backgroundColor']);
+    backgroundColorHallOfFame = await PreferencedColor.deserialize(
         null, _defaultValues['backgroundColorHallOfFame']);
-    textDuringInitialization = TextOnPomodoro.deserialize(
+    textDuringInitialization = await TextOnPomodoro.deserialize(
         null, _defaultValues['textDuringInitialization']);
-    textDuringActiveSession = TextOnPomodoro.deserialize(
+    textDuringActiveSession = await TextOnPomodoro.deserialize(
         null, _defaultValues['textDuringActiveSession']);
-    textDuringPauseSession = TextOnPomodoro.deserialize(
+    textDuringPauseSession = await TextOnPomodoro.deserialize(
         null, _defaultValues['textDuringPauseSession']);
-    textDuringPause =
-        TextOnPomodoro.deserialize(null, _defaultValues['textDuringPause']);
-    textDone = TextOnPomodoro.deserialize(null, _defaultValues['textDone']);
-    saveToTextFile =
-        PreferencedBool.deserialize(null, _defaultValues['saveToTextFile']);
-    useHallOfFame =
-        PreferencedBool.deserialize(null, _defaultValues['useHallOfFame']);
-    mustFollowForFaming = PreferencedBool.deserialize(
+    textDuringPause = await TextOnPomodoro.deserialize(
+        null, _defaultValues['textDuringPause']);
+    textDone =
+        await TextOnPomodoro.deserialize(null, _defaultValues['textDone']);
+    saveToTextFile = await PreferencedBool.deserialize(
+        null, _defaultValues['saveToTextFile']);
+    useHallOfFame = await PreferencedBool.deserialize(
+        null, _defaultValues['useHallOfFame']);
+    mustFollowForFaming = await PreferencedBool.deserialize(
         null, _defaultValues['mustFollowForFaming']);
-    hallOfFameScrollVelocity = PreferencedInt.deserialize(
+    hallOfFameScrollVelocity = await PreferencedInt.deserialize(
         null, _defaultValues['hallOfFameScrollVelocity']);
-    textTimerHasStarted =
-        TextToChat.deserialize(null, _defaultValues['textTimerHasStarted']);
-    textTimerActiveSessionHasEnded = TextToChat.deserialize(
+    textTimerHasStarted = await TextToChat.deserialize(
+        null, _defaultValues['textTimerHasStarted']);
+    textTimerActiveSessionHasEnded = await TextToChat.deserialize(
         null, _defaultValues['textTimerActiveSessionHasEnded']);
-    textTimerPauseHasEnded =
-        TextToChat.deserialize(null, _defaultValues['textTimerPauseHasEnded']);
-    textTimerWorkingHasEnded = TextToChat.deserialize(
+    textTimerPauseHasEnded = await TextToChat.deserialize(
+        null, _defaultValues['textTimerPauseHasEnded']);
+    textTimerWorkingHasEnded = await TextToChat.deserialize(
         null, _defaultValues['textTimerWorkingHasEnded']);
-    textNewcomersGreetings =
-        TextToChat.deserialize(null, _defaultValues['textNewcomersGreetings']);
-    textUserHasConnectedGreetings = TextToChat.deserialize(
+    textNewcomersGreetings = await TextToChat.deserialize(
+        null, _defaultValues['textNewcomersGreetings']);
+    textUserHasConnectedGreetings = await TextToChat.deserialize(
         null, _defaultValues['textUserHasConnectedGreetings']);
-    textWhitelist = PreferencedText.deserialize(null);
-    textBlacklist = PreferencedText.deserialize(null);
-    textHallOfFameTitle = PreferencedText.deserialize(
+    textWhitelist = await PreferencedText.deserialize(null);
+    textBlacklist = await PreferencedText.deserialize(null);
+    textHallOfFameTitle = await PreferencedText.deserialize(
         null, _defaultValues['textHallOfFameTitle']);
-    textHallOfFameName =
-        PreferencedText.deserialize(null, _defaultValues['textHallOfFameName']);
-    textHallOfFameToday = PreferencedText.deserialize(
+    textHallOfFameName = await PreferencedText.deserialize(
+        null, _defaultValues['textHallOfFameName']);
+    textHallOfFameToday = await PreferencedText.deserialize(
         null, _defaultValues['textHallOfFameToday']);
-    textHallOfFameAlltime = PreferencedText.deserialize(
+    textHallOfFameAlltime = await PreferencedText.deserialize(
         null, _defaultValues['textHallOfFameAlltime']);
-    textHallOfFameTotal = PreferencedText.deserialize(
+    textHallOfFameTotal = await PreferencedText.deserialize(
         null, _defaultValues['textHallOfFameTotal']);
 
     _addAllCallbacks();
@@ -461,58 +468,53 @@ class AppPreferences with ChangeNotifier {
   ///
   /// Reset the app configuration to their original values
   void updateFromSerialized(map) async {
-    texts = PreferencedLanguage.deserialize(map['texts']);
-    nbSessions = PreferencedInt.deserialize(map['nbSessions']);
-    sessionDuration = PreferencedDuration.deserialize(map['sessionDuration']);
-    pauseDuration = PreferencedDuration.deserialize(map['pauseDuration']);
-    activeBackgroundImage =
-        PreferencedImageFile.deserialize(map['activeBackgroundImage']);
-    pauseBackgroundImage =
-        PreferencedImageFile.deserialize(map['pauseBackgroundImage']);
-    endActiveSessionSound =
-        PreferencedSoundFile.deserialize(map['endActiveSessionSound']);
-    endPauseSessionSound =
-        PreferencedSoundFile.deserialize(map['endPauseSessionSound']);
-    endWorkingSound = PreferencedSoundFile.deserialize(map['endWorkingSound']);
-    backgroundColor = PreferencedColor.deserialize(map['backgroundColor']);
+    texts = await PreferencedLanguage.deserialize(map['texts']);
+    nbSessions = await PreferencedInt.deserialize(map['nbSessions']);
+    sessionDuration =
+        await PreferencedDuration.deserialize(map['sessionDuration']);
+    pauseDuration = await PreferencedDuration.deserialize(map['pauseDuration']);
+    backgroundColor =
+        await PreferencedColor.deserialize(map['backgroundColor']);
     backgroundColorHallOfFame =
-        PreferencedColor.deserialize(map['backgroundColorHallOfFame']);
+        await PreferencedColor.deserialize(map['backgroundColorHallOfFame']);
     textDuringInitialization =
-        TextOnPomodoro.deserialize(map['textDuringInitialization']);
+        await TextOnPomodoro.deserialize(map['textDuringInitialization']);
     textDuringActiveSession =
-        TextOnPomodoro.deserialize(map['textDuringActiveSession']);
+        await TextOnPomodoro.deserialize(map['textDuringActiveSession']);
     textDuringPauseSession =
-        TextOnPomodoro.deserialize(map['textDuringPauseSession']);
-    textDuringPause = TextOnPomodoro.deserialize(map['textDuringPause']);
-    textDone = TextOnPomodoro.deserialize(map['textDone']);
-    saveToTextFile = PreferencedBool.deserialize(map['saveToTextFile']);
-    useHallOfFame = PreferencedBool.deserialize(map['useHallOfFame']);
+        await TextOnPomodoro.deserialize(map['textDuringPauseSession']);
+    textDuringPause = await TextOnPomodoro.deserialize(map['textDuringPause']);
+    textDone = await TextOnPomodoro.deserialize(map['textDone']);
+    saveToTextFile = await PreferencedBool.deserialize(map['saveToTextFile']);
+    useHallOfFame = await PreferencedBool.deserialize(map['useHallOfFame']);
     mustFollowForFaming =
-        PreferencedBool.deserialize(map['mustFollowForFaming']);
+        await PreferencedBool.deserialize(map['mustFollowForFaming']);
     hallOfFameScrollVelocity =
-        PreferencedInt.deserialize(map['hallOfFameScrollVelocity']);
-    textTimerHasStarted = TextToChat.deserialize(map['textTimerHasStarted']);
+        await PreferencedInt.deserialize(map['hallOfFameScrollVelocity']);
+    textTimerHasStarted =
+        await TextToChat.deserialize(map['textTimerHasStarted']);
     textTimerActiveSessionHasEnded =
-        TextToChat.deserialize(map['textTimerActiveSessionHasEnded']);
+        await TextToChat.deserialize(map['textTimerActiveSessionHasEnded']);
     textTimerPauseHasEnded =
-        TextToChat.deserialize(map['textTimerPauseHasEnded']);
+        await TextToChat.deserialize(map['textTimerPauseHasEnded']);
     textTimerWorkingHasEnded =
-        TextToChat.deserialize(map['textTimerWorkingHasEnded']);
+        await TextToChat.deserialize(map['textTimerWorkingHasEnded']);
     textNewcomersGreetings =
-        TextToChat.deserialize(map['textNewcomersGreetings']);
+        await TextToChat.deserialize(map['textNewcomersGreetings']);
     textUserHasConnectedGreetings =
-        TextToChat.deserialize(map['textUserHasConnectedGreetings']);
-    textWhitelist = PreferencedText.deserialize(map['textWhitelist']);
-    textBlacklist = PreferencedText.deserialize(map['textBlacklist']);
+        await TextToChat.deserialize(map['textUserHasConnectedGreetings']);
+    textWhitelist = await PreferencedText.deserialize(map['textWhitelist']);
+    textBlacklist = await PreferencedText.deserialize(map['textBlacklist']);
     textHallOfFameTitle =
-        PreferencedText.deserialize(map['textHallOfFameTitle']);
-    textHallOfFameName = PreferencedText.deserialize(map['textHallOfFameName']);
+        await PreferencedText.deserialize(map['textHallOfFameTitle']);
+    textHallOfFameName =
+        await PreferencedText.deserialize(map['textHallOfFameName']);
     textHallOfFameToday =
-        PreferencedText.deserialize(map['textHallOfFameToday']);
+        await PreferencedText.deserialize(map['textHallOfFameToday']);
     textHallOfFameAlltime =
-        PreferencedText.deserialize(map['textHallOfFameAlltime']);
+        await PreferencedText.deserialize(map['textHallOfFameAlltime']);
     textHallOfFameTotal =
-        PreferencedText.deserialize(map['textHallOfFameTotal']);
+        await PreferencedText.deserialize(map['textHallOfFameTotal']);
   }
 
   void _addAllCallbacks() {

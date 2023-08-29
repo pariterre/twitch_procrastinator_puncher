@@ -151,31 +151,32 @@ class ConfigurationBoard extends StatelessWidget {
   Widget _buildInformation(BuildContext context) {
     final preferences = AppPreferences.of(context);
 
-    return Wrap(
-      children: [
-        Text(preferences.texts.titleDescription1,
+    return kIsWeb
+        ? Text(
+            preferences.texts.titleDescriptionWeb,
             style: TextStyle(
                 color: ThemeColor().configurationText,
-                fontSize: ThemeSize.text(context))),
-        InkWell(
-            onTap: () async {
-              await launchUrl(Uri.parse(webClientSite));
-            },
-            child: Text(
-              webClientSite,
-              style: TextStyle(
-                  color: ThemeColor().configurationText,
-                  fontSize: ThemeSize.text(context),
-                  decoration: TextDecoration.underline),
-            )),
-        Text(
-          preferences.texts.titleDescription2,
-          style: TextStyle(
-              color: ThemeColor().configurationText,
-              fontSize: ThemeSize.text(context)),
-        ),
-      ],
-    );
+                fontSize: ThemeSize.text(context)),
+          )
+        : Wrap(
+            children: [
+              Text(preferences.texts.titleDescriptionDesktop,
+                  style: TextStyle(
+                      color: ThemeColor().configurationText,
+                      fontSize: ThemeSize.text(context))),
+              InkWell(
+                  onTap: () async {
+                    await launchUrl(Uri.parse(webClientSite));
+                  },
+                  child: Text(
+                    webClientSite,
+                    style: TextStyle(
+                        color: ThemeColor().configurationText,
+                        fontSize: ThemeSize.text(context),
+                        decoration: TextDecoration.underline),
+                  )),
+            ],
+          );
   }
 
   Widget _buildColorPickers(BuildContext context) {
@@ -314,6 +315,8 @@ class ConfigurationBoard extends StatelessWidget {
           title: preferences.texts.filesActiveImage,
           file: preferences.activeBackgroundImage,
           selectFileCallback: (data) async {
+            if (data == null) return;
+
             if (kIsWeb) {
               await preferences.activeBackgroundImage.setFileFromRaw(data);
             } else {

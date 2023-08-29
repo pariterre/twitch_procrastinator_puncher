@@ -43,8 +43,7 @@ class FileSelectorTile extends StatelessWidget {
     if (kIsWeb) {
       final result = (await fp.FilePicker.platform.pickFiles());
       if (result == null) return;
-      final bytes = result.files[0].bytes!;
-      selectFileCallback(bytes);
+      selectFileCallback(result.files[0].bytes!);
     } else {
       final path = await FilesystemPicker.open(
         title: 'Open file',

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 import 'package:twitch_procastinator_puncher/models/app_fonts.dart';
 import 'package:twitch_procastinator_puncher/models/config.dart';
@@ -33,7 +34,8 @@ class PreferencedInt extends PreferencedElement {
     return _value;
   }
 
-  static PreferencedInt deserialize(map, [int defaultValue = 0]) =>
+  static Future<PreferencedInt> deserialize(map,
+          [int defaultValue = 0]) async =>
       PreferencedInt(map ?? defaultValue);
 
   int _value;
@@ -61,7 +63,8 @@ class PreferencedBool extends PreferencedElement {
     return _value;
   }
 
-  static PreferencedBool deserialize(map, [bool defaultValue = false]) =>
+  static Future<PreferencedBool> deserialize(map,
+          [bool defaultValue = false]) async =>
       PreferencedBool(map ?? defaultValue);
 
   bool _value;
@@ -89,7 +92,8 @@ class PreferencedColor extends PreferencedElement {
     return _value.value;
   }
 
-  static PreferencedColor deserialize(map, [int defaultValue = 0xFF000000]) =>
+  static Future<PreferencedColor> deserialize(map,
+          [int defaultValue = 0xFF000000]) async =>
       PreferencedColor(Color(map ?? defaultValue));
 
   Color _value;
@@ -117,7 +121,8 @@ class PreferencedDuration extends PreferencedElement {
     return _value.inSeconds;
   }
 
-  static PreferencedDuration deserialize(map, [int defaultValue = 0]) =>
+  static Future<PreferencedDuration> deserialize(map,
+          [int defaultValue = 0]) async =>
       PreferencedDuration(Duration(seconds: map ?? defaultValue));
 
   Duration _value;
@@ -136,53 +141,50 @@ class PreferencedDuration extends PreferencedElement {
 abstract class PreferencedFile extends PreferencedElement {
   FileType get fileType;
 
-  @override
-  PreferencedFile.fromPath(String? filepath, {this.lastVisitedFolderCallback})
-      : _file = filepath == null ? null : File(filepath).readAsBytesSync(),
-        _filename = filepath == null ? null : basename(filepath);
+  PreferencedFile({Uint8List? raw, String? filepath})
+      : _raw = raw,
+        _filepath = filepath;
 
-  @override
-  PreferencedFile.fromRaw(
-    Uint8List? rawFile, {
-    String? filename,
-  })  : _file = rawFile,
-        _filename = filename;
+  Map<String, dynamic> serialize() => kIsWeb
+      ? {'raw': _raw?.map<int>((e) => e).toList()}
+      : {'filepath': _filepath};
+
+  bool get hasFile => _raw != null;
+
+  String? _filepath;
+  String? get filename => _filepath == null ? null : basename(_filepath!);
+
+  Uint8List? _raw;
+  Future<void> setFileFromRaw(Uint8List raw, {String? filepath}) async {
+    // Contrary to [setFile], it does not copy the original file anywhere
+    _raw = raw;
+    _filepath = filepath;
+    if (onChanged != null) onChanged!();
+  }
+
+  ///
+  /// This is a callback that is called whenever a file is set using [setFile].
+  /// It is the programmer responsability to register to this callback.
   Function(Directory)? lastVisitedFolderCallback;
 
-  Map<String, dynamic> serialize({withRawFile = false}) {
-    return {
-      'filename': _filename,
-      'rawFile': withRawFile ? _file : null,
-    };
-  }
-
-  bool get hasFile => _file != null;
-
-  String? _filename;
-  String? get filename => _filename;
-
-  Uint8List? _file;
-  Future<void> setFileFromRaw(Uint8List? bytes) async {
-    // Contrary to [setFile], it does not copy the original file anywhere
-    _file = bytes;
-    _filename = null;
+  Future<void> setFile(File originalFile) async {
+    _raw = await (await _copyFile(originalFile)).readAsBytes();
+    _filepath = originalFile.path;
     if (onChanged != null) onChanged!();
-  }
-
-  Future<void> setFile(File? originalFile) async {
-    _file = originalFile == null
-        ? null
-        : await (await _copyFile(originalFile)).readAsBytes();
-    _filename = originalFile == null ? null : basename(originalFile.path);
-    if (onChanged != null) onChanged!();
-    if (originalFile != null && lastVisitedFolderCallback != null) {
+    if (lastVisitedFolderCallback != null) {
       lastVisitedFolderCallback!(originalFile.parent);
     }
   }
 
+  void clear() {
+    _raw = null;
+    _filepath = null;
+    if (onChanged != null) onChanged!();
+  }
+
   @override
   String toString() {
-    return _filename ?? '';
+    return filename ?? '';
   }
 
   ///
@@ -197,32 +199,39 @@ class PreferencedImageFile extends PreferencedFile {
   @override
   FileType get fileType => FileType.image;
 
-  PreferencedImageFile.fromRaw(Uint8List? rawFile,
-      {String? filename, double? size})
-      : _size = size ?? 1,
-        _image = rawFile != null
-            ? Image.memory(rawFile)
-            : filename != null
-                ? Image.file(File('${appDirectory.path}/$filename'))
-                : null,
-        super.fromRaw(rawFile, filename: filename);
+  PreferencedImageFile() : super();
 
-  @override
-  Future<void> setFileFromRaw(Uint8List? bytes) {
-    _image = bytes == null ? null : Image.memory(bytes);
-    return super.setFileFromRaw(bytes);
+  PreferencedImageFile.fromRaw(Uint8List raw, {String? filepath, double? size})
+      : _size = size ?? 1,
+        super(raw: raw, filepath: filepath) {
+    if (_raw != null) _image = Image.memory(_raw!);
+  }
+
+  static Future<PreferencedImageFile> fromPath(String filepath,
+      {double? size}) async {
+    final raw = await (kIsWeb
+        ? PickedFile(filepath).readAsBytes()
+        : File(filepath).readAsBytes());
+    return PreferencedImageFile.fromRaw(raw, filepath: filepath, size: size);
   }
 
   @override
-  Future<void> setFile(File? originalFile) async {
-    _image = originalFile == null ? null : Image.file(originalFile);
+  Future<void> setFileFromRaw(Uint8List raw, {String? filepath, double? size}) {
+    _image = Image.memory(raw);
+
+    return super.setFileFromRaw(raw, filepath: filepath);
+  }
+
+  @override
+  Future<void> setFile(File originalFile) async {
+    _image = Image.file(originalFile);
     super.setFile(originalFile);
   }
 
   Image? _image;
   Image? get image => _image;
 
-  double _size;
+  double _size = 1;
   double get size => _size;
   set size(double value) {
     _size = value;
@@ -230,49 +239,72 @@ class PreferencedImageFile extends PreferencedFile {
   }
 
   @override
-  Map<String, dynamic> serialize({withRawFile = false}) {
-    return super.serialize(withRawFile: withRawFile)..addAll({'size': _size});
+  Map<String, dynamic> serialize() {
+    return super.serialize()..addAll({'size': _size});
   }
 
-  static PreferencedImageFile deserialize(map) => PreferencedImageFile.fromRaw(
-        map?['rawFile'] != null
-            ? Uint8List.fromList((map?['rawFile'] as List).cast<int>())
-            : map?['filename'] != null
-                ? File('${appDirectory.path}/${map?['filename']}')
-                    .readAsBytesSync()
-                : null,
-        filename: map?['filename'],
-        size: map?['size'],
-      );
+  static Future<PreferencedImageFile> deserialize(map) async {
+    if (kIsWeb) {
+      final raw = map?['raw'];
+      if (raw == null) return PreferencedImageFile();
+
+      return PreferencedImageFile.fromRaw(
+          Uint8List.fromList((raw as List).map<int>((e) => e).toList()),
+          size: map?['size']);
+    } else {
+      final filepath = map?['filepath'];
+      if (filepath == null) return PreferencedImageFile();
+      return await PreferencedImageFile.fromPath(filepath, size: map?['size']);
+    }
+  }
+
+  @override
+  void clear() {
+    _size = 1;
+    super.clear();
+  }
 }
 
 class PreferencedSoundFile extends PreferencedFile {
-  PreferencedSoundFile.fromRaw(Uint8List? rawFile, {String? filename})
-      : super.fromRaw(rawFile, filename: filename);
+  static Future<PreferencedSoundFile> fromPath(String filepath) async {
+    final raw = await (kIsWeb
+        ? PickedFile(filepath).readAsBytes()
+        : File(filepath).readAsBytes());
+    return PreferencedSoundFile.fromRaw(raw, filepath: filepath);
+  }
+
+  PreferencedSoundFile() : super();
+
+  PreferencedSoundFile.fromRaw(Uint8List raw, {String? filepath})
+      : super(raw: raw, filepath: filepath);
 
   @override
   FileType get fileType => FileType.sound;
 
   Source? get playableSource {
-    if (_file == null) return null;
+    if (_raw == null) return null;
 
     if (kIsWeb) {
       return UrlSource(
-          Uri.dataFromBytes(_file!, mimeType: 'audio/mpeg').toString());
+          Uri.dataFromBytes(_raw!, mimeType: 'audio/mpeg').toString());
     } else {
-      return DeviceFileSource('${appDirectory.path}/${filename!}');
+      return DeviceFileSource(_filepath!);
     }
   }
 
-  static PreferencedSoundFile deserialize(map) => PreferencedSoundFile.fromRaw(
-        map?['rawFile'] != null
-            ? Uint8List.fromList((map?['rawFile'] as List).cast<int>())
-            : map?['filename'] != null
-                ? File('${appDirectory.path}/${map?['filename']}')
-                    .readAsBytesSync()
-                : null,
-        filename: map?['filename'],
-      );
+  static Future<PreferencedSoundFile> deserialize(map) async {
+    if (kIsWeb) {
+      final raw = map?['raw'];
+      if (raw == null) return PreferencedSoundFile();
+
+      return PreferencedSoundFile.fromRaw(
+          Uint8List.fromList((raw as List).map<int>((e) => e).toList()));
+    } else {
+      final filepath = map?['filepath'];
+      if (filepath == null) return PreferencedSoundFile();
+      return await PreferencedSoundFile.fromPath(filepath);
+    }
+  }
 }
 
 class PreferencedText extends PreferencedElement {
@@ -332,8 +364,8 @@ class PreferencedText extends PreferencedElement {
     if (onChanged != null) onChanged!();
   }
 
-  static PreferencedText deserialize(Map<String, dynamic>? map,
-      [String defaultValue = '']) {
+  static Future<PreferencedText> deserialize(Map<String, dynamic>? map,
+      [String defaultValue = '']) async {
     final text = map?['text'] ?? defaultValue;
     final color = Color(map?['color'] ?? 0xFF000000);
     final font = AppFonts.values[map?['font'] ?? 0];
@@ -347,8 +379,8 @@ class PreferencedText extends PreferencedElement {
 class TextToChat extends PreferencedText {
   TextToChat(String text) : super(text, color: Colors.white);
 
-  static TextToChat deserialize(Map<String, dynamic>? map,
-      [String defaultValue = '']) {
+  static Future<TextToChat> deserialize(Map<String, dynamic>? map,
+      [String defaultValue = '']) async {
     final text = map?['text'] ?? defaultValue;
     return TextToChat(text);
   }
@@ -381,8 +413,8 @@ class TextOnPomodoro extends PreferencedText {
     if (onChanged != null) onChanged!();
   }
 
-  static TextOnPomodoro deserialize(Map<String, dynamic>? map,
-      [String defaultValue = '']) {
+  static Future<TextOnPomodoro> deserialize(Map<String, dynamic>? map,
+      [String defaultValue = '']) async {
     final text = map?['text'] ?? defaultValue;
     final offset = map?['offset'] ?? [0.0, 150.0];
     final size = map?['size'] ?? 1.0;

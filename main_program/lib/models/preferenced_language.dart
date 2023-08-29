@@ -14,7 +14,8 @@ class PreferencedLanguage extends PreferencedElement {
     return _current.index;
   }
 
-  static PreferencedLanguage deserialize(map, [int defaultValue = 0]) =>
+  static Future<PreferencedLanguage> deserialize(map,
+          [int defaultValue = 0]) async =>
       PreferencedLanguage(Language.values[map ?? defaultValue]);
 
   Language _current;
@@ -38,37 +39,41 @@ class PreferencedLanguage extends PreferencedElement {
     }
   }
 
-  String get titleDescription1 {
+  String get titleDescriptionDesktop {
     switch (_current) {
       case Language.english:
-        return 'This is the configuration software for the timer of the '
-            'Procrastinator Puncher! To import it into your streaming platform, '
-            'you have two options:\n'
-            '\n'
-            '    1. Grab the current window\n'
-            '    2. Add a browser source with a resolution fixed at 1920x1080 '
-            'that points to ';
+        return 'Welcome to the Procrastination Hunter!\n'
+            'This software can be used as is to help you punch the procrastination. '
+            'It\'s also possible to connect it to Twitch for use during your '
+            'broadcasts. In this case, to import it into your streaming '
+            'platform, you can capture the window. Alternatively, you can use '
+            'the web version at the following address: ';
       case Language.french:
-        return 'Ceci est le logiciel de configuration pour le minuteur du '
-            'Chasseur de Procrastination ! Pour l\'importer dans votre '
-            'plateforme de diffusion en continu, vous avez deux options :\n'
-            '\n'
-            '    1. Capturez la fenêtre actuelle\n'
-            '    2. Ajoutez une source de navigateur avec la résolution '
-            '1920x1080 qui pointe vers ';
+        return 'Bienvenue au Chasseur de Procrastination!\n'
+            'Ce logiciel peut être utilisé tel quel pour vous aider à chasser la '
+            'procrastination. Il est également possible de le connecter à Twitch '
+            'pour être utilisé lors de vos diffusions. Dans ce cas, pour '
+            'l\'importer dans votre plateforme de diffusion, vous pouvez capturer '
+            'la fenêtre. Alternativement, vous pouvez utiliser la version web à '
+            'l\'adresse suivante : ';
     }
   }
 
-  String get titleDescription2 {
+  String get titleDescriptionWeb {
     switch (_current) {
       case Language.english:
-        return '\n'
-            'Please note that you still need to have the configuration software '
-            'up and running in order to connect to the web client.';
+        return 'Welcome to the Procrastination Puncher!\n'
+            'This software can be used as is to help you punch the procrastination. '
+            'It\'s also possible to connect it to Twitch for use during your '
+            'broadcasts. In this case, to import it into your streaming platform, '
+            'you can simply open a web browser and import this web page.';
       case Language.french:
-        return '\n'
-            'Veuillez noter que vous devez toujours avoir le logiciel de '
-            'configuration en cours d\'exécution pour vous connecter au client web';
+        return 'Bienvenue au Chasseur de Procrastination!\n'
+            'Ce logiciel peut être utilisé tel quel pour vous aider à chasser la '
+            'procrastination. Il est également possible de le connecter à Twitch '
+            'pour être utilisé lors de vos diffusions. Dans ce cas, pour '
+            'l\'importer dans votre plateforme de diffusion, vous pouvez '
+            'simplement ouvrir un navigateur web et y importer cette page web.';
     }
   }
 
@@ -313,7 +318,9 @@ class PreferencedLanguage extends PreferencedElement {
             'current data and is irreversible';
       case Language.french:
         return 'Êtes-vous certain de vouloir import les données? Ceci excrasera '
-            'les données existantes et est irréversible';
+            'les données existantes et est irréversible. \n\n'
+            'Notez cependant que pour des raisons de sécurités, les fichiers '
+            'sources (tels image et son) doivent être réimportées à la main';
     }
   }
 
