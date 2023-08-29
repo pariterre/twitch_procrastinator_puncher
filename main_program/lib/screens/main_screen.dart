@@ -177,8 +177,10 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   List<String>? _moderators;
-  Future<void> fetchModerators() async =>
-      _moderators = (await _twitchManager!.api.fetchModerators())!;
+  Future<void> fetchModerators() async {
+    _moderators = (await _twitchManager!.api.fetchModerators())!;
+    WidgetsBinding.instance.addPostFrameCallback((_) => setState(() {}));
+  }
 
   void _onMessageReceived(String sender, String message) async {
     // If we are not done fetching, we are really early in the process, so we
