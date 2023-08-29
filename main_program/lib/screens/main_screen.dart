@@ -148,7 +148,7 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void _connectToTwitch() async {
-    _setTwitchManager(await showDialog<TwitchManager>(
+    await _setTwitchManager(await showDialog<TwitchManager>(
       context: context,
       builder: (context) => Dialog(
           child: TwitchAuthenticationScreen(
@@ -162,7 +162,7 @@ class _MainScreenState extends State<MainScreen> {
     setState(() {});
   }
 
-  void _setTwitchManager(TwitchManager? manager) {
+  Future<void> _setTwitchManager(TwitchManager? manager) async {
     if (manager == null) return;
 
     _twitchManager = manager;
@@ -171,16 +171,12 @@ class _MainScreenState extends State<MainScreen> {
     final participants = Participants.of(context, listen: false);
     _twitchManager!.irc.messageCallback = _onMessageReceived;
     participants.twitchManager = _twitchManager!;
-    fetchModerators();
+    _moderators = (await _twitchManager!.api.fetchModerators())!;
     participants.greetNewcomerCallback = _greetNewComers;
     participants.greetUserHasConnectedCallback = _greetUserHasConnected;
   }
 
   List<String>? _moderators;
-  Future<void> fetchModerators() async {
-    _moderators = (await _twitchManager!.api.fetchModerators())!;
-    WidgetsBinding.instance.addPostFrameCallback((_) => setState(() {}));
-  }
 
   void _onMessageReceived(String sender, String message) async {
     // If we are not done fetching, we are really early in the process, so we
