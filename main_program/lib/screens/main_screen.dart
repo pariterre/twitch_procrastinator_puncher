@@ -163,15 +163,17 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   Future<void> _setTwitchManager(TwitchManager? manager) async {
-    if (manager == null) return;
+    if (manager == null || !manager.isConnected) return;
+    final participants = Participants.of(context, listen: false);
 
+    // Set internals
     _twitchManager = manager;
+    _moderators =
+        (await _twitchManager!.api.fetchModerators(includeStreamer: true))!;
 
     // Connect everything related to participants
-    final participants = Participants.of(context, listen: false);
     _twitchManager!.irc.messageCallback = _onMessageReceived;
     participants.twitchManager = _twitchManager!;
-    _moderators = (await _twitchManager!.api.fetchModerators())!;
     participants.greetNewcomerCallback = _greetNewComers;
     participants.greetUserHasConnectedCallback = _greetUserHasConnected;
   }

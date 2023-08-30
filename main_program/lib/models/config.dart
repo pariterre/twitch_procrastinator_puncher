@@ -37,4 +37,5 @@ const twitchScope = [
   TwitchScope.chatters,
   TwitchScope.readFollowers,
   TwitchScope.readSubscribers,
+  TwitchScope.readModerator,
 ];
