@@ -17,7 +17,7 @@ dependencies:
   flutter_colorpicker: ^1.0.3
   audioplayers: ^4.1.0
   twitch_manager:
-    path: ../plugins/twitch_manager
+    path: ./plugins/twitch_manager
   window_manager: ^0.3.4
   url_launcher: ^6.1.11
   google_fonts: ^4.0.4

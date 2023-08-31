@@ -5,8 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "main_program",
-            "cwd": "main_program",
+            "name": "Procrastinator puncher",
             "request": "launch",
             "type": "dart"
         }

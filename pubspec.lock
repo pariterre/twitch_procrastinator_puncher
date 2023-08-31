@@ -680,7 +680,7 @@ packages:
   twitch_manager:
     dependency: "direct main"
     description:
-      path: "../plugins/twitch_manager"
+      path: "plugins/twitch_manager"
       relative: true
     source: path
     version: "1.0.0+1"
