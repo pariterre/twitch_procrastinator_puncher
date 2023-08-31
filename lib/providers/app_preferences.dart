@@ -78,8 +78,8 @@ class AppPreferences with ChangeNotifier {
   PreferencedInt nbSessions;
 
   // Session time
-  PreferencedDuration sessionDuration;
-  PreferencedDuration pauseDuration;
+  List<PreferencedDuration> sessionDurations;
+  List<PreferencedDuration> pauseDurations;
 
   // Background image during the countdown
   PreferencedImageFile activeBackgroundImage;
@@ -234,19 +234,32 @@ class AppPreferences with ChangeNotifier {
     }
 
     // Call the real constructor
+    final nbSessions = await PreferencedInt.deserialize(
+        previousPreferences?['nbSessions'], _defaultValues['nbSessions']);
     return AppPreferences._(
         lastVisitedDirectory:
             Directory(previousPreferences?['lastVisitedDirectory'] ?? ''),
         texts: await PreferencedLanguage.deserialize(
             previousPreferences?['texts'], _defaultValues['texts']),
-        nbSessions: await PreferencedInt.deserialize(
-            previousPreferences?['nbSessions'], _defaultValues['nbSessions']),
-        sessionDuration: await PreferencedDuration.deserialize(
-            previousPreferences?['sessionDuration'],
-            _defaultValues['sessionDuration']),
-        pauseDuration: await PreferencedDuration.deserialize(
-            previousPreferences?['pauseDuration'],
-            _defaultValues['pauseDuration']),
+        nbSessions: nbSessions,
+        sessionDurations: (previousPreferences?['sessionDurations'] as List?)
+                ?.map((e) => PreferencedDuration.deserializeSync(
+                    e, _defaultValues['sessionDuration']))
+                .toList() ??
+            [
+              for (int i = 0; i < nbSessions.value; i++)
+                PreferencedDuration.deserializeSync(
+                    null, _defaultValues['sessionDuration'])
+            ],
+        pauseDurations: (previousPreferences?['pauseDurations'] as List?)
+                ?.map((e) => PreferencedDuration.deserializeSync(
+                    e, _defaultValues['pauseDuration']))
+                .toList() ??
+            [
+              for (int i = 0; i < nbSessions.value; i++)
+                PreferencedDuration.deserializeSync(
+                    null, _defaultValues['pauseDuration'])
+            ],
         activeBackgroundImage: await PreferencedImageFile.deserialize(
             previousPreferences?['activeBackgroundImage']),
         pauseBackgroundImage: await PreferencedImageFile.deserialize(
@@ -263,8 +276,10 @@ class AppPreferences with ChangeNotifier {
         backgroundColorHallOfFame: await PreferencedColor.deserialize(
             previousPreferences?['backgroundColorHallOfFame'],
             _defaultValues['backgroundColorHallOfFame']),
-        fontPomodoro: previousPreferences?['fontPomodoro'] ?? _defaultValues['fontPomodoro'],
-        textColorHallOfFame: previousPreferences?['textColorHallOfFame'] ?? _defaultValues['textColorHallOfFame'],
+        fontPomodoro: previousPreferences?['fontPomodoro'] ??
+            _defaultValues['fontPomodoro'],
+        textColorHallOfFame: previousPreferences?['textColorHallOfFame'] ??
+            _defaultValues['textColorHallOfFame'],
         textDuringInitialization: await TextOnPomodoro.deserialize(previousPreferences?['textDuringInitialization'], _defaultValues['textDuringInitialization']),
         textDuringActiveSession: await TextOnPomodoro.deserialize(previousPreferences?['textDuringActiveSession'], _defaultValues['textDuringActiveSession']),
         textDuringPauseSession: await TextOnPomodoro.deserialize(previousPreferences?['textDuringPauseSession'], _defaultValues['textDuringPauseSession']),
@@ -294,8 +309,8 @@ class AppPreferences with ChangeNotifier {
     required Directory lastVisitedDirectory,
     required this.texts,
     required this.nbSessions,
-    required this.sessionDuration,
-    required this.pauseDuration,
+    required this.sessionDurations,
+    required this.pauseDurations,
     required this.activeBackgroundImage,
     required this.pauseBackgroundImage,
     required this.endActiveSessionSound,
@@ -350,8 +365,8 @@ class AppPreferences with ChangeNotifier {
         'lastVisitedDirectory': _lastVisitedDirectory.path,
         'texts': texts.serialize(),
         'nbSessions': nbSessions.serialize(),
-        'sessionDuration': sessionDuration.serialize(),
-        'pauseDuration': pauseDuration.serialize(),
+        'sessionDurations': sessionDurations.map((e) => e.serialize()).toList(),
+        'pauseDurations': pauseDurations.map((e) => e.serialize()).toList(),
         'activeBackgroundImage':
             skipBinaryFiles ? null : activeBackgroundImage.serialize(),
         'pauseBackgroundImage':
@@ -399,10 +414,16 @@ class AppPreferences with ChangeNotifier {
         await PreferencedLanguage.deserialize(null, _defaultValues['texts']);
     nbSessions =
         await PreferencedInt.deserialize(null, _defaultValues['nbSessions']);
-    sessionDuration = await PreferencedDuration.deserialize(
-        null, _defaultValues['sessionDuration']);
-    pauseDuration = await PreferencedDuration.deserialize(
-        null, _defaultValues['pauseDuration']);
+    sessionDurations = [
+      for (int i = 0; i < nbSessions.value; i++)
+        PreferencedDuration.deserializeSync(
+            null, _defaultValues['sessionDuration'])
+    ];
+    pauseDurations = [
+      for (int i = 0; i < nbSessions.value; i++)
+        PreferencedDuration.deserializeSync(
+            null, _defaultValues['pauseDuration'])
+    ];
     activeBackgroundImage = await PreferencedImageFile.deserialize(null);
     pauseBackgroundImage = await PreferencedImageFile.deserialize(null);
     endActiveSessionSound = await PreferencedSoundFile.deserialize(null);
@@ -470,9 +491,12 @@ class AppPreferences with ChangeNotifier {
   void updateFromSerialized(map) async {
     texts = await PreferencedLanguage.deserialize(map['texts']);
     nbSessions = await PreferencedInt.deserialize(map['nbSessions']);
-    sessionDuration =
-        await PreferencedDuration.deserialize(map['sessionDuration']);
-    pauseDuration = await PreferencedDuration.deserialize(map['pauseDuration']);
+    sessionDurations = (map['sessionDurations'] as List)
+        .map((e) => PreferencedDuration.deserializeSync(e))
+        .toList();
+    pauseDurations = (map['pauseDurations'] as List)
+        .map((e) => PreferencedDuration.deserializeSync(e))
+        .toList();
     backgroundColor =
         await PreferencedColor.deserialize(map['backgroundColor']);
     backgroundColorHallOfFame =
@@ -520,10 +544,38 @@ class AppPreferences with ChangeNotifier {
   void _addAllCallbacks() {
     // Set the necessary callback
     texts.onChanged = _save;
-    nbSessions.onChanged = _save;
+    nbSessions.onChanged = () async {
+      if (sessionDurations.length < nbSessions.value) {
+        for (int i = sessionDurations.length; i < nbSessions.value; i++) {
+          sessionDurations.add(await PreferencedDuration.deserialize(
+              sessionDurations.isNotEmpty
+                  ? sessionDurations[0].value.inSeconds
+                  : _defaultValues['sessionDuration']));
+          sessionDurations.last.onChanged = _save;
 
-    sessionDuration.onChanged = _save;
-    pauseDuration.onChanged = _save;
+          pauseDurations.add(await PreferencedDuration.deserialize(
+              pauseDurations.isNotEmpty
+                  ? pauseDurations[0].value.inSeconds
+                  : _defaultValues['pauseDuration']));
+          pauseDurations.last.onChanged = _save;
+        }
+      } else if (sessionDurations.length > nbSessions.value) {
+        for (int i = sessionDurations.length - 1; i >= nbSessions.value; i--) {
+          sessionDurations.removeAt(i);
+          pauseDurations.removeAt(i);
+        }
+      } else {
+        // Do nothing
+      }
+      _save();
+    };
+
+    for (final duration in sessionDurations) {
+      duration.onChanged = _save;
+    }
+    for (final duration in pauseDurations) {
+      duration.onChanged = _save;
+    }
 
     activeBackgroundImage.onChanged = _save;
     activeBackgroundImage.lastVisitedFolderCallback = _setLastVisited;

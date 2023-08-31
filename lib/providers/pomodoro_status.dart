@@ -2,38 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:twitch_procastinator_puncher/models/preferenced_element.dart';
 
 enum StopWatchStatus { initializing, inSession, inPauseSession, paused, done }
 
 class PomodoroStatus with ChangeNotifier {
-  int _nbSessions = 0;
-  int get nbSessions => _nbSessions;
-  set nbSessions(int value) {
-    _nbSessions = value;
-    notifyListeners();
-  }
-
   bool _firstSessionStarted = false;
   int _currentSession = 0;
   int get currentSession => _currentSession;
-
-  Duration _focusSessionDuration = const Duration();
-  Duration get sessionDuration => _focusSessionDuration;
-  set sessionDuration(Duration duration) {
-    _focusSessionDuration = duration;
-    if (_stopWatchStatus == StopWatchStatus.initializing) {
-      _timer = duration;
-    }
-    notifyListeners();
-  }
-
-  Duration _pauseSessionDuration = const Duration();
-  Duration get pauseSessionDuration => _pauseSessionDuration;
-  set pauseSessionDuration(Duration duration) {
-    _pauseSessionDuration = duration;
-    notifyListeners();
-  }
 
   Duration _timer = const Duration();
   StopWatchStatus _stopWatchStatus = StopWatchStatus.initializing;
@@ -69,43 +44,42 @@ class PomodoroStatus with ChangeNotifier {
 
   ///
   /// Reset the counter
-  void reset({
-    required PreferencedInt nbSessions,
-    required PreferencedDuration focusSessionDuration,
-    required PreferencedDuration pauseSessionDuration,
-    bool notify = true,
-  }) {
+  void reset({bool notify = true}) {
     // Reset all the internal states
-    _nbSessions = nbSessions.value;
     _firstSessionStarted = false;
     _currentSession = 0;
-    _focusSessionDuration = focusSessionDuration.value;
-    _pauseSessionDuration = pauseSessionDuration.value;
 
     _stopWatchStatus = StopWatchStatus.initializing;
-    _timer = Duration(seconds: _focusSessionDuration.inSeconds);
+    _timer = getActiveDuration(_currentSession);
 
     if (notify) notifyListeners();
   }
 
+  ///
+  /// Set the timer to a specific value it has not run yet
+  void setTimer(Duration duration) {
+    if (_stopWatchStatus == StopWatchStatus.initializing) {
+      _timer = duration;
+    }
+    notifyListeners();
+  }
+
   // CONSTRUCTORS
-  PomodoroStatus({required this.sessionHasFinishedCallback}) {
+  PomodoroStatus(
+      {required this.getNbSession,
+      required this.getActiveDuration,
+      required this.getPauseDuration,
+      required this.onSessionEnded}) {
     Timer.periodic(const Duration(seconds: 1), (Timer t) => _updateCounter());
   }
   static PomodoroStatus of(BuildContext context, {listen = true}) =>
       Provider.of<PomodoroStatus>(context, listen: listen);
 
-  Map<String, dynamic> serialize() => {
-        'nbSessions': nbSessions,
-        'currentSession': currentSession,
-        'focusSessionDuration': sessionDuration.inSeconds,
-        'pauseSessionDuration': pauseSessionDuration.inSeconds,
-        'stopWatchStatus': stopWatchStatus.index,
-        'timer': timer.inSeconds
-      };
-
   // TIMER CALLBACK
-  Function() sessionHasFinishedCallback;
+  int Function() getNbSession;
+  Duration Function(int index) getActiveDuration;
+  Duration Function(int index) getPauseDuration;
+  Function() onSessionEnded;
 
   ///
   /// Callback that announces that an active session has finished
@@ -134,9 +108,9 @@ class PomodoroStatus with ChangeNotifier {
       // Decrement the counter, if it gets to zeros advance the session
       int newTimerValue = _timer.inSeconds - 1;
       if (newTimerValue <= 0) {
-        sessionHasFinishedCallback();
+        onSessionEnded();
 
-        if (_currentSession + 1 == _nbSessions) {
+        if (_currentSession + 1 == getNbSession()) {
           if (finishedWorkingGuiCallback != null) {
             finishedWorkingGuiCallback!();
           }
@@ -149,7 +123,7 @@ class PomodoroStatus with ChangeNotifier {
             activeSessionHasFinishedGuiCallback!();
           }
           _stopWatchStatus = StopWatchStatus.inPauseSession;
-          newTimerValue = _pauseSessionDuration.inSeconds;
+          newTimerValue = getPauseDuration(_currentSession).inSeconds;
         }
       }
       _timer = Duration(seconds: newTimerValue);
@@ -163,7 +137,7 @@ class PomodoroStatus with ChangeNotifier {
         }
         _currentSession++;
         _stopWatchStatus = StopWatchStatus.inSession;
-        newTimerValue = _focusSessionDuration.inSeconds;
+        newTimerValue = getActiveDuration(_currentSession).inSeconds;
       }
       _timer = Duration(seconds: newTimerValue);
     }

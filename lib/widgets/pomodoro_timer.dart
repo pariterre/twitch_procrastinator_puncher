@@ -25,34 +25,33 @@ class PomodoroTimer extends StatelessWidget {
 
   Widget _buildText(context) {
     final windowHeight = MediaQuery.of(context).size.height;
-    final appPreferences = AppPreferences.of(context);
+    final preferences = AppPreferences.of(context);
 
     late TextOnPomodoro textOnPomodoro;
     // If we are on initializing phase, show the text with the focus
     switch (_statusToShow(context)) {
       case StopWatchStatus.initializing:
-        textOnPomodoro = appPreferences.textDuringInitialization;
+        textOnPomodoro = preferences.textDuringInitialization;
         break;
       case StopWatchStatus.inSession:
-        textOnPomodoro = appPreferences.textDuringActiveSession;
+        textOnPomodoro = preferences.textDuringActiveSession;
         break;
       case StopWatchStatus.inPauseSession:
-        textOnPomodoro = appPreferences.textDuringPauseSession;
+        textOnPomodoro = preferences.textDuringPauseSession;
         break;
       case StopWatchStatus.paused:
-        textOnPomodoro = appPreferences.textDuringPause;
+        textOnPomodoro = preferences.textDuringPause;
         break;
       case StopWatchStatus.done:
-        textOnPomodoro = appPreferences.textDone;
+        textOnPomodoro = preferences.textDone;
         break;
     }
-    final textStyle = appPreferences.fontPomodoro.style(
+    final textStyle = preferences.fontPomodoro.style(
         textStyle: TextStyle(
             color: textOnPomodoro.color,
             fontWeight: FontWeight.bold,
             fontSize: windowHeight * 0.11 * textOnPomodoro.size));
 
-    final preferences = AppPreferences.of(context, listen: false);
     if (preferences.saveToTextFile.value) {
       final file = File('${appDirectory.path}/$textExportFilename');
       file.writeAsString(textOnPomodoro.formattedText(context));

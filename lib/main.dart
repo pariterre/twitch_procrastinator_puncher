@@ -24,20 +24,24 @@ void main() async {
   }
 
   await declareAppDirectory();
-  final appPreferences = await AppPreferences.factory();
+  final preferences = await AppPreferences.factory();
   final participants = await Participants.factory(
-      mustFollowForFaming: appPreferences.mustFollowForFaming.value,
-      whitelist: appPreferences.textWhitelist.text,
-      blacklist: appPreferences.textBlacklist.text);
+      mustFollowForFaming: preferences.mustFollowForFaming.value,
+      whitelist: preferences.textWhitelist.text,
+      blacklist: preferences.textBlacklist.text);
 
   runApp(MultiProvider(
     providers: [
-      ChangeNotifierProvider(create: (context) => appPreferences),
+      ChangeNotifierProvider(create: (context) => preferences),
       ChangeNotifierProvider(create: (context) => participants),
       ChangeNotifierProvider(
           create: (context) => PomodoroStatus(
-              sessionHasFinishedCallback:
-                  participants.addSessionDoneToAllConnected)),
+              getNbSession: () => preferences.nbSessions.value,
+              getActiveDuration: (int index) =>
+                  preferences.sessionDurations[index].value,
+              getPauseDuration: (int index) =>
+                  preferences.pauseDurations[index].value,
+              onSessionEnded: participants.addSessionDoneToAllConnected)),
     ],
     child: MaterialApp(
       initialRoute: MainScreen.route,

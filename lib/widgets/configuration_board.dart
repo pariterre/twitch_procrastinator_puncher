@@ -270,37 +270,63 @@ class ConfigurationBoard extends StatelessWidget {
 
   Widget _buildTimerConfiguration(BuildContext context) {
     final preferences = AppPreferences.of(context);
-    final pomodoro = PomodoroStatus.of(context, listen: false);
     final padding = ThemePadding.normal(context);
+
+    /// This method creates the duo active an pause durations. If the switch
+    /// for preparing the duration individually is set to false, then changing
+    /// the value of one of which should change the value of all the others.
+    /// This information is carried by [setAllDurationsOnChanged].
+    Widget buildActiveAndPauseDurations(
+        {required int index, required bool setAllDurationsOnChanged}) {
+      return Column(
+        children: [
+          TimeSelectorTile(
+            title: preferences.texts.controllerSessionDuration,
+            initialValue: preferences.sessionDurations[index],
+            onValidChange: (value) {
+              if (setAllDurationsOnChanged) {
+                for (final duration in preferences.sessionDurations) {
+                  duration.set(value);
+                }
+              } else {
+                preferences.sessionDurations[index].set(value);
+              }
+
+              // Set to index 0 as it only set if it has not run yet (i.e. the
+              // timer never ran)
+              PomodoroStatus.of(context, listen: false)
+                  .setTimer(preferences.sessionDurations[0].value);
+            },
+          ),
+          SizedBox(height: padding),
+          TimeSelectorTile(
+            title: preferences.texts.controllerPauseDuration,
+            initialValue:
+                AppPreferences.of(context, listen: false).pauseDurations[index],
+            onValidChange: (value) {
+              if (setAllDurationsOnChanged) {
+                for (final duration in preferences.pauseDurations) {
+                  duration.set(value);
+                }
+              } else {
+                preferences.pauseDurations[index].set(value);
+              }
+            },
+          ),
+        ],
+      );
+    }
 
     return Column(
       children: [
         IntSelectorTile(
           title: preferences.texts.controllerNumberOfSession,
           initialValue: preferences.nbSessions,
-          onValidChange: (value) {
-            preferences.nbSessions.set(value);
-            pomodoro.nbSessions = value;
-          },
+          onValidChange: (value) => preferences.nbSessions.set(value),
         ),
         SizedBox(height: padding),
-        TimeSelectorTile(
-          title: preferences.texts.controllerSessionDuration,
-          initialValue: preferences.sessionDuration,
-          onValidChange: (value) {
-            preferences.sessionDuration.set(value);
-            pomodoro.sessionDuration = value;
-          },
-        ),
-        SizedBox(height: padding),
-        TimeSelectorTile(
-          title: preferences.texts.controllerPauseDuration,
-          initialValue: AppPreferences.of(context, listen: false).pauseDuration,
-          onValidChange: (value) {
-            preferences.pauseDuration.set(value);
-            pomodoro.pauseSessionDuration = value;
-          },
-        ),
+        Switch(onChanged: (bool value) {}, value: false),
+        buildActiveAndPauseDurations(index: 0, setAllDurationsOnChanged: true),
       ],
     );
   }
@@ -717,6 +743,7 @@ class ConfigurationBoard extends StatelessWidget {
         Center(
           child: ElevatedButton(
             onPressed: () async {
+              final navigator = Navigator.of(context);
               final answer = await showDialog<bool>(
                 context: context,
                 builder: (context) => AreYouSureDialog(
@@ -726,6 +753,7 @@ class ConfigurationBoard extends StatelessWidget {
               );
               if (answer == null || !answer) return;
               preferences.reset();
+              navigator.pushReplacementNamed(MainScreen.route);
             },
             style: ThemeButton.elevated,
             child: Text(

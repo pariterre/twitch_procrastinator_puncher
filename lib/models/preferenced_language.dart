@@ -181,7 +181,7 @@ class PreferencedLanguage extends PreferencedElement {
       case Language.english:
         return 'Pause duration (mm:ss)';
       case Language.french:
-        return 'Nombre des pauses (mm:ss)';
+        return 'Durée des pauses (mm:ss)';
     }
   }
 

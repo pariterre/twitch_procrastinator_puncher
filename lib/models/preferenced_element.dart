@@ -5,10 +5,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
-import 'package:twitch_procastinator_puncher/models/app_fonts.dart';
 import 'package:twitch_procastinator_puncher/models/config.dart';
 import 'package:twitch_procastinator_puncher/models/helpers.dart';
 import 'package:twitch_procastinator_puncher/models/participant.dart';
+import 'package:twitch_procastinator_puncher/providers/app_preferences.dart';
 import 'package:twitch_procastinator_puncher/providers/participants.dart';
 import 'package:twitch_procastinator_puncher/providers/pomodoro_status.dart';
 
@@ -123,6 +123,9 @@ class PreferencedDuration extends PreferencedElement {
 
   static Future<PreferencedDuration> deserialize(map,
           [int defaultValue = 0]) async =>
+      PreferencedDuration(Duration(seconds: map ?? defaultValue));
+
+  static PreferencedDuration deserializeSync(map, [int defaultValue = 0]) =>
       PreferencedDuration(Duration(seconds: map ?? defaultValue));
 
   Duration _value;
@@ -319,16 +322,18 @@ class PreferencedText extends PreferencedElement {
   }
 
   String formattedText(BuildContext context, [Participant? participant]) {
+    final preferences = AppPreferences.of(context, listen: false);
     final pomodoro = PomodoroStatus.of(context, listen: false);
     final participants = Participants.of(context, listen: false);
 
     var out = text
         .replaceAll('{session}', (pomodoro.currentSession + 1).toString())
-        .replaceAll('{nbSessions}', pomodoro.nbSessions.toString())
+        .replaceAll('{nbSessions}', preferences.nbSessions.toString())
         .replaceAll('{timer}', durationAsString(pomodoro.timer))
-        .replaceAll('{sessionTime}', durationAsString(pomodoro.sessionDuration))
-        .replaceAll(
-            '{pauseTime}', durationAsString(pomodoro.pauseSessionDuration))
+        .replaceAll('{sessionTime}',
+            durationAsString(preferences.sessionDurations[0].value))
+        .replaceAll('{pauseTime}',
+            durationAsString(preferences.pauseDurations[0].value))
         .replaceAll('{done}', participants.sessionsDone.toString())
         .replaceAll('{doneToday}', participants.sessionsDoneToday.toString())
         .replaceAll(r'\n', '\n');
