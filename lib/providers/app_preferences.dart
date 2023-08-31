@@ -19,6 +19,7 @@ String get rootPath => Platform.isWindows ? r'C:\' : '/';
 const Map<String, dynamic> _defaultValues = {
   'texts': 0,
   'nbSessions': 4,
+  'managerSessionIndividually': false,
   'sessionDuration': 50 * 60,
   'pauseDuration': 10 * 60,
   'activeBackgroundImage': null,
@@ -78,6 +79,7 @@ class AppPreferences with ChangeNotifier {
   PreferencedInt nbSessions;
 
   // Session time
+  PreferencedBool managerSessionIndividually;
   List<PreferencedDuration> sessionDurations;
   List<PreferencedDuration> pauseDurations;
 
@@ -242,6 +244,9 @@ class AppPreferences with ChangeNotifier {
         texts: await PreferencedLanguage.deserialize(
             previousPreferences?['texts'], _defaultValues['texts']),
         nbSessions: nbSessions,
+        managerSessionIndividually: await PreferencedBool.deserialize(
+            previousPreferences?['managerSessionIndividually'],
+            _defaultValues['managerSessionIndividually']),
         sessionDurations: (previousPreferences?['sessionDurations'] as List?)
                 ?.map((e) => PreferencedDuration.deserializeSync(
                     e, _defaultValues['sessionDuration']))
@@ -278,8 +283,8 @@ class AppPreferences with ChangeNotifier {
             _defaultValues['backgroundColorHallOfFame']),
         fontPomodoro: previousPreferences?['fontPomodoro'] ??
             _defaultValues['fontPomodoro'],
-        textColorHallOfFame: previousPreferences?['textColorHallOfFame'] ??
-            _defaultValues['textColorHallOfFame'],
+        textColorHallOfFame:
+            previousPreferences?['textColorHallOfFame'] ?? _defaultValues['textColorHallOfFame'],
         textDuringInitialization: await TextOnPomodoro.deserialize(previousPreferences?['textDuringInitialization'], _defaultValues['textDuringInitialization']),
         textDuringActiveSession: await TextOnPomodoro.deserialize(previousPreferences?['textDuringActiveSession'], _defaultValues['textDuringActiveSession']),
         textDuringPauseSession: await TextOnPomodoro.deserialize(previousPreferences?['textDuringPauseSession'], _defaultValues['textDuringPauseSession']),
@@ -309,6 +314,7 @@ class AppPreferences with ChangeNotifier {
     required Directory lastVisitedDirectory,
     required this.texts,
     required this.nbSessions,
+    required this.managerSessionIndividually,
     required this.sessionDurations,
     required this.pauseDurations,
     required this.activeBackgroundImage,
@@ -365,6 +371,7 @@ class AppPreferences with ChangeNotifier {
         'lastVisitedDirectory': _lastVisitedDirectory.path,
         'texts': texts.serialize(),
         'nbSessions': nbSessions.serialize(),
+        'managerSessionIndividually': managerSessionIndividually.serialize(),
         'sessionDurations': sessionDurations.map((e) => e.serialize()).toList(),
         'pauseDurations': pauseDurations.map((e) => e.serialize()).toList(),
         'activeBackgroundImage':
@@ -414,6 +421,8 @@ class AppPreferences with ChangeNotifier {
         await PreferencedLanguage.deserialize(null, _defaultValues['texts']);
     nbSessions =
         await PreferencedInt.deserialize(null, _defaultValues['nbSessions']);
+    managerSessionIndividually = await PreferencedBool.deserialize(
+        null, _defaultValues['managerSessionIndividually']);
     sessionDurations = [
       for (int i = 0; i < nbSessions.value; i++)
         PreferencedDuration.deserializeSync(
@@ -491,6 +500,8 @@ class AppPreferences with ChangeNotifier {
   void updateFromSerialized(map) async {
     texts = await PreferencedLanguage.deserialize(map['texts']);
     nbSessions = await PreferencedInt.deserialize(map['nbSessions']);
+    managerSessionIndividually =
+        await PreferencedBool.deserialize(map['managerSessionIndividually']);
     sessionDurations = (map['sessionDurations'] as List)
         .map((e) => PreferencedDuration.deserializeSync(e))
         .toList();
@@ -569,6 +580,7 @@ class AppPreferences with ChangeNotifier {
       }
       _save();
     };
+    managerSessionIndividually.onChanged = _save;
 
     for (final duration in sessionDurations) {
       duration.onChanged = _save;

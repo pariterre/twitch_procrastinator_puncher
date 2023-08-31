@@ -277,11 +277,22 @@ class ConfigurationBoard extends StatelessWidget {
     /// the value of one of which should change the value of all the others.
     /// This information is carried by [setAllDurationsOnChanged].
     Widget buildActiveAndPauseDurations(
-        {required int index, required bool setAllDurationsOnChanged}) {
+        {required int index,
+        required bool setAllDurationsOnChanged,
+        required bool showPauseDuration}) {
       return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (!setAllDurationsOnChanged)
+            Text(preferences.texts.controllerSessionIndexed(index + 1),
+                style: TextStyle(
+                    color: ThemeColor().configurationText,
+                    fontWeight: FontWeight.bold,
+                    fontSize: ThemeSize.text(context))),
           TimeSelectorTile(
-            title: preferences.texts.controllerSessionDuration,
+            title: setAllDurationsOnChanged
+                ? preferences.texts.controllerSessionsDuration
+                : preferences.texts.controllerSessionDuration,
             initialValue: preferences.sessionDurations[index],
             onValidChange: (value) {
               if (setAllDurationsOnChanged) {
@@ -298,21 +309,27 @@ class ConfigurationBoard extends StatelessWidget {
                   .setTimer(preferences.sessionDurations[0].value);
             },
           ),
-          SizedBox(height: padding),
-          TimeSelectorTile(
-            title: preferences.texts.controllerPauseDuration,
-            initialValue:
-                AppPreferences.of(context, listen: false).pauseDurations[index],
-            onValidChange: (value) {
-              if (setAllDurationsOnChanged) {
-                for (final duration in preferences.pauseDurations) {
-                  duration.set(value);
-                }
-              } else {
-                preferences.pauseDurations[index].set(value);
-              }
-            },
-          ),
+          if (showPauseDuration)
+            Padding(
+              padding: EdgeInsets.only(top: padding),
+              child: TimeSelectorTile(
+                title: setAllDurationsOnChanged
+                    ? preferences.texts.controllerPausesDuration
+                    : preferences.texts.controllerPauseDuration,
+                initialValue: AppPreferences.of(context, listen: false)
+                    .pauseDurations[index],
+                onValidChange: (value) {
+                  if (setAllDurationsOnChanged) {
+                    for (final duration in preferences.pauseDurations) {
+                      duration.set(value);
+                    }
+                  } else {
+                    preferences.pauseDurations[index].set(value);
+                  }
+                },
+              ),
+            ),
+          SizedBox(height: 2 * padding),
         ],
       );
     }
@@ -325,8 +342,36 @@ class ConfigurationBoard extends StatelessWidget {
           onValidChange: (value) => preferences.nbSessions.set(value),
         ),
         SizedBox(height: padding),
-        Switch(onChanged: (bool value) {}, value: false),
-        buildActiveAndPauseDurations(index: 0, setAllDurationsOnChanged: true),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Text(
+              preferences.texts.controllerSessionIndividually,
+              style: TextStyle(
+                  color: ThemeColor().configurationText,
+                  fontSize: ThemeSize.text(context)),
+            ),
+            Switch(
+              onChanged: (bool value) {
+                preferences.managerSessionIndividually.value = value;
+              },
+              value: preferences.managerSessionIndividually.value,
+              activeColor: Colors.white,
+            ),
+          ],
+        ),
+        if (!preferences.managerSessionIndividually.value)
+          buildActiveAndPauseDurations(
+              index: 0,
+              setAllDurationsOnChanged: true,
+              showPauseDuration: true),
+        if (preferences.managerSessionIndividually.value) ...[
+          for (int i = 0; i < preferences.nbSessions.value; i++)
+            buildActiveAndPauseDurations(
+                index: i,
+                setAllDurationsOnChanged: false,
+                showPauseDuration: i != preferences.nbSessions.value - 1)
+        ],
       ],
     );
   }

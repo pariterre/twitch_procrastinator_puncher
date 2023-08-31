@@ -167,12 +167,48 @@ class PreferencedLanguage extends PreferencedElement {
     }
   }
 
+  String get controllerSessionIndividually {
+    switch (_current) {
+      case Language.english:
+        return 'Manager sessions individually';
+      case Language.french:
+        return 'Gérer les sessions individuellement';
+    }
+  }
+
+  String controllerSessionIndexed(int index) {
+    switch (_current) {
+      case Language.english:
+        return 'Session $index';
+      case Language.french:
+        return 'Session $index';
+    }
+  }
+
+  String get controllerSessionsDuration {
+    switch (_current) {
+      case Language.english:
+        return 'Sessions duration (mm:ss)';
+      case Language.french:
+        return 'Durée des séances (mm:ss)';
+    }
+  }
+
   String get controllerSessionDuration {
     switch (_current) {
       case Language.english:
         return 'Session duration (mm:ss)';
       case Language.french:
-        return 'Durée des séances (mm:ss)';
+        return 'Durée de la séance (mm:ss)';
+    }
+  }
+
+  String get controllerPausesDuration {
+    switch (_current) {
+      case Language.english:
+        return 'Pauses duration (mm:ss)';
+      case Language.french:
+        return 'Durée des pauses (mm:ss)';
     }
   }
 
@@ -181,7 +217,7 @@ class PreferencedLanguage extends PreferencedElement {
       case Language.english:
         return 'Pause duration (mm:ss)';
       case Language.french:
-        return 'Durée des pauses (mm:ss)';
+        return 'Durée de la pause (mm:ss)';
     }
   }
 
