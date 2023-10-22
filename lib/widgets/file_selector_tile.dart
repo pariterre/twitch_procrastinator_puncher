@@ -1,10 +1,10 @@
 import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
-import 'package:file_picker/file_picker.dart' as fp;
 import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:twitch_procastinator_puncher/helpers/file_picker_interface.dart';
 import 'package:twitch_procastinator_puncher/models/app_theme.dart';
 import 'package:twitch_procastinator_puncher/models/preferenced_element.dart';
 import 'package:twitch_procastinator_puncher/providers/app_preferences.dart';
@@ -43,9 +43,9 @@ class FileSelectorTile extends StatelessWidget {
     final appPreferences = AppPreferences.of(context, listen: false);
 
     if (kIsWeb) {
-      final result = (await fp.FilePicker.platform.pickFiles());
+      final result = await FilePickerInterface.instance.pickFile(context);
       if (result == null) return;
-      onFileSelected(result.files[0].bytes!);
+      onFileSelected(result);
     } else {
       final path = await FilesystemPicker.open(
         title: 'Open file',

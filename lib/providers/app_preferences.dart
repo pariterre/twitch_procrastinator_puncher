@@ -1,16 +1,15 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:twitch_procastinator_puncher/helpers/file_picker_interface.dart';
 import 'package:twitch_procastinator_puncher/models/app_fonts.dart';
 import 'package:twitch_procastinator_puncher/models/config.dart';
 import 'package:twitch_procastinator_puncher/models/preferenced_element.dart';
 import 'package:twitch_procastinator_puncher/models/preferenced_language.dart';
-import 'package:universal_html/html.dart' as html;
 
 export 'package:twitch_procastinator_puncher/models/app_fonts.dart';
 
@@ -166,38 +165,23 @@ class AppPreferences with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> exportWeb() async {
+  Future<void> exportWeb(context) async {
     if (!kIsWeb) throw 'exportWeb only works on web-based interface';
 
     const encoder = JsonEncoder.withIndent('\t');
     final text = encoder.convert(serialize(skipBinaryFiles: true));
 
-    // prepare
-    final bytes = utf8.encode(text);
-    final blob = html.Blob([bytes]);
-    final url = html.Url.createObjectUrlFromBlob(blob);
-    final anchor = html.document.createElement('a') as html.AnchorElement
-      ..href = url
-      ..style.display = 'none'
-      ..download = preferencesFilename;
-    html.document.body!.children.add(anchor);
-
-    // download
-    anchor.click();
-
-    // cleanup
-    html.document.body!.children.remove(anchor);
-    html.Url.revokeObjectUrl(url);
+    FilePickerInterface.instance
+        .saveFile(context, data:text, filename: preferencesFilename);
   }
 
-  Future<void> importWeb() async {
+  Future<void> importWeb(context) async {
     if (!kIsWeb) throw 'importWeb only works on web-based interface';
 
-    final result = await FilePicker.platform.pickFiles();
+    final result = await FilePickerInterface.instance.pickFile(context);
     if (result == null) return;
 
-    final loadedPreferences =
-        json.decode(utf8.decode(result.files.first.bytes!));
+    final loadedPreferences = json.decode(utf8.decode(result));
 
     updateFromSerialized(loadedPreferences);
     _save();

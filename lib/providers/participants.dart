@@ -2,15 +2,14 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:twitch_manager/twitch_manager.dart';
+import 'package:twitch_procastinator_puncher/helpers/file_picker_interface.dart';
 import 'package:twitch_procastinator_puncher/models/config.dart';
 import 'package:twitch_procastinator_puncher/models/participant.dart';
-import 'package:universal_html/html.dart' as html;
 
 List<String> _extractUsersFromString(String value) {
   final List<String> out = value.split(';');
@@ -244,44 +243,28 @@ class Participants extends ChangeNotifier {
       prefs.setString(_saveFilename, jsonEncode(serialize()));
     } else {
       final file = File(_savePath);
-      const encoder = JsonEncoder.withIndent('\t');
+      const encoder = JsonEncoder.withIndent('  ');
       await file.writeAsString(encoder.convert(serialize()));
     }
     notifyListeners();
   }
 
-  Future<void> exportWeb() async {
+  Future<void> exportWeb(context) async {
     if (!kIsWeb) throw 'exportWeb only works on web-based interface';
 
-    const encoder = JsonEncoder.withIndent('\t');
+    const encoder = JsonEncoder.withIndent('  ');
     final text = encoder.convert(serialize());
-
-    // prepare
-    final bytes = utf8.encode(text);
-    final blob = html.Blob([bytes]);
-    final url = html.Url.createObjectUrlFromBlob(blob);
-    final anchor = html.document.createElement('a') as html.AnchorElement
-      ..href = url
-      ..style.display = 'none'
-      ..download = _saveFilename;
-    html.document.body!.children.add(anchor);
-
-    // download
-    anchor.click();
-
-    // cleanup
-    html.document.body!.children.remove(anchor);
-    html.Url.revokeObjectUrl(url);
+    FilePickerInterface.instance
+        .saveFile(context, data: text, filename: _saveFilename);
   }
 
-  Future<void> importWeb() async {
+  Future<void> importWeb(context) async {
     if (!kIsWeb) throw 'importWeb only works on web-based interface';
 
-    final result = await FilePicker.platform.pickFiles();
+    final result = await FilePickerInterface.instance.pickFile(context);
     if (result == null) return;
 
-    final loadedParticipants =
-        json.decode(utf8.decode(result.files.first.bytes!));
+    final loadedParticipants = json.decode(utf8.decode(result));
 
     final participants = (loadedParticipants?['participants'] as List?)
             ?.map<Participant>((map) => Participant.deserialize(map))

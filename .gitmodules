@@ -1,3 +1,6 @@
 [submodule "plugins/twitch_manager"]
 	path = plugins/twitch_manager
 	url = https://github.com/pariterre/twitch_manager
+[submodule "plugins/file_sender"]
+	path = plugins/file_sender
+	url = https://github.com/pariterre/file_sender.git

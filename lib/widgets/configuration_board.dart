@@ -601,8 +601,8 @@ class ConfigurationBoard extends StatelessWidget {
             children: [
               ElevatedButton(
                   style: ThemeButton.elevated,
-                  onPressed: () =>
-                      Participants.of(context, listen: false).exportWeb(),
+                  onPressed: () => Participants.of(context, listen: false)
+                      .exportWeb(context),
                   child: Text(
                     preferences.texts.hallOfFameExport,
                     textAlign: TextAlign.center,
@@ -622,7 +622,8 @@ class ConfigurationBoard extends StatelessWidget {
                               .texts.hallOfFameImportAreYouSureContent));
                   if (answer == null || !answer) return;
 
-                  participants.importWeb();
+                  if (!context.mounted) return;
+                  participants.importWeb(context);
                 },
                 child: Text(
                   preferences.texts.hallOfFameImport,
@@ -747,8 +748,8 @@ class ConfigurationBoard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               ElevatedButton(
-                onPressed: () =>
-                    AppPreferences.of(context, listen: false).exportWeb(),
+                onPressed: () => AppPreferences.of(context, listen: false)
+                    .exportWeb(context),
                 style: ThemeButton.elevated,
                 child: Text(
                   textAlign: TextAlign.center,
@@ -770,7 +771,8 @@ class ConfigurationBoard extends StatelessWidget {
                               preferences.texts.micsImportAreYouSureContent));
                   if (answer == null || !answer) return;
 
-                  await preferences.importWeb();
+                  if (!context.mounted) return;
+                  await preferences.importWeb(context);
 
                   navigator.pushReplacementNamed(MainScreen.route);
                 },
