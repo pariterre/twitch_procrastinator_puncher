@@ -11,6 +11,7 @@ import 'package:twitch_procastinator_puncher/providers/pomodoro_status.dart';
 import 'package:twitch_procastinator_puncher/widgets/configuration_board.dart';
 import 'package:twitch_procastinator_puncher/widgets/hall_of_fame.dart';
 import 'package:twitch_procastinator_puncher/widgets/pomodoro_timer.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -52,6 +53,47 @@ class _MainScreenState extends State<MainScreen> {
     pomodoro.activeSessionHasFinishedGuiCallback = _activeSessionDone;
     pomodoro.pauseHasFinishedGuiCallback = _pauseSessionDone;
     pomodoro.finishedWorkingGuiCallback = _workingDone;
+
+    final preferences = AppPreferences.of(context, listen: false);
+    if (preferences.shouldAskToBuyMeACoffee) {
+      WidgetsBinding.instance
+          .addPostFrameCallback((_) => _showBuyMeACoffeeDialog());
+    }
+  }
+
+  void _showBuyMeACoffeeDialog() async {
+    final preferences = AppPreferences.of(context, listen: false);
+
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text(preferences.texts.buyMeACoffeeDialogTitle),
+        content: Text(preferences.texts.buyMeACoffeeDialogContent),
+        actions: [
+          OutlinedButton(
+            onPressed: () => Navigator.pop(context),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: Colors.black,
+            ),
+            child: Text(preferences.texts.buyMeACoffeeDialogNo),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              await launchUrl(Uri.parse(buyMeACoffeeLink));
+              if (mounted) Navigator.pop(context);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.purple,
+            ),
+            child: Text(
+              preferences.texts.buyMeACoffeeDialogYes,
+              style: const TextStyle(fontWeight: FontWeight.w500),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void _startTimer() {

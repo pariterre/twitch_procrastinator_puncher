@@ -85,6 +85,8 @@ class ConfigurationBoard extends StatelessWidget {
                     _buildHallOfFameOptions(context),
                     const Divider(),
                     _buildReset(context),
+                    const Divider(),
+                    _buildSupportingMe(context),
                   ],
                 ),
               ),
@@ -812,6 +814,40 @@ class ConfigurationBoard extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
+      ],
+    );
+  }
+
+  Widget _buildSupportingMe(BuildContext context) {
+    final preferences = AppPreferences.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(preferences.texts.supportingMeTitle,
+            style: TextStyle(
+                color: ThemeColor().configurationText,
+                fontWeight: FontWeight.bold,
+                fontSize: ThemeSize.text(context))),
+        const SizedBox(height: 8),
+        Text(
+          preferences.texts.supportingMeText,
+          style: TextStyle(
+              color: ThemeColor().configurationText,
+              fontSize: ThemeSize.text(context)),
+        ),
+        const SizedBox(height: 8),
+        InkWell(
+            onTap: () async {
+              await launchUrl(Uri.parse(buyMeACoffeeLink));
+            },
+            child: Text(
+              buyMeACoffeeLink,
+              style: TextStyle(
+                  color: ThemeColor().configurationText,
+                  fontSize: ThemeSize.text(context),
+                  decoration: TextDecoration.underline),
+            ))
       ],
     );
   }

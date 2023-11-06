@@ -320,6 +320,68 @@ class PreferencedLanguage extends PreferencedElement {
     }
   }
 
+  String get supportingMeTitle {
+    switch (_current) {
+      case Language.english:
+        return 'Buy me a coffee';
+      case Language.french:
+        return 'M\'offrir un café';
+    }
+  }
+
+  String get supportingMeText {
+    switch (_current) {
+      case Language.english:
+        return 'If you like this software, consider buying me a coffee. It will '
+            'help me continue to develop this software and others.';
+      case Language.french:
+        return 'Si vous aimez ce logiciel, considérez m\'acheter un café. Cela '
+            'm\'aidera à continuer de développer ce logiciel et d\'autres.';
+    }
+  }
+
+  String get buyMeACoffeeDialogTitle {
+    switch (_current) {
+      case Language.english:
+        return 'Buy me a coffee';
+      case Language.french:
+        return 'M\'offrir un café';
+    }
+  }
+
+  String get buyMeACoffeeDialogContent {
+    switch (_current) {
+      case Language.english:
+        return 'Today is my birthday! If you like this software, I\'d be '
+            'eternally grateful if you were to consider buying me a coffee.\n'
+            'It will help me continue to develop this software and others.';
+      case Language.french:
+        return 'Aujourd\'hui est mon anniversaire! Si vous aimez ce logiciel, '
+            'je vous serais éternellement reconnaissant si vous envisagiez de '
+            'm\'acheter un café.\n'
+            'Cela m\'aidera à continuer de développer ce '
+            'logiciel et d\'autres.';
+    }
+  }
+
+  String get buyMeACoffeeDialogNo {
+    switch (_current) {
+      case Language.english:
+        return 'No, what you a doing is not so great...';
+      case Language.french:
+        return 'Non, ce que tu fais n\'est pas si génial...';
+    }
+  }
+
+  String get buyMeACoffeeDialogYes {
+    switch (_current) {
+      case Language.english:
+        return 'Yes, you are awesome!';
+      case Language.french:
+        return 'Oui, tu es génial!';
+    }
+  }
+
   String get miscExportButton {
     switch (_current) {
       case Language.english:

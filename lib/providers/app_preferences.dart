@@ -18,6 +18,7 @@ String get rootPath => Platform.isWindows ? r'C:\' : '/';
 const Map<String, dynamic> _defaultValues = {
   'texts': 0,
   'nbSessions': 4,
+  'nextTimeAskingForACoffee': 0,
   'managerSessionIndividually': false,
   'sessionDuration': 50 * 60,
   'pauseDuration': 10 * 60,
@@ -76,6 +77,8 @@ class AppPreferences with ChangeNotifier {
 
   // Number of total session
   PreferencedInt nbSessions;
+
+  PreferencedInt _nextTimeAskingForACoffee;
 
   // Session time
   PreferencedBool managerSessionIndividually;
@@ -152,6 +155,30 @@ class AppPreferences with ChangeNotifier {
   }
 
   ///
+  /// Returns true if the app should ask to buy me a coffee
+  bool get shouldAskToBuyMeACoffee {
+    if (_nextTimeAskingForACoffee.value == 0) setNextTimeAskingForACoffee();
+
+    final isDue = DateTime.now().compareTo(DateTime.fromMillisecondsSinceEpoch(
+            _nextTimeAskingForACoffee.value)) >
+        0;
+
+    if (isDue) {
+      setNextTimeAskingForACoffee();
+      return true;
+    }
+
+    return false;
+  }
+
+  ///
+  /// Set the next time to ask for a coffee to my next birthday
+  void setNextTimeAskingForACoffee() {
+    _nextTimeAskingForACoffee.value =
+        DateTime(DateTime.now().year + 1, 10, 17).millisecondsSinceEpoch;
+  }
+
+  ///
   /// Save the current preferences to a file
   void _save() async {
     if (kIsWeb) {
@@ -172,7 +199,7 @@ class AppPreferences with ChangeNotifier {
     final text = encoder.convert(serialize(skipBinaryFiles: true));
 
     FilePickerInterface.instance
-        .saveFile(context, data:text, filename: preferencesFilename);
+        .saveFile(context, data: text, filename: preferencesFilename);
   }
 
   Future<void> importWeb(context) async {
@@ -223,6 +250,9 @@ class AppPreferences with ChangeNotifier {
     final nbSessions = await PreferencedInt.deserialize(
         previousPreferences?['nbSessions'], _defaultValues['nbSessions']);
     return AppPreferences._(
+        nextTimeAskingForACoffee: await PreferencedInt.deserialize(
+            previousPreferences?['nextTimeAskingForACoffee'],
+            _defaultValues['nextTimeAskingForACoffee']),
         lastVisitedDirectory:
             Directory(previousPreferences?['lastVisitedDirectory'] ?? ''),
         texts: await PreferencedLanguage.deserialize(
@@ -267,8 +297,7 @@ class AppPreferences with ChangeNotifier {
             _defaultValues['backgroundColorHallOfFame']),
         fontPomodoro: previousPreferences?['fontPomodoro'] ??
             _defaultValues['fontPomodoro'],
-        textColorHallOfFame:
-            previousPreferences?['textColorHallOfFame'] ?? _defaultValues['textColorHallOfFame'],
+        textColorHallOfFame: previousPreferences?['textColorHallOfFame'] ?? _defaultValues['textColorHallOfFame'],
         textDuringInitialization: await TextOnPomodoro.deserialize(previousPreferences?['textDuringInitialization'], _defaultValues['textDuringInitialization']),
         textDuringActiveSession: await TextOnPomodoro.deserialize(previousPreferences?['textDuringActiveSession'], _defaultValues['textDuringActiveSession']),
         textDuringPauseSession: await TextOnPomodoro.deserialize(previousPreferences?['textDuringPauseSession'], _defaultValues['textDuringPauseSession']),
@@ -298,6 +327,7 @@ class AppPreferences with ChangeNotifier {
     required Directory lastVisitedDirectory,
     required this.texts,
     required this.nbSessions,
+    required PreferencedInt nextTimeAskingForACoffee,
     required this.managerSessionIndividually,
     required this.sessionDurations,
     required this.pauseDurations,
@@ -333,7 +363,8 @@ class AppPreferences with ChangeNotifier {
     required this.textHallOfFameToday,
     required this.textHallOfFameAlltime,
     required this.textHallOfFameTotal,
-  }) : _lastVisitedDirectory = lastVisitedDirectory {
+  })  : _lastVisitedDirectory = lastVisitedDirectory,
+        _nextTimeAskingForACoffee = nextTimeAskingForACoffee {
     _addAllCallbacks();
 
     // Force the repainting of the colors
@@ -355,6 +386,7 @@ class AppPreferences with ChangeNotifier {
         'lastVisitedDirectory': _lastVisitedDirectory.path,
         'texts': texts.serialize(),
         'nbSessions': nbSessions.serialize(),
+        'nextTimeAskingForACoffee': _nextTimeAskingForACoffee.serialize(),
         'managerSessionIndividually': managerSessionIndividually.serialize(),
         'sessionDurations': sessionDurations.map((e) => e.serialize()).toList(),
         'pauseDurations': pauseDurations.map((e) => e.serialize()).toList(),
@@ -564,6 +596,7 @@ class AppPreferences with ChangeNotifier {
       }
       _save();
     };
+    _nextTimeAskingForACoffee.onChanged = _save;
     managerSessionIndividually.onChanged = _save;
 
     for (final duration in sessionDurations) {
