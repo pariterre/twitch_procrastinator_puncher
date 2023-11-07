@@ -239,6 +239,15 @@ class PreferencedLanguage extends PreferencedElement {
     }
   }
 
+  String get filesEndImage {
+    switch (_current) {
+      case Language.english:
+        return 'Image at the end of sessions';
+      case Language.french:
+        return 'Image à la fin des séances';
+    }
+  }
+
   String get filesEndActiveSound {
     switch (_current) {
       case Language.english:

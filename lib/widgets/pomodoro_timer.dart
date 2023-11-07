@@ -75,11 +75,15 @@ class PomodoroTimer extends StatelessWidget {
     double imageSize = 1;
     final status = _statusToShow(context);
 
-    if ((status == StopWatchStatus.inPauseSession ||
-            status == StopWatchStatus.paused) &&
-        preferences.pauseBackgroundImage.image != null) {
+    if (preferences.pauseBackgroundImage.image != null &&
+        (status == StopWatchStatus.inPauseSession ||
+            status == StopWatchStatus.paused)) {
       background = preferences.pauseBackgroundImage.image!;
       imageSize = preferences.pauseBackgroundImage.size;
+    } else if (preferences.endBackgroundImage.image != null &&
+        status == StopWatchStatus.done) {
+      background = preferences.endBackgroundImage.image!;
+      imageSize = preferences.endBackgroundImage.size;
     } else if (preferences.activeBackgroundImage.image != null) {
       background = preferences.activeBackgroundImage.image!;
       imageSize = preferences.activeBackgroundImage.size;

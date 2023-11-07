@@ -24,6 +24,7 @@ const Map<String, dynamic> _defaultValues = {
   'pauseDuration': 10 * 60,
   'activeBackgroundImage': null,
   'pauseBackgroundImage': null,
+  'endBackgroundImage': null,
   'endActiveSessionSound': null,
   'endPauseSessionSound': null,
   'endWorkingSound': null,
@@ -78,7 +79,7 @@ class AppPreferences with ChangeNotifier {
   // Number of total session
   PreferencedInt nbSessions;
 
-  PreferencedInt _nextTimeAskingForACoffee;
+  final PreferencedInt _nextTimeAskingForACoffee;
 
   // Session time
   PreferencedBool managerSessionIndividually;
@@ -88,6 +89,7 @@ class AppPreferences with ChangeNotifier {
   // Background image during the countdown
   PreferencedImageFile activeBackgroundImage;
   PreferencedImageFile pauseBackgroundImage;
+  PreferencedImageFile endBackgroundImage;
 
   // Sound during count downd
   PreferencedSoundFile endActiveSessionSound;
@@ -283,6 +285,8 @@ class AppPreferences with ChangeNotifier {
             previousPreferences?['activeBackgroundImage']),
         pauseBackgroundImage: await PreferencedImageFile.deserialize(
             previousPreferences?['pauseBackgroundImage']),
+        endBackgroundImage: await PreferencedImageFile.deserialize(
+            previousPreferences?['endBackgroundImage']),
         endActiveSessionSound: await PreferencedSoundFile.deserialize(
             previousPreferences?['endActiveSessionSound']),
         endPauseSessionSound: await PreferencedSoundFile.deserialize(
@@ -292,11 +296,9 @@ class AppPreferences with ChangeNotifier {
         backgroundColor: await PreferencedColor.deserialize(
             previousPreferences?['backgroundColor'],
             _defaultValues['backgroundColor']),
-        backgroundColorHallOfFame: await PreferencedColor.deserialize(
-            previousPreferences?['backgroundColorHallOfFame'],
-            _defaultValues['backgroundColorHallOfFame']),
-        fontPomodoro: previousPreferences?['fontPomodoro'] ??
-            _defaultValues['fontPomodoro'],
+        backgroundColorHallOfFame:
+            await PreferencedColor.deserialize(previousPreferences?['backgroundColorHallOfFame'], _defaultValues['backgroundColorHallOfFame']),
+        fontPomodoro: previousPreferences?['fontPomodoro'] ?? _defaultValues['fontPomodoro'],
         textColorHallOfFame: previousPreferences?['textColorHallOfFame'] ?? _defaultValues['textColorHallOfFame'],
         textDuringInitialization: await TextOnPomodoro.deserialize(previousPreferences?['textDuringInitialization'], _defaultValues['textDuringInitialization']),
         textDuringActiveSession: await TextOnPomodoro.deserialize(previousPreferences?['textDuringActiveSession'], _defaultValues['textDuringActiveSession']),
@@ -333,6 +335,7 @@ class AppPreferences with ChangeNotifier {
     required this.pauseDurations,
     required this.activeBackgroundImage,
     required this.pauseBackgroundImage,
+    required this.endBackgroundImage,
     required this.endActiveSessionSound,
     required this.endPauseSessionSound,
     required this.endWorkingSound,
@@ -394,6 +397,8 @@ class AppPreferences with ChangeNotifier {
             skipBinaryFiles ? null : activeBackgroundImage.serialize(),
         'pauseBackgroundImage':
             skipBinaryFiles ? null : pauseBackgroundImage.serialize(),
+        'endBackgroundImage':
+            skipBinaryFiles ? null : endBackgroundImage.serialize(),
         'endActiveSessionSound':
             skipBinaryFiles ? null : endActiveSessionSound.serialize(),
         'endPauseSessionSound':
@@ -451,6 +456,7 @@ class AppPreferences with ChangeNotifier {
     ];
     activeBackgroundImage = await PreferencedImageFile.deserialize(null);
     pauseBackgroundImage = await PreferencedImageFile.deserialize(null);
+    endBackgroundImage = await PreferencedImageFile.deserialize(null);
     endActiveSessionSound = await PreferencedSoundFile.deserialize(null);
     endPauseSessionSound = await PreferencedSoundFile.deserialize(null);
     endWorkingSound = await PreferencedSoundFile.deserialize(null);
@@ -610,6 +616,8 @@ class AppPreferences with ChangeNotifier {
     activeBackgroundImage.lastVisitedFolderCallback = _setLastVisited;
     pauseBackgroundImage.onChanged = _save;
     pauseBackgroundImage.lastVisitedFolderCallback = _setLastVisited;
+    endBackgroundImage.onChanged = _save;
+    endBackgroundImage.lastVisitedFolderCallback = _setLastVisited;
 
     endActiveSessionSound.onChanged = _save;
     endActiveSessionSound.lastVisitedFolderCallback = _setLastVisited;

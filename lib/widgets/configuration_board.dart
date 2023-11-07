@@ -427,6 +427,26 @@ class ConfigurationBoard extends StatelessWidget {
         ),
         SizedBox(height: padding * 0.5),
         FileSelectorTile(
+          title: preferences.texts.filesEndImage,
+          file: preferences.endBackgroundImage,
+          onFileSelected: (data) async {
+            if (kIsWeb) {
+              await preferences.endBackgroundImage.setFileFromRaw(data);
+            } else {
+              await preferences.endBackgroundImage.setFile(data);
+            }
+          },
+          onFileDeleted: preferences.endBackgroundImage.clear,
+          onSizeChanged: (direction) {
+            if (direction == PlusOrMinusSelection.plus) {
+              preferences.endBackgroundImage.size += 0.05;
+            } else {
+              preferences.endBackgroundImage.size -= 0.05;
+            }
+          },
+        ),
+        SizedBox(height: padding * 0.5),
+        FileSelectorTile(
           title: preferences.texts.filesEndActiveSound,
           file: preferences.endActiveSessionSound,
           onFileSelected: (data) async {
