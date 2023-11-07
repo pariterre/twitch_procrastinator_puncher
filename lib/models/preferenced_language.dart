@@ -639,12 +639,39 @@ class PreferencedLanguage extends PreferencedElement {
     }
   }
 
+  String get followerRedeemNone {
+    switch (_current) {
+      case Language.english:
+        return 'Select a redeem';
+      case Language.french:
+        return 'Sélectionner';
+    }
+  }
+
+  String get followerRedeemLongerPause {
+    switch (_current) {
+      case Language.english:
+        return 'Longer pause';
+      case Language.french:
+        return 'Pause plus longue';
+    }
+  }
+
+  String get followerRedeemLongerSession {
+    switch (_current) {
+      case Language.english:
+        return 'Longer session';
+      case Language.french:
+        return 'Séance plus longue';
+    }
+  }
+
   String get followerRedeemLabel {
     switch (_current) {
       case Language.english:
         return 'Write the exact name of the redeem';
       case Language.french:
-        return 'Écrivez le nom exact de la récompse';
+        return 'Écrivez le nom exact de la récompense';
     }
   }
 

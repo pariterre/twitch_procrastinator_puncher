@@ -27,7 +27,7 @@ class PomodoroTimer extends StatelessWidget {
     final windowHeight = MediaQuery.of(context).size.height;
     final preferences = AppPreferences.of(context);
 
-    late TextOnPomodoro textOnPomodoro;
+    late TextOnTimer textOnPomodoro;
     // If we are on initializing phase, show the text with the focus
     switch (_statusToShow(context)) {
       case StopWatchStatus.initializing:

@@ -29,6 +29,7 @@ dependencies:
   web_socket_client: ^0.1.0
   file_sender:
     path: ./plugins/file_sender
+  dropdown_model_list: ^1.1.5
 
 dev_dependencies:
   flutter_test:

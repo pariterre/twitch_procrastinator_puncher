@@ -1,11 +1,14 @@
 import 'dart:io';
 
 import 'package:arrow_pad/arrow_pad.dart';
+import 'package:dropdown_model_list/drop_down/model.dart';
+import 'package:dropdown_model_list/drop_down/select_drop_list.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:twitch_procastinator_puncher/models/app_theme.dart';
 import 'package:twitch_procastinator_puncher/models/config.dart';
 import 'package:twitch_procastinator_puncher/models/preferenced_element.dart';
+import 'package:twitch_procastinator_puncher/models/redeem.dart';
 import 'package:twitch_procastinator_puncher/models/twitch_status.dart';
 import 'package:twitch_procastinator_puncher/providers/app_preferences.dart';
 import 'package:twitch_procastinator_puncher/providers/participants.dart';
@@ -608,6 +611,7 @@ class ConfigurationBoard extends StatelessWidget {
     final padding = ThemePadding.normal(context);
 
     return AnimatedExpandingCard(
+      initialExpandedState: true,
       header: Row(
         children: [
           Text(
@@ -622,13 +626,24 @@ class ConfigurationBoard extends StatelessWidget {
         ],
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        ...preferences.redeems
+            .asMap()
+            .keys
+            .map((index) => _buildRedeemSelectorTile(
+                  context,
+                  hint: '${preferences.texts.followerRedeemLabel} ${index + 1}',
+                  redeem: preferences.redeems[index],
+                  onDeleted: () => preferences.removeRedeemAt(index),
+                )),
         Center(
           child: Padding(
             padding: EdgeInsets.only(top: padding),
             child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () =>
+                    AppPreferences.of(context, listen: false).newRedeem(),
                 style: ThemeButton.elevated,
                 child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     const Icon(Icons.add, color: Colors.green),
                     Text(
@@ -642,11 +657,6 @@ class ConfigurationBoard extends StatelessWidget {
                 )),
           ),
         ),
-        ...preferences.textFollowersRedeems.map((e) => _buildStringSelectorTile(
-              context,
-              title: preferences.texts.followerRedeemLabel,
-              plainText: e,
-            )),
       ]),
     );
   }
@@ -994,7 +1004,7 @@ class ConfigurationBoard extends StatelessWidget {
     );
   }
 
-  StringSelectorTile _buildStringSelectorTile(
+  Widget _buildStringSelectorTile(
     context, {
     required String title,
     required PreferencedText plainText,
@@ -1016,22 +1026,81 @@ class ConfigurationBoard extends StatelessWidget {
         plainText.text = value;
         if (focus != null) gainFocusCallback(focus);
       },
-      onSizeChanged: plainText.runtimeType == TextOnPomodoro
+      onSizeChanged: plainText.runtimeType == TextOnTimer
           ? (direction) {
-              (plainText as TextOnPomodoro).increaseSize(
+              (plainText as TextOnTimer).increaseSize(
                   direction == PlusOrMinusSelection.plus ? 0.01 : -0.01);
               if (focus != null) gainFocusCallback(focus);
             }
           : null,
-      onMoveText: plainText.runtimeType == TextOnPomodoro
+      onMoveText: plainText.runtimeType == TextOnTimer
           ? (direction) {
-              _moveText(context, (plainText as TextOnPomodoro).addToOffset,
-                  direction);
+              _moveText(
+                  context, (plainText as TextOnTimer).addToOffset, direction);
               if (focus != null) gainFocusCallback(focus);
             }
           : null,
       initialColor: initialColor,
       onColorChanged: onColorChanged,
+    );
+  }
+
+  Widget _buildRedeemSelectorTile(
+    context, {
+    required String hint,
+    required RedeemPreferenced redeem,
+    required Function() onDeleted,
+  }) {
+    final padding = ThemePadding.normal(context);
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: 2 * padding),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          StringSelectorTile(
+            key: ValueKey(redeem.hashCode),
+            title: hint,
+            initialText: redeem.title,
+            onTextChanged: (String value) => redeem.title = value,
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: SelectDropList(
+                    key: ValueKey(redeem.hashCode),
+                    paddingTop: padding / 2,
+                    heightBottomContainer: 20 + (Redeem.values.length - 1) * 42,
+                    itemSelected: OptionItem(
+                        id: redeem.redeem.index.toString(),
+                        title: redeem.redeem.name(context)),
+                    dropListModel: DropListModel(Redeem.values
+                        .where((e) => e != Redeem.none)
+                        .map(
+                          (e) => OptionItem(
+                              id: e.index.toString(), title: e.name(context)),
+                        )
+                        .toList()),
+                    showIcon: false,
+                    showArrowIcon: true,
+                    onOptionSelected: (value) {
+                      redeem.redeem = Redeem.values[int.parse(value.id!)];
+                    }),
+              ),
+              IconButton(
+                  onPressed: onDeleted,
+                  icon: const Icon(
+                    Icons.delete,
+                    color: Colors.red,
+                  )),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

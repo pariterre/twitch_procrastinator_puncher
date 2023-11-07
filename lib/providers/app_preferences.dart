@@ -37,7 +37,7 @@ const Map<String, dynamic> _defaultValues = {
   'textDuringPauseSession': r'Pause\n{timer}!',
   'textDuringPause': r'Pause!',
   'textDone': r'Congratulation!',
-  'textFollowersRedeem': '',
+  'redeem': null,
   'saveToTextFile': false,
   'useHallOfFame': true,
   'mustFollowForFaming': true,
@@ -102,11 +102,11 @@ class AppPreferences with ChangeNotifier {
   PreferencedColor backgroundColorHallOfFame;
 
   // Foreground texts
-  TextOnPomodoro textDuringInitialization;
-  TextOnPomodoro textDuringActiveSession;
-  TextOnPomodoro textDuringPauseSession;
-  TextOnPomodoro textDuringPause;
-  TextOnPomodoro textDone;
+  TextOnTimer textDuringInitialization;
+  TextOnTimer textDuringActiveSession;
+  TextOnTimer textDuringPauseSession;
+  TextOnTimer textDuringPause;
+  TextOnTimer textDone;
 
   AppFonts get fontPomodoro => textDuringInitialization.font;
   set fontPomodoro(AppFonts value) {
@@ -118,7 +118,17 @@ class AppPreferences with ChangeNotifier {
   }
 
   // Some options for the followers redeem
-  List<PreferencedText> textFollowersRedeems;
+  List<RedeemPreferenced> redeems;
+  void newRedeem() {
+    redeems.add(RedeemPreferenced());
+    redeems.last.onChanged = _save;
+    _save();
+  }
+
+  void removeRedeemAt(int index) {
+    redeems.removeAt(index);
+    _save();
+  }
 
   // Some options for the hall of fame
   PreferencedBool saveToTextFile;
@@ -127,12 +137,12 @@ class AppPreferences with ChangeNotifier {
 
   PreferencedInt hallOfFameScrollVelocity;
 
-  TextToChat textTimerHasStarted;
-  TextToChat textTimerActiveSessionHasEnded;
-  TextToChat textTimerPauseHasEnded;
-  TextToChat textTimerWorkingHasEnded;
-  TextToChat textNewcomersGreetings;
-  TextToChat textUserHasConnectedGreetings;
+  UnformattedPreferencedText textTimerHasStarted;
+  UnformattedPreferencedText textTimerActiveSessionHasEnded;
+  UnformattedPreferencedText textTimerPauseHasEnded;
+  UnformattedPreferencedText textTimerWorkingHasEnded;
+  UnformattedPreferencedText textNewcomersGreetings;
+  UnformattedPreferencedText textUserHasConnectedGreetings;
 
   PreferencedText textWhitelist;
   PreferencedText textBlacklist;
@@ -304,22 +314,22 @@ class AppPreferences with ChangeNotifier {
             await PreferencedColor.deserialize(previousPreferences?['backgroundColorHallOfFame'], _defaultValues['backgroundColorHallOfFame']),
         fontPomodoro: previousPreferences?['fontPomodoro'] ?? _defaultValues['fontPomodoro'],
         textColorHallOfFame: previousPreferences?['textColorHallOfFame'] ?? _defaultValues['textColorHallOfFame'],
-        textDuringInitialization: await TextOnPomodoro.deserialize(previousPreferences?['textDuringInitialization'], _defaultValues['textDuringInitialization']),
-        textDuringActiveSession: await TextOnPomodoro.deserialize(previousPreferences?['textDuringActiveSession'], _defaultValues['textDuringActiveSession']),
-        textDuringPauseSession: await TextOnPomodoro.deserialize(previousPreferences?['textDuringPauseSession'], _defaultValues['textDuringPauseSession']),
-        textDuringPause: await TextOnPomodoro.deserialize(previousPreferences?['textDuringPause'], _defaultValues['textDuringPause']),
-        textDone: await TextOnPomodoro.deserialize(previousPreferences?['textDone'], _defaultValues['textDone']),
-        textFollowersRedeems: (previousPreferences?['textFollowersRedeems'] as List?)?.map((e) => PreferencedText.deserializeSync(e, _defaultValues['textFollowersRedeem'])).toList() ?? [],
+        textDuringInitialization: await TextOnTimer.deserialize(previousPreferences?['textDuringInitialization'], _defaultValues['textDuringInitialization']),
+        textDuringActiveSession: await TextOnTimer.deserialize(previousPreferences?['textDuringActiveSession'], _defaultValues['textDuringActiveSession']),
+        textDuringPauseSession: await TextOnTimer.deserialize(previousPreferences?['textDuringPauseSession'], _defaultValues['textDuringPauseSession']),
+        textDuringPause: await TextOnTimer.deserialize(previousPreferences?['textDuringPause'], _defaultValues['textDuringPause']),
+        textDone: await TextOnTimer.deserialize(previousPreferences?['textDone'], _defaultValues['textDone']),
+        redeems: (previousPreferences?['redeems'] as List?)?.map((e) => RedeemPreferenced.deserializeSync(e)).toList() ?? [],
         saveToTextFile: await PreferencedBool.deserialize(previousPreferences?['saveToTextFile'], _defaultValues['saveToTextFile']),
         useHallOfFame: await PreferencedBool.deserialize(previousPreferences?['useHallOfFame'], _defaultValues['useHallOfFame']),
         mustFollowForFaming: await PreferencedBool.deserialize(previousPreferences?['mustFollowForFaming'], _defaultValues['mustFollowForFaming']),
         hallOfFameScrollVelocity: await PreferencedInt.deserialize(previousPreferences?['hallOfFameScrollVelocity'], _defaultValues['hallOfFameScrollVelocity']),
-        textTimerHasStarted: await TextToChat.deserialize(previousPreferences?['textTimerHasStarted'], _defaultValues['textTimerHasStarted']),
-        textTimerActiveSessionHasEnded: await TextToChat.deserialize(previousPreferences?['textTimerActiveSessionHasEnded'], _defaultValues['textTimerActiveSessionHasEnded']),
-        textTimerPauseHasEnded: await TextToChat.deserialize(previousPreferences?['textTimerPauseHasEnded'], _defaultValues['textTimerPauseHasEnded']),
-        textTimerWorkingHasEnded: await TextToChat.deserialize(previousPreferences?['textTimerWorkingHasEnded'], _defaultValues['textTimerWorkingHasEnded']),
-        textNewcomersGreetings: await TextToChat.deserialize(previousPreferences?['textNewcomersGreetings'], _defaultValues['textNewcomersGreetings']),
-        textUserHasConnectedGreetings: await TextToChat.deserialize(previousPreferences?['textUserHasConnectedGreetings'], _defaultValues['textUserHasConnectedGreetings']),
+        textTimerHasStarted: await UnformattedPreferencedText.deserialize(previousPreferences?['textTimerHasStarted'], _defaultValues['textTimerHasStarted']),
+        textTimerActiveSessionHasEnded: await UnformattedPreferencedText.deserialize(previousPreferences?['textTimerActiveSessionHasEnded'], _defaultValues['textTimerActiveSessionHasEnded']),
+        textTimerPauseHasEnded: await UnformattedPreferencedText.deserialize(previousPreferences?['textTimerPauseHasEnded'], _defaultValues['textTimerPauseHasEnded']),
+        textTimerWorkingHasEnded: await UnformattedPreferencedText.deserialize(previousPreferences?['textTimerWorkingHasEnded'], _defaultValues['textTimerWorkingHasEnded']),
+        textNewcomersGreetings: await UnformattedPreferencedText.deserialize(previousPreferences?['textNewcomersGreetings'], _defaultValues['textNewcomersGreetings']),
+        textUserHasConnectedGreetings: await UnformattedPreferencedText.deserialize(previousPreferences?['textUserHasConnectedGreetings'], _defaultValues['textUserHasConnectedGreetings']),
         textWhitelist: await PreferencedText.deserialize(previousPreferences?['textWhitelist']),
         textBlacklist: await PreferencedText.deserialize(previousPreferences?['textBlacklist']),
         fontHallOfFame: previousPreferences?['fontHallOfFame'] ?? _defaultValues['fontHallOfFame'],
@@ -353,7 +363,7 @@ class AppPreferences with ChangeNotifier {
     required this.textDuringPauseSession,
     required this.textDuringPause,
     required this.textDone,
-    required this.textFollowersRedeems,
+    required this.redeems,
     required this.saveToTextFile,
     required this.useHallOfFame,
     required this.mustFollowForFaming,
@@ -419,8 +429,7 @@ class AppPreferences with ChangeNotifier {
         'textDuringPauseSession': textDuringPauseSession.serialize(),
         'textDuringPause': textDuringPause.serialize(),
         'textDone': textDone.serialize(),
-        'textFollowersRedeems':
-            textFollowersRedeems.map((e) => e.serialize()).toList(),
+        'redeems': redeems.map((e) => e.serialize()).toList(),
         'saveToTextFile': saveToTextFile.serialize(),
         'useHallOfFame': useHallOfFame.serialize(),
         'mustFollowForFaming': mustFollowForFaming.serialize(),
@@ -472,17 +481,16 @@ class AppPreferences with ChangeNotifier {
         null, _defaultValues['backgroundColor']);
     backgroundColorHallOfFame = await PreferencedColor.deserialize(
         null, _defaultValues['backgroundColorHallOfFame']);
-    textDuringInitialization = await TextOnPomodoro.deserialize(
+    textDuringInitialization = await TextOnTimer.deserialize(
         null, _defaultValues['textDuringInitialization']);
-    textDuringActiveSession = await TextOnPomodoro.deserialize(
+    textDuringActiveSession = await TextOnTimer.deserialize(
         null, _defaultValues['textDuringActiveSession']);
-    textDuringPauseSession = await TextOnPomodoro.deserialize(
+    textDuringPauseSession = await TextOnTimer.deserialize(
         null, _defaultValues['textDuringPauseSession']);
-    textDuringPause = await TextOnPomodoro.deserialize(
-        null, _defaultValues['textDuringPause']);
-    textDone =
-        await TextOnPomodoro.deserialize(null, _defaultValues['textDone']);
-    textFollowersRedeems = [];
+    textDuringPause =
+        await TextOnTimer.deserialize(null, _defaultValues['textDuringPause']);
+    textDone = await TextOnTimer.deserialize(null, _defaultValues['textDone']);
+    redeems = [];
     saveToTextFile = await PreferencedBool.deserialize(
         null, _defaultValues['saveToTextFile']);
     useHallOfFame = await PreferencedBool.deserialize(
@@ -491,18 +499,20 @@ class AppPreferences with ChangeNotifier {
         null, _defaultValues['mustFollowForFaming']);
     hallOfFameScrollVelocity = await PreferencedInt.deserialize(
         null, _defaultValues['hallOfFameScrollVelocity']);
-    textTimerHasStarted = await TextToChat.deserialize(
+    textTimerHasStarted = await UnformattedPreferencedText.deserialize(
         null, _defaultValues['textTimerHasStarted']);
-    textTimerActiveSessionHasEnded = await TextToChat.deserialize(
-        null, _defaultValues['textTimerActiveSessionHasEnded']);
-    textTimerPauseHasEnded = await TextToChat.deserialize(
+    textTimerActiveSessionHasEnded =
+        await UnformattedPreferencedText.deserialize(
+            null, _defaultValues['textTimerActiveSessionHasEnded']);
+    textTimerPauseHasEnded = await UnformattedPreferencedText.deserialize(
         null, _defaultValues['textTimerPauseHasEnded']);
-    textTimerWorkingHasEnded = await TextToChat.deserialize(
+    textTimerWorkingHasEnded = await UnformattedPreferencedText.deserialize(
         null, _defaultValues['textTimerWorkingHasEnded']);
-    textNewcomersGreetings = await TextToChat.deserialize(
+    textNewcomersGreetings = await UnformattedPreferencedText.deserialize(
         null, _defaultValues['textNewcomersGreetings']);
-    textUserHasConnectedGreetings = await TextToChat.deserialize(
-        null, _defaultValues['textUserHasConnectedGreetings']);
+    textUserHasConnectedGreetings =
+        await UnformattedPreferencedText.deserialize(
+            null, _defaultValues['textUserHasConnectedGreetings']);
     textWhitelist = await PreferencedText.deserialize(null);
     textBlacklist = await PreferencedText.deserialize(null);
     textHallOfFameTitle = await PreferencedText.deserialize(
@@ -544,34 +554,37 @@ class AppPreferences with ChangeNotifier {
     backgroundColorHallOfFame =
         await PreferencedColor.deserialize(map['backgroundColorHallOfFame']);
     textDuringInitialization =
-        await TextOnPomodoro.deserialize(map['textDuringInitialization']);
+        await TextOnTimer.deserialize(map['textDuringInitialization']);
     textDuringActiveSession =
-        await TextOnPomodoro.deserialize(map['textDuringActiveSession']);
+        await TextOnTimer.deserialize(map['textDuringActiveSession']);
     textDuringPauseSession =
-        await TextOnPomodoro.deserialize(map['textDuringPauseSession']);
-    textDuringPause = await TextOnPomodoro.deserialize(map['textDuringPause']);
-    textDone = await TextOnPomodoro.deserialize(map['textDone']);
-    textFollowersRedeems = (map['textFollowersRedeems'] as List)
-        .map((e) => PreferencedText.deserializeSync(e))
-        .toList();
+        await TextOnTimer.deserialize(map['textDuringPauseSession']);
+    textDuringPause = await TextOnTimer.deserialize(map['textDuringPause']);
+    textDone = await TextOnTimer.deserialize(map['textDone']);
+    redeems = (map['redeems'] as List?)
+            ?.map((e) => RedeemPreferenced.deserializeSync(e))
+            .toList() ??
+        [];
     saveToTextFile = await PreferencedBool.deserialize(map['saveToTextFile']);
     useHallOfFame = await PreferencedBool.deserialize(map['useHallOfFame']);
     mustFollowForFaming =
         await PreferencedBool.deserialize(map['mustFollowForFaming']);
     hallOfFameScrollVelocity =
         await PreferencedInt.deserialize(map['hallOfFameScrollVelocity']);
-    textTimerHasStarted =
-        await TextToChat.deserialize(map['textTimerHasStarted']);
+    textTimerHasStarted = await UnformattedPreferencedText.deserialize(
+        map['textTimerHasStarted']);
     textTimerActiveSessionHasEnded =
-        await TextToChat.deserialize(map['textTimerActiveSessionHasEnded']);
-    textTimerPauseHasEnded =
-        await TextToChat.deserialize(map['textTimerPauseHasEnded']);
-    textTimerWorkingHasEnded =
-        await TextToChat.deserialize(map['textTimerWorkingHasEnded']);
-    textNewcomersGreetings =
-        await TextToChat.deserialize(map['textNewcomersGreetings']);
+        await UnformattedPreferencedText.deserialize(
+            map['textTimerActiveSessionHasEnded']);
+    textTimerPauseHasEnded = await UnformattedPreferencedText.deserialize(
+        map['textTimerPauseHasEnded']);
+    textTimerWorkingHasEnded = await UnformattedPreferencedText.deserialize(
+        map['textTimerWorkingHasEnded']);
+    textNewcomersGreetings = await UnformattedPreferencedText.deserialize(
+        map['textNewcomersGreetings']);
     textUserHasConnectedGreetings =
-        await TextToChat.deserialize(map['textUserHasConnectedGreetings']);
+        await UnformattedPreferencedText.deserialize(
+            map['textUserHasConnectedGreetings']);
     textWhitelist = await PreferencedText.deserialize(map['textWhitelist']);
     textBlacklist = await PreferencedText.deserialize(map['textBlacklist']);
     textHallOfFameTitle =
@@ -647,7 +660,7 @@ class AppPreferences with ChangeNotifier {
     textDuringPause.onChanged = _save;
     textDone.onChanged = _save;
 
-    for (var element in textFollowersRedeems) {
+    for (var element in redeems) {
       element.onChanged = _save;
     }
 

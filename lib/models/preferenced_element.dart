@@ -8,6 +8,7 @@ import 'package:path/path.dart';
 import 'package:twitch_procastinator_puncher/models/config.dart';
 import 'package:twitch_procastinator_puncher/models/helpers.dart';
 import 'package:twitch_procastinator_puncher/models/participant.dart';
+import 'package:twitch_procastinator_puncher/models/redeem.dart';
 import 'package:twitch_procastinator_puncher/providers/app_preferences.dart';
 import 'package:twitch_procastinator_puncher/providers/participants.dart';
 import 'package:twitch_procastinator_puncher/providers/pomodoro_status.dart';
@@ -385,21 +386,26 @@ class PreferencedText extends PreferencedElement {
       {'text': _text, 'color': _color.value, 'font': _font.index};
 }
 
-class TextToChat extends PreferencedText {
-  TextToChat(String text) : super(text, color: Colors.white);
+class UnformattedPreferencedText extends PreferencedText {
+  UnformattedPreferencedText(String text) : super(text, color: Colors.white);
 
-  static Future<TextToChat> deserialize(Map<String, dynamic>? map,
-      [String defaultValue = '']) async {
+  static Future<UnformattedPreferencedText> deserialize(
+          Map<String, dynamic>? map,
+          [String defaultValue = '']) async =>
+      UnformattedPreferencedText.deserializeSync(map, defaultValue);
+
+  static UnformattedPreferencedText deserializeSync(Map<String, dynamic>? map,
+      [String defaultValue = '']) {
     final text = map?['text'] ?? defaultValue;
-    return TextToChat(text);
+    return UnformattedPreferencedText(text);
   }
 }
 
-class TextOnPomodoro extends PreferencedText {
+class TextOnTimer extends PreferencedText {
   Offset _offset;
   double _size;
 
-  TextOnPomodoro(
+  TextOnTimer(
     String text, {
     required Offset offset,
     required double size,
@@ -422,13 +428,13 @@ class TextOnPomodoro extends PreferencedText {
     if (onChanged != null) onChanged!();
   }
 
-  static Future<TextOnPomodoro> deserialize(Map<String, dynamic>? map,
+  static Future<TextOnTimer> deserialize(Map<String, dynamic>? map,
       [String defaultValue = '']) async {
     final text = map?['text'] ?? defaultValue;
     final offset = map?['offset'] ?? [0.0, 150.0];
     final size = map?['size'] ?? 1.0;
     final color = Color(map?['color'] ?? 0xFF000000);
-    return TextOnPomodoro(text,
+    return TextOnTimer(text,
         offset: Offset(offset[0], offset[1]), size: size, color: color);
   }
 
@@ -438,4 +444,40 @@ class TextOnPomodoro extends PreferencedText {
       'offset': [_offset.dx, _offset.dy],
       'size': _size,
     });
+}
+
+class RedeemPreferenced extends PreferencedElement {
+  RedeemPreferenced({
+    Redeem redeem = Redeem.none,
+    String title = '',
+  })  : _redeem = redeem,
+        _title = title;
+
+  String _title;
+  String get title => _title;
+  set title(String value) {
+    _title = value;
+    if (onChanged != null) onChanged!();
+  }
+
+  Redeem _redeem;
+  Redeem get redeem => _redeem;
+  set redeem(Redeem value) {
+    _redeem = value;
+    if (onChanged != null) onChanged!();
+  }
+
+  static RedeemPreferenced deserializeSync(map) {
+    final title = map?['title'];
+    final redeem = Redeem.values[map?['redeem']];
+    return RedeemPreferenced(title: title, redeem: redeem);
+  }
+
+  static Future<RedeemPreferenced> deserialize(map) async =>
+      deserializeSync(map);
+
+  Map<String, dynamic> serialize() => {
+        'title': title,
+        'redeem': redeem.index,
+      };
 }
