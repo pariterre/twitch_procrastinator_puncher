@@ -212,6 +212,9 @@ class _MainScreenState extends State<MainScreen> {
     participants.twitchManager = _twitchManager!;
     participants.greetNewcomerCallback = _greetNewComers;
     participants.greetUserHasConnectedCallback = _greetUserHasConnected;
+
+    // Connect the redeem
+    // TODO: Connect twitch callback when redeem is done (via _onRedeemRequest)
   }
 
   List<String>? _moderators;
@@ -232,6 +235,17 @@ class _MainScreenState extends State<MainScreen> {
         _resetTimer();
         break;
     }
+  }
+
+  void _onRedeemRequest(String title) {
+    AppPreferences.of(context, listen: false).redeems.forEach((redeem) {
+      if (redeem.title == title) {
+        PomodoroStatus.of(context, listen: false).addRedeem(redeem);
+        return;
+      }
+    });
+    // If we get here, the redeem is not related to the procrastinator puncher
+    // or the name of the redeem was wrong.
   }
 
   @override

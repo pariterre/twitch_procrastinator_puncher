@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:twitch_procastinator_puncher/models/preferenced_element.dart';
+import 'package:twitch_procastinator_puncher/models/redeem.dart';
 
 enum StopWatchStatus { initializing, inSession, inPauseSession, paused, done }
 
@@ -9,6 +11,8 @@ class PomodoroStatus with ChangeNotifier {
   bool _firstSessionStarted = false;
   int _currentSession = 0;
   int get currentSession => _currentSession;
+
+  final List<RedeemPreferenced> _pendingRedeems = [];
 
   Duration _timer = const Duration();
   StopWatchStatus _stopWatchStatus = StopWatchStatus.initializing;
@@ -55,6 +59,10 @@ class PomodoroStatus with ChangeNotifier {
     if (notify) notifyListeners();
   }
 
+  void addRedeem(RedeemPreferenced redeem) {
+    _pendingRedeems.add(redeem);
+  }
+
   ///
   /// Set the timer to a specific value it has not run yet
   void setTimer(Duration duration) {
@@ -97,6 +105,17 @@ class PomodoroStatus with ChangeNotifier {
   /// Callback that announces that we arrived at the end
   Future<void> Function()? finishedWorkingGuiCallback;
 
+  int get _pauseDuration {
+    final officialPause = getPauseDuration(_currentSession).inSeconds;
+
+    final redeemedPause = _pendingRedeems
+        .where((e) => e.redeem == Redeem.longerPause)
+        .fold(0, (prev, e) => prev + e.duration.inSeconds);
+    _pendingRedeems.removeWhere((e) => e.redeem == Redeem.longerPause);
+
+    return officialPause + redeemedPause;
+  }
+
   // This method is automatically called every seconds
   void _updateCounter() {
     if (_stopWatchStatus == StopWatchStatus.inSession) {
@@ -123,7 +142,7 @@ class PomodoroStatus with ChangeNotifier {
             activeSessionHasFinishedGuiCallback!();
           }
           _stopWatchStatus = StopWatchStatus.inPauseSession;
-          newTimerValue = getPauseDuration(_currentSession).inSeconds;
+          newTimerValue = _pauseDuration;
         }
       }
       _timer = Duration(seconds: newTimerValue);

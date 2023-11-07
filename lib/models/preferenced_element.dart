@@ -450,8 +450,10 @@ class RedeemPreferenced extends PreferencedElement {
   RedeemPreferenced({
     Redeem redeem = Redeem.none,
     String title = '',
+    Duration duration = const Duration(minutes: 5),
   })  : _redeem = redeem,
-        _title = title;
+        _title = title,
+        _duration = duration;
 
   String _title;
   String get title => _title;
@@ -467,11 +469,18 @@ class RedeemPreferenced extends PreferencedElement {
     if (onChanged != null) onChanged!();
   }
 
-  static RedeemPreferenced deserializeSync(map) {
-    final title = map?['title'];
-    final redeem = Redeem.values[map?['redeem']];
-    return RedeemPreferenced(title: title, redeem: redeem);
+  Duration _duration;
+  Duration get duration => _duration;
+  set duration(Duration value) {
+    _duration = value;
+    if (onChanged != null) onChanged!();
   }
+
+  static RedeemPreferenced deserializeSync(map) => RedeemPreferenced(
+        title: map?['title'],
+        redeem: Redeem.values[map?['redeem']],
+        duration: Duration(seconds: map?['duration'] ?? 60 * 5),
+      );
 
   static Future<RedeemPreferenced> deserialize(map) async =>
       deserializeSync(map);
@@ -479,5 +488,6 @@ class RedeemPreferenced extends PreferencedElement {
   Map<String, dynamic> serialize() => {
         'title': title,
         'redeem': redeem.index,
+        'duration': duration.inSeconds,
       };
 }
