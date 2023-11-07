@@ -369,8 +369,12 @@ class PreferencedText extends PreferencedElement {
     if (onChanged != null) onChanged!();
   }
 
-  static Future<PreferencedText> deserialize(Map<String, dynamic>? map,
-      [String defaultValue = '']) async {
+  static Future<PreferencedText> deserialize(map,
+          [String defaultValue = '']) async =>
+      deserializeSync(map, defaultValue);
+
+  static PreferencedText deserializeSync(Map<String, dynamic>? map,
+      [String defaultValue = '']) {
     final text = map?['text'] ?? defaultValue;
     final color = Color(map?['color'] ?? 0xFF000000);
     final font = AppFonts.values[map?['font'] ?? 0];

@@ -37,6 +37,7 @@ const Map<String, dynamic> _defaultValues = {
   'textDuringPauseSession': r'Pause\n{timer}!',
   'textDuringPause': r'Pause!',
   'textDone': r'Congratulation!',
+  'textFollowersRedeem': '',
   'saveToTextFile': false,
   'useHallOfFame': true,
   'mustFollowForFaming': true,
@@ -116,7 +117,10 @@ class AppPreferences with ChangeNotifier {
     textDone.font = value;
   }
 
-  // Some options
+  // Some options for the followers redeem
+  List<PreferencedText> textFollowersRedeems;
+
+  // Some options for the hall of fame
   PreferencedBool saveToTextFile;
   PreferencedBool useHallOfFame;
   PreferencedBool mustFollowForFaming;
@@ -305,6 +309,7 @@ class AppPreferences with ChangeNotifier {
         textDuringPauseSession: await TextOnPomodoro.deserialize(previousPreferences?['textDuringPauseSession'], _defaultValues['textDuringPauseSession']),
         textDuringPause: await TextOnPomodoro.deserialize(previousPreferences?['textDuringPause'], _defaultValues['textDuringPause']),
         textDone: await TextOnPomodoro.deserialize(previousPreferences?['textDone'], _defaultValues['textDone']),
+        textFollowersRedeems: (previousPreferences?['textFollowersRedeems'] as List?)?.map((e) => PreferencedText.deserializeSync(e, _defaultValues['textFollowersRedeem'])).toList() ?? [],
         saveToTextFile: await PreferencedBool.deserialize(previousPreferences?['saveToTextFile'], _defaultValues['saveToTextFile']),
         useHallOfFame: await PreferencedBool.deserialize(previousPreferences?['useHallOfFame'], _defaultValues['useHallOfFame']),
         mustFollowForFaming: await PreferencedBool.deserialize(previousPreferences?['mustFollowForFaming'], _defaultValues['mustFollowForFaming']),
@@ -348,6 +353,7 @@ class AppPreferences with ChangeNotifier {
     required this.textDuringPauseSession,
     required this.textDuringPause,
     required this.textDone,
+    required this.textFollowersRedeems,
     required this.saveToTextFile,
     required this.useHallOfFame,
     required this.mustFollowForFaming,
@@ -413,6 +419,8 @@ class AppPreferences with ChangeNotifier {
         'textDuringPauseSession': textDuringPauseSession.serialize(),
         'textDuringPause': textDuringPause.serialize(),
         'textDone': textDone.serialize(),
+        'textFollowersRedeems':
+            textFollowersRedeems.map((e) => e.serialize()).toList(),
         'saveToTextFile': saveToTextFile.serialize(),
         'useHallOfFame': useHallOfFame.serialize(),
         'mustFollowForFaming': mustFollowForFaming.serialize(),
@@ -474,6 +482,7 @@ class AppPreferences with ChangeNotifier {
         null, _defaultValues['textDuringPause']);
     textDone =
         await TextOnPomodoro.deserialize(null, _defaultValues['textDone']);
+    textFollowersRedeems = [];
     saveToTextFile = await PreferencedBool.deserialize(
         null, _defaultValues['saveToTextFile']);
     useHallOfFame = await PreferencedBool.deserialize(
@@ -542,6 +551,9 @@ class AppPreferences with ChangeNotifier {
         await TextOnPomodoro.deserialize(map['textDuringPauseSession']);
     textDuringPause = await TextOnPomodoro.deserialize(map['textDuringPause']);
     textDone = await TextOnPomodoro.deserialize(map['textDone']);
+    textFollowersRedeems = (map['textFollowersRedeems'] as List)
+        .map((e) => PreferencedText.deserializeSync(e))
+        .toList();
     saveToTextFile = await PreferencedBool.deserialize(map['saveToTextFile']);
     useHallOfFame = await PreferencedBool.deserialize(map['useHallOfFame']);
     mustFollowForFaming =
@@ -634,6 +646,10 @@ class AppPreferences with ChangeNotifier {
     textDuringPauseSession.onChanged = _save;
     textDuringPause.onChanged = _save;
     textDone.onChanged = _save;
+
+    for (var element in textFollowersRedeems) {
+      element.onChanged = _save;
+    }
 
     saveToTextFile.onChanged = _save;
     useHallOfFame.onChanged = _save;

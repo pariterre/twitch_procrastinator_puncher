@@ -87,7 +87,6 @@ class FileSelectorTile extends StatelessWidget {
                   Text(title,
                       style: TextStyle(
                           color: ThemeColor().configurationText,
-                          fontWeight: FontWeight.bold,
                           fontSize: ThemeSize.text(context))),
                   if (tooltipText != null) SizedBox(width: padding),
                   if (tooltipText != null) InfoTooltip(message: tooltipText),

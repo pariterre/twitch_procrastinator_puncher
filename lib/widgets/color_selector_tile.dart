@@ -63,7 +63,6 @@ class _ColorSelectorTileState extends State<ColorSelectorTile> {
               Text(widget.title,
                   style: TextStyle(
                       color: ThemeColor().configurationText,
-                      fontWeight: FontWeight.bold,
                       fontSize: ThemeSize.text(context))),
               if (widget.tooltipMessage != null) SizedBox(width: padding),
               if (widget.tooltipMessage != null)

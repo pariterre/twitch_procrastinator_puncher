@@ -11,6 +11,7 @@ import 'package:twitch_procastinator_puncher/providers/app_preferences.dart';
 import 'package:twitch_procastinator_puncher/providers/participants.dart';
 import 'package:twitch_procastinator_puncher/providers/pomodoro_status.dart';
 import 'package:twitch_procastinator_puncher/screens/main_screen.dart';
+import 'package:twitch_procastinator_puncher/widgets/animated_expanding_card.dart';
 import 'package:twitch_procastinator_puncher/widgets/are_you_sure_dialog.dart';
 import 'package:twitch_procastinator_puncher/widgets/checkbox_tile.dart';
 import 'package:twitch_procastinator_puncher/widgets/color_selector_tile.dart';
@@ -74,13 +75,11 @@ class ConfigurationBoard extends StatelessWidget {
                     const Divider(),
                     _buildTimerConfiguration(context),
                     const Divider(),
-                    _buildImageSelectors(context),
-                    const Divider(),
-                    _buildColorPickers(context),
-                    const Divider(),
                     _buildTextOnImage(context),
                     const Divider(),
                     _buildChatMessages(context),
+                    const Divider(),
+                    _buildFollowerRedeem(context),
                     const Divider(),
                     _buildHallOfFameOptions(context),
                     const Divider(),
@@ -181,92 +180,84 @@ class ConfigurationBoard extends StatelessWidget {
           );
   }
 
-  Widget _buildColorPickers(BuildContext context) {
-    final preferences = AppPreferences.of(context);
-
-    return ColorSelectorTile(
-        title: preferences.texts.miscBackgroundColor,
-        tooltipMessage: preferences.texts.miscBackgroundColorTooltip,
-        currentColor: preferences.backgroundColor.value,
-        onChanged: (color) => preferences.backgroundColor.set(color));
-  }
-
   Widget _buildController(context) {
     final preferences = AppPreferences.of(context);
     final pomodoro = PomodoroStatus.of(context, listen: false);
     final padding = ThemePadding.normal(context);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(preferences.texts.controllerTitle,
-            style: TextStyle(
-                color: ThemeColor().configurationText,
-                fontWeight: FontWeight.bold,
-                fontSize: ThemeSize.text(context))),
-        SizedBox(height: padding),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            ElevatedButton(
-              onPressed:
-                  pomodoro.stopWatchStatus == StopWatchStatus.initializing ||
-                          pomodoro.stopWatchStatus == StopWatchStatus.paused
-                      ? startTimerCallback
-                      : pauseTimerCallback,
-              style: ThemeButton.elevated,
-              child: Text(
-                pomodoro.stopWatchStatus == StopWatchStatus.initializing
-                    ? preferences.texts.controllerStartTimer
-                    : pomodoro.stopWatchStatus == StopWatchStatus.paused
-                        ? preferences.texts.controllerResumeTimer
-                        : preferences.texts.controllerPauseTimer,
-                style: TextStyle(
-                    color: Colors.black, fontSize: ThemeSize.text(context)),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: resetTimerCallback,
-              style: ThemeButton.elevated,
-              child: Text(
-                preferences.texts.controllerResetTimer,
-                style: TextStyle(
-                    color: Colors.black, fontSize: ThemeSize.text(context)),
-              ),
-            ),
-          ],
-        ),
-        if (twitchStatus != TwitchStatus.initializing &&
-            connectToTwitch != null)
-          Center(
-            child: Padding(
-              padding: EdgeInsets.only(top: padding),
-              child: ElevatedButton(
-                onPressed: () async {
-                  final answer = await showDialog<bool>(
-                      context: context,
-                      builder: (context) => AreYouSureDialog(
-                            title: preferences
-                                .texts.controllerReconnectTwitchConfirm,
-                            content: preferences
-                                .texts.controllerReconnectTwitchContent,
-                          ));
-                  if (answer == null || !answer) return;
-
-                  connectToTwitch!();
-                },
+    return AnimatedExpandingCard(
+      initialExpandedState: true,
+      header: Text(preferences.texts.controllerTitle,
+          style: TextStyle(
+              color: ThemeColor().configurationText,
+              fontWeight: FontWeight.bold,
+              fontSize: ThemeSize.text(context))),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                onPressed:
+                    pomodoro.stopWatchStatus == StopWatchStatus.initializing ||
+                            pomodoro.stopWatchStatus == StopWatchStatus.paused
+                        ? startTimerCallback
+                        : pauseTimerCallback,
                 style: ThemeButton.elevated,
                 child: Text(
-                    twitchStatus == TwitchStatus.connected
-                        ? preferences.texts.controllerReconnectTwitch
-                        : preferences.texts.controllerConnectTwitch,
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: ThemeSize.text(context))),
+                  pomodoro.stopWatchStatus == StopWatchStatus.initializing
+                      ? preferences.texts.controllerStartTimer
+                      : pomodoro.stopWatchStatus == StopWatchStatus.paused
+                          ? preferences.texts.controllerResumeTimer
+                          : preferences.texts.controllerPauseTimer,
+                  style: TextStyle(
+                      color: Colors.black, fontSize: ThemeSize.text(context)),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: resetTimerCallback,
+                style: ThemeButton.elevated,
+                child: Text(
+                  preferences.texts.controllerResetTimer,
+                  style: TextStyle(
+                      color: Colors.black, fontSize: ThemeSize.text(context)),
+                ),
+              ),
+            ],
+          ),
+          if (twitchStatus != TwitchStatus.initializing &&
+              connectToTwitch != null)
+            Center(
+              child: Padding(
+                padding: EdgeInsets.only(top: padding),
+                child: ElevatedButton(
+                  onPressed: () async {
+                    final answer = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AreYouSureDialog(
+                              title: preferences
+                                  .texts.controllerReconnectTwitchConfirm,
+                              content: preferences
+                                  .texts.controllerReconnectTwitchContent,
+                            ));
+                    if (answer == null || !answer) return;
+
+                    connectToTwitch!();
+                  },
+                  style: ThemeButton.elevated,
+                  child: Text(
+                      twitchStatus == TwitchStatus.connected
+                          ? preferences.texts.controllerReconnectTwitch
+                          : preferences.texts.controllerConnectTwitch,
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: ThemeSize.text(context))),
+                ),
               ),
             ),
-          )
-      ],
+        ],
+      ),
     );
   }
 
@@ -336,45 +327,59 @@ class ConfigurationBoard extends StatelessWidget {
       );
     }
 
-    return Column(
-      children: [
-        IntSelectorTile(
-          title: preferences.texts.controllerNumberOfSession,
-          initialValue: preferences.nbSessions,
-          onValidChange: (value) => preferences.nbSessions.set(value),
-        ),
-        SizedBox(height: padding),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Text(
-              preferences.texts.controllerSessionIndividually,
-              style: TextStyle(
-                  color: ThemeColor().configurationText,
-                  fontSize: ThemeSize.text(context)),
-            ),
-            Switch(
-              onChanged: (bool value) {
-                preferences.managerSessionIndividually.value = value;
-              },
-              value: preferences.managerSessionIndividually.value,
-              activeColor: Colors.white,
-            ),
-          ],
-        ),
-        if (!preferences.managerSessionIndividually.value)
-          buildActiveAndPauseDurations(
-              index: 0,
-              setAllDurationsOnChanged: true,
-              showPauseDuration: true),
-        if (preferences.managerSessionIndividually.value) ...[
-          for (int i = 0; i < preferences.nbSessions.value; i++)
+    return AnimatedExpandingCard(
+      header: Text(preferences.texts.controllerConfigurationTitle,
+          style: TextStyle(
+              color: ThemeColor().configurationText,
+              fontWeight: FontWeight.bold,
+              fontSize: ThemeSize.text(context))),
+      child: Column(
+        children: [
+          IntSelectorTile(
+            title: preferences.texts.controllerNumberOfSession,
+            initialValue: preferences.nbSessions,
+            onValidChange: (value) => preferences.nbSessions.set(value),
+          ),
+          SizedBox(height: padding),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text(
+                preferences.texts.controllerSessionIndividually,
+                style: TextStyle(
+                    color: ThemeColor().configurationText,
+                    fontSize: ThemeSize.text(context)),
+              ),
+              Switch(
+                onChanged: (bool value) {
+                  preferences.managerSessionIndividually.value = value;
+                },
+                value: preferences.managerSessionIndividually.value,
+                activeColor: Colors.white,
+              ),
+            ],
+          ),
+          if (!preferences.managerSessionIndividually.value)
             buildActiveAndPauseDurations(
-                index: i,
-                setAllDurationsOnChanged: false,
-                showPauseDuration: i != preferences.nbSessions.value - 1)
+                index: 0,
+                setAllDurationsOnChanged: true,
+                showPauseDuration: true),
+          if (preferences.managerSessionIndividually.value) ...[
+            for (int i = 0; i < preferences.nbSessions.value; i++)
+              buildActiveAndPauseDurations(
+                  index: i,
+                  setAllDurationsOnChanged: false,
+                  showPauseDuration: i != preferences.nbSessions.value - 1)
+          ],
+          ColorSelectorTile(
+              title: preferences.texts.miscBackgroundColor,
+              tooltipMessage: preferences.texts.miscBackgroundColorTooltip,
+              currentColor: preferences.backgroundColor.value,
+              onChanged: (color) => preferences.backgroundColor.set(color)),
+          SizedBox(height: 2 * padding),
+          _buildImageSelectors(context),
         ],
-      ],
+      ),
     );
   }
 
@@ -511,88 +516,138 @@ class ConfigurationBoard extends StatelessWidget {
     final preferences = AppPreferences.of(context);
     final padding = ThemePadding.normal(context);
 
-    return Column(
-      children: [
-        Row(children: [
+    return AnimatedExpandingCard(
+      header: Row(children: [
+        Text(
+          preferences.texts.timerTextsTitle,
+          style: TextStyle(
+              color: ThemeColor().configurationText,
+              fontWeight: FontWeight.bold,
+              fontSize: ThemeSize.text(context)),
+        ),
+        SizedBox(width: padding),
+        InfoTooltip(message: preferences.texts.timerTextsTitleTooltip),
+      ]),
+      child: Column(
+        children: [
+          _buildStringSelectorTile(
+            context,
+            title: preferences.texts.timerTextsIntroduction,
+            plainText: preferences.textDuringInitialization,
+            focus: StopWatchStatus.initializing,
+            initialColor: preferences.textDuringInitialization.color,
+            onColorChanged: (color) =>
+                preferences.textDuringInitialization.color = color,
+          ),
+          _buildStringSelectorTile(
+            context,
+            title: preferences.texts.timerTextsSessions,
+            plainText: preferences.textDuringActiveSession,
+            focus: StopWatchStatus.inSession,
+            initialColor: preferences.textDuringActiveSession.color,
+            onColorChanged: (color) =>
+                preferences.textDuringActiveSession.color = color,
+          ),
+          _buildStringSelectorTile(
+            context,
+            title: preferences.texts.timerTextsPauses,
+            plainText: preferences.textDuringPauseSession,
+            focus: StopWatchStatus.inPauseSession,
+            initialColor: preferences.textDuringPauseSession.color,
+            onColorChanged: (color) =>
+                preferences.textDuringPauseSession.color = color,
+          ),
+          _buildStringSelectorTile(
+            context,
+            title: preferences.texts.timerTextsTimerPauses,
+            plainText: preferences.textDuringPause,
+            focus: StopWatchStatus.paused,
+            initialColor: preferences.textDuringPause.color,
+            onColorChanged: (color) =>
+                preferences.textDuringPause.color = color,
+          ),
+          _buildStringSelectorTile(
+            context,
+            title: preferences.texts.timerTextsAllDone,
+            plainText: preferences.textDone,
+            focus: StopWatchStatus.done,
+            initialColor: preferences.textDone.color,
+            onColorChanged: (color) => preferences.textDone.color = color,
+          ),
+          SizedBox(height: padding),
+          DropMenuSelectorTile<AppFonts>(
+              title: preferences.texts.miscFont,
+              value: preferences.fontPomodoro,
+              items: AppFonts.values
+                  .map<DropdownMenuItem<AppFonts>>(
+                      (e) => DropdownMenuItem<AppFonts>(
+                          value: e,
+                          child: Padding(
+                            padding: EdgeInsets.only(left: padding),
+                            child: Text(e.name, style: e.style()),
+                          )))
+                  .toList(),
+              onChanged: (value) => preferences.fontPomodoro = value!),
+          SizedBox(height: padding),
+          if (!kIsWeb)
+            CheckboxTile(
+              title: preferences.texts.timerTextsExport,
+              tooltipMessage: preferences.texts.timerTextsExportTooltip,
+              value: preferences.saveToTextFile.value,
+              onChanged: (value) {
+                preferences.saveToTextFile.set(value!);
+              },
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFollowerRedeem(BuildContext context) {
+    final preferences = AppPreferences.of(context);
+    final padding = ThemePadding.normal(context);
+
+    return AnimatedExpandingCard(
+      header: Row(
+        children: [
           Text(
-            preferences.texts.timerTextsTitle,
+            preferences.texts.followerRedeemTitle,
             style: TextStyle(
                 color: ThemeColor().configurationText,
                 fontWeight: FontWeight.bold,
                 fontSize: ThemeSize.text(context)),
           ),
           SizedBox(width: padding),
-          InfoTooltip(message: preferences.texts.timerTextsTitleTooltip),
-        ]),
-        SizedBox(height: padding),
-        _buildStringSelectorTile(
-          context,
-          title: preferences.texts.timerTextsIntroduction,
-          plainText: preferences.textDuringInitialization,
-          focus: StopWatchStatus.initializing,
-          initialColor: preferences.textDuringInitialization.color,
-          onColorChanged: (color) =>
-              preferences.textDuringInitialization.color = color,
-        ),
-        _buildStringSelectorTile(
-          context,
-          title: preferences.texts.timerTextsSessions,
-          plainText: preferences.textDuringActiveSession,
-          focus: StopWatchStatus.inSession,
-          initialColor: preferences.textDuringActiveSession.color,
-          onColorChanged: (color) =>
-              preferences.textDuringActiveSession.color = color,
-        ),
-        _buildStringSelectorTile(
-          context,
-          title: preferences.texts.timerTextsPauses,
-          plainText: preferences.textDuringPauseSession,
-          focus: StopWatchStatus.inPauseSession,
-          initialColor: preferences.textDuringPauseSession.color,
-          onColorChanged: (color) =>
-              preferences.textDuringPauseSession.color = color,
-        ),
-        _buildStringSelectorTile(
-          context,
-          title: preferences.texts.timerTextsTimerPauses,
-          plainText: preferences.textDuringPause,
-          focus: StopWatchStatus.paused,
-          initialColor: preferences.textDuringPause.color,
-          onColorChanged: (color) => preferences.textDuringPause.color = color,
-        ),
-        _buildStringSelectorTile(
-          context,
-          title: preferences.texts.timerTextsAllDone,
-          plainText: preferences.textDone,
-          focus: StopWatchStatus.done,
-          initialColor: preferences.textDone.color,
-          onColorChanged: (color) => preferences.textDone.color = color,
-        ),
-        SizedBox(height: padding),
-        DropMenuSelectorTile<AppFonts>(
-            title: preferences.texts.miscFont,
-            value: preferences.fontPomodoro,
-            items: AppFonts.values
-                .map<DropdownMenuItem<AppFonts>>(
-                    (e) => DropdownMenuItem<AppFonts>(
-                        value: e,
-                        child: Padding(
-                          padding: EdgeInsets.only(left: padding),
-                          child: Text(e.name, style: e.style()),
-                        )))
-                .toList(),
-            onChanged: (value) => preferences.fontPomodoro = value!),
-        SizedBox(height: padding),
-        if (!kIsWeb)
-          CheckboxTile(
-            title: preferences.texts.timerTextsExport,
-            tooltipMessage: preferences.texts.timerTextsExportTooltip,
-            value: preferences.saveToTextFile.value,
-            onChanged: (value) {
-              preferences.saveToTextFile.set(value!);
-            },
+          InfoTooltip(message: preferences.texts.followerRedeemTitleTooltip),
+        ],
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Center(
+          child: Padding(
+            padding: EdgeInsets.only(top: padding),
+            child: ElevatedButton(
+                onPressed: () {},
+                style: ThemeButton.elevated,
+                child: Row(
+                  children: [
+                    const Icon(Icons.add, color: Colors.green),
+                    Text(
+                      preferences.texts.followerRedeemAddButton,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: ThemeSize.text(context)),
+                    ),
+                  ],
+                )),
           ),
-      ],
+        ),
+        ...preferences.textFollowersRedeems.map((e) => _buildStringSelectorTile(
+              context,
+              title: preferences.texts.followerRedeemLabel,
+              plainText: e,
+            )),
+      ]),
     );
   }
 
@@ -601,8 +656,8 @@ class ConfigurationBoard extends StatelessWidget {
     final participants = Participants.of(context);
     final padding = ThemePadding.normal(context);
 
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Row(
+    return AnimatedExpandingCard(
+      header: Row(
         children: [
           Text(
             preferences.texts.hallOfFameTitle,
@@ -615,226 +670,237 @@ class ConfigurationBoard extends StatelessWidget {
           InfoTooltip(message: preferences.texts.hallOfFameTitleTooltip),
         ],
       ),
-      if (kIsWeb)
-        Padding(
-          padding: const EdgeInsets.only(top: 4.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ElevatedButton(
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        if (kIsWeb)
+          Padding(
+            padding: EdgeInsets.only(bottom: padding),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                    style: ThemeButton.elevated,
+                    onPressed: () => Participants.of(context, listen: false)
+                        .exportWeb(context),
+                    child: Text(
+                      preferences.texts.hallOfFameExport,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: ThemeSize.text(context)),
+                    )),
+                ElevatedButton(
                   style: ThemeButton.elevated,
-                  onPressed: () => Participants.of(context, listen: false)
-                      .exportWeb(context),
+                  onPressed: () async {
+                    final participants =
+                        Participants.of(context, listen: false);
+                    final answer = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AreYouSureDialog(
+                            title: preferences
+                                .texts.hallOfFameImportAreYouSureTitle,
+                            content: preferences
+                                .texts.hallOfFameImportAreYouSureContent));
+                    if (answer == null || !answer) return;
+
+                    if (!context.mounted) return;
+                    participants.importWeb(context);
+                  },
                   child: Text(
-                    preferences.texts.hallOfFameExport,
+                    preferences.texts.hallOfFameImport,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                         color: Colors.black, fontSize: ThemeSize.text(context)),
-                  )),
-              ElevatedButton(
-                style: ThemeButton.elevated,
-                onPressed: () async {
-                  final participants = Participants.of(context, listen: false);
-                  final answer = await showDialog<bool>(
-                      context: context,
-                      builder: (context) => AreYouSureDialog(
-                          title:
-                              preferences.texts.hallOfFameImportAreYouSureTitle,
-                          content: preferences
-                              .texts.hallOfFameImportAreYouSureContent));
-                  if (answer == null || !answer) return;
-
-                  if (!context.mounted) return;
-                  participants.importWeb(context);
-                },
-                child: Text(
-                  preferences.texts.hallOfFameImport,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: Colors.black, fontSize: ThemeSize.text(context)),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
+        CheckboxTile(
+          title: preferences.texts.hallOfFameUsage,
+          value: preferences.useHallOfFame.value,
+          onChanged: (value) => preferences.useHallOfFame.set(value!),
         ),
-      SizedBox(height: padding),
-      CheckboxTile(
-        title: preferences.texts.hallOfFameUsage,
-        value: preferences.useHallOfFame.value,
-        onChanged: (value) => preferences.useHallOfFame.set(value!),
-      ),
-      SizedBox(height: padding),
-      CheckboxTile(
-        title: preferences.texts.hallOfFameMustFollow,
-        tooltipMessage: preferences.texts.hallOfFameMustFollowTooltip,
-        value: preferences.mustFollowForFaming.value,
-        onChanged: (value) {
-          preferences.mustFollowForFaming.set(value!);
-          participants.mustFollowForFaming = value;
-        },
-      ),
-      SizedBox(height: padding),
-      _buildStringSelectorTile(
-        context,
-        title: preferences.texts.hallOfFameWhiteListed,
-        plainText: preferences.textWhitelist,
-        onTextComplete: () =>
-            participants.whitelist = preferences.textWhitelist.text,
-      ),
-      _buildStringSelectorTile(
-        context,
-        title: preferences.texts.hallOfFameBlackListed,
-        plainText: preferences.textBlacklist,
-        onTextComplete: () =>
-            participants.blacklist = preferences.textBlacklist.text,
-      ),
-      SizedBox(height: padding),
-      SizedBox(height: padding),
-      ColorSelectorTile(
-          title: preferences.texts.hallOfFameBackgroundColor,
-          currentColor: preferences.backgroundColorHallOfFame.value,
-          onChanged: (color) =>
-              preferences.backgroundColorHallOfFame.set(color)),
-      SizedBox(height: padding),
-      DropMenuSelectorTile<AppFonts>(
-          title: preferences.texts.miscFont,
-          value: preferences.fontHallOfFame,
-          items: AppFonts.values
-              .map<DropdownMenuItem<AppFonts>>(
-                  (e) => DropdownMenuItem<AppFonts>(
-                      value: e,
-                      child: Padding(
-                        padding: EdgeInsets.only(left: padding),
-                        child: Text(
-                          e.name,
-                          style: e.style(),
-                        ),
-                      )))
-              .toList(),
-          onChanged: (value) => preferences.fontHallOfFame = value!),
-      SizedBox(height: padding),
-      ColorSelectorTile(
-          title: preferences.texts.hallOfFameTextColor,
-          currentColor: preferences.textColorHallOfFame,
-          onChanged: (color) => preferences.textColorHallOfFame = color),
-      SizedBox(height: padding),
-      PlusOrMinusTile(
-        title: preferences.texts.hallOfFameScollingSpeed,
-        onTap: (selection) => preferences.hallOfFameScrollVelocity.set(
-            preferences.hallOfFameScrollVelocity.value +
-                (selection == PlusOrMinusSelection.plus ? -100 : 100)),
-      ),
-      SizedBox(height: padding),
-      _buildStringSelectorTile(
-        context,
-        title: preferences.texts.hallOfFameTextTitleMain,
-        plainText: preferences.textHallOfFameTitle,
-      ),
-      _buildStringSelectorTile(
-        context,
-        title: preferences.texts.hallOfFameTextTitleViewers,
-        plainText: preferences.textHallOfFameName,
-      ),
-      _buildStringSelectorTile(
-        context,
-        title: preferences.texts.hallOfFameTextTitleToday,
-        plainText: preferences.textHallOfFameToday,
-      ),
-      _buildStringSelectorTile(
-        context,
-        title: preferences.texts.hallOfFameTextTitleInAll,
-        plainText: preferences.textHallOfFameAlltime,
-      ),
-      _buildStringSelectorTile(
-        context,
-        title: preferences.texts.hallOfFameTextTitleGrandTotal,
-        plainText: preferences.textHallOfFameTotal,
-      ),
-    ]);
+        SizedBox(height: padding),
+        CheckboxTile(
+          title: preferences.texts.hallOfFameMustFollow,
+          tooltipMessage: preferences.texts.hallOfFameMustFollowTooltip,
+          value: preferences.mustFollowForFaming.value,
+          onChanged: (value) {
+            preferences.mustFollowForFaming.set(value!);
+            participants.mustFollowForFaming = value;
+          },
+        ),
+        SizedBox(height: padding),
+        _buildStringSelectorTile(
+          context,
+          title: preferences.texts.hallOfFameWhiteListed,
+          plainText: preferences.textWhitelist,
+          onTextComplete: () =>
+              participants.whitelist = preferences.textWhitelist.text,
+        ),
+        _buildStringSelectorTile(
+          context,
+          title: preferences.texts.hallOfFameBlackListed,
+          plainText: preferences.textBlacklist,
+          onTextComplete: () =>
+              participants.blacklist = preferences.textBlacklist.text,
+        ),
+        SizedBox(height: padding),
+        SizedBox(height: padding),
+        ColorSelectorTile(
+            title: preferences.texts.hallOfFameBackgroundColor,
+            currentColor: preferences.backgroundColorHallOfFame.value,
+            onChanged: (color) =>
+                preferences.backgroundColorHallOfFame.set(color)),
+        SizedBox(height: padding),
+        DropMenuSelectorTile<AppFonts>(
+            title: preferences.texts.miscFont,
+            value: preferences.fontHallOfFame,
+            items: AppFonts.values
+                .map<DropdownMenuItem<AppFonts>>(
+                    (e) => DropdownMenuItem<AppFonts>(
+                        value: e,
+                        child: Padding(
+                          padding: EdgeInsets.only(left: padding),
+                          child: Text(
+                            e.name,
+                            style: e.style(),
+                          ),
+                        )))
+                .toList(),
+            onChanged: (value) => preferences.fontHallOfFame = value!),
+        SizedBox(height: padding),
+        ColorSelectorTile(
+            title: preferences.texts.hallOfFameTextColor,
+            currentColor: preferences.textColorHallOfFame,
+            onChanged: (color) => preferences.textColorHallOfFame = color),
+        SizedBox(height: padding),
+        PlusOrMinusTile(
+          title: preferences.texts.hallOfFameScollingSpeed,
+          onTap: (selection) => preferences.hallOfFameScrollVelocity.set(
+              preferences.hallOfFameScrollVelocity.value +
+                  (selection == PlusOrMinusSelection.plus ? -100 : 100)),
+        ),
+        SizedBox(height: padding),
+        _buildStringSelectorTile(
+          context,
+          title: preferences.texts.hallOfFameTextTitleMain,
+          plainText: preferences.textHallOfFameTitle,
+        ),
+        _buildStringSelectorTile(
+          context,
+          title: preferences.texts.hallOfFameTextTitleViewers,
+          plainText: preferences.textHallOfFameName,
+        ),
+        _buildStringSelectorTile(
+          context,
+          title: preferences.texts.hallOfFameTextTitleToday,
+          plainText: preferences.textHallOfFameToday,
+        ),
+        _buildStringSelectorTile(
+          context,
+          title: preferences.texts.hallOfFameTextTitleInAll,
+          plainText: preferences.textHallOfFameAlltime,
+        ),
+        _buildStringSelectorTile(
+          context,
+          title: preferences.texts.hallOfFameTextTitleGrandTotal,
+          plainText: preferences.textHallOfFameTotal,
+        ),
+      ]),
+    );
   }
 
   Widget _buildReset(BuildContext context) {
     final preferences = AppPreferences.of(context);
+    final padding = ThemePadding.normal(context);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(preferences.texts.miscTitle,
-            style: TextStyle(
-                color: ThemeColor().configurationText,
-                fontWeight: FontWeight.bold,
-                fontSize: ThemeSize.text(context))),
-        const SizedBox(height: 8),
-        if (kIsWeb)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ElevatedButton(
-                onPressed: () => AppPreferences.of(context, listen: false)
-                    .exportWeb(context),
-                style: ThemeButton.elevated,
-                child: Text(
-                  textAlign: TextAlign.center,
-                  preferences.texts.miscExportButton,
-                  style: TextStyle(
-                      color: Colors.black, fontSize: ThemeSize.text(context)),
-                ),
+    return AnimatedExpandingCard(
+      header: Text(preferences.texts.miscTitle,
+          style: TextStyle(
+              color: ThemeColor().configurationText,
+              fontWeight: FontWeight.bold,
+              fontSize: ThemeSize.text(context))),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (kIsWeb)
+            Padding(
+              padding: EdgeInsets.only(bottom: padding),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () => AppPreferences.of(context, listen: false)
+                        .exportWeb(context),
+                    style: ThemeButton.elevated,
+                    child: Text(
+                      textAlign: TextAlign.center,
+                      preferences.texts.miscExportButton,
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: ThemeSize.text(context)),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      final navigator = Navigator.of(context);
+                      final preferences =
+                          AppPreferences.of(context, listen: false);
+
+                      final answer = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AreYouSureDialog(
+                              title:
+                                  preferences.texts.miscImportAreYouSureTitle,
+                              content: preferences
+                                  .texts.micsImportAreYouSureContent));
+                      if (answer == null || !answer) return;
+
+                      if (!context.mounted) return;
+                      await preferences.importWeb(context);
+
+                      navigator.pushReplacementNamed(MainScreen.route);
+                    },
+                    style: ThemeButton.elevated,
+                    child: Text(
+                      textAlign: TextAlign.center,
+                      preferences.texts.miscImportButton,
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: ThemeSize.text(context)),
+                    ),
+                  ),
+                ],
               ),
-              ElevatedButton(
-                onPressed: () async {
-                  final navigator = Navigator.of(context);
-                  final preferences = AppPreferences.of(context, listen: false);
-
-                  final answer = await showDialog<bool>(
-                      context: context,
-                      builder: (context) => AreYouSureDialog(
-                          title: preferences.texts.miscImportAreYouSureTitle,
-                          content:
-                              preferences.texts.micsImportAreYouSureContent));
-                  if (answer == null || !answer) return;
-
-                  if (!context.mounted) return;
-                  await preferences.importWeb(context);
-
-                  navigator.pushReplacementNamed(MainScreen.route);
-                },
-                style: ThemeButton.elevated,
-                child: Text(
-                  textAlign: TextAlign.center,
-                  preferences.texts.miscImportButton,
-                  style: TextStyle(
-                      color: Colors.black, fontSize: ThemeSize.text(context)),
-                ),
+            ),
+          Center(
+            child: ElevatedButton(
+              onPressed: () async {
+                final navigator = Navigator.of(context);
+                final answer = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AreYouSureDialog(
+                    title: preferences.texts.miscResetConfirmTitle,
+                    content: preferences.texts.miscResetConfirm,
+                  ),
+                );
+                if (answer == null || !answer) return;
+                preferences.reset();
+                navigator.pushReplacementNamed(MainScreen.route);
+              },
+              style: ThemeButton.elevated,
+              child: Text(
+                preferences.texts.miscResetButton,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    color: Colors.black, fontSize: ThemeSize.text(context)),
               ),
-            ],
-          ),
-        const SizedBox(height: 8),
-        Center(
-          child: ElevatedButton(
-            onPressed: () async {
-              final navigator = Navigator.of(context);
-              final answer = await showDialog<bool>(
-                context: context,
-                builder: (context) => AreYouSureDialog(
-                  title: preferences.texts.miscResetConfirmTitle,
-                  content: preferences.texts.miscResetConfirm,
-                ),
-              );
-              if (answer == null || !answer) return;
-              preferences.reset();
-              navigator.pushReplacementNamed(MainScreen.route);
-            },
-            style: ThemeButton.elevated,
-            child: Text(
-              preferences.texts.miscResetButton,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  color: Colors.black, fontSize: ThemeSize.text(context)),
             ),
           ),
-        ),
-        const SizedBox(height: 12),
-      ],
+          const SizedBox(height: 12),
+        ],
+      ),
     );
   }
 
@@ -876,54 +942,55 @@ class ConfigurationBoard extends StatelessWidget {
     final preferences = AppPreferences.of(context);
     final padding = ThemePadding.normal(context);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(
-              preferences.texts.chatTitle,
-              style: TextStyle(
-                  color: ThemeColor().configurationText,
-                  fontWeight: FontWeight.bold,
-                  fontSize: ThemeSize.text(context)),
-            ),
-            SizedBox(width: padding),
-            InfoTooltip(message: preferences.texts.chatTitleTooltip),
-          ],
-        ),
-        SizedBox(height: padding),
-        _buildStringSelectorTile(
-          context,
-          title: preferences.texts.chatTimerHasStarted,
-          plainText: preferences.textTimerHasStarted,
-        ),
-        _buildStringSelectorTile(
-          context,
-          title: preferences.texts.chatTimerSessionHasEnded,
-          plainText: preferences.textTimerActiveSessionHasEnded,
-        ),
-        _buildStringSelectorTile(
-          context,
-          title: preferences.texts.chatTimerPauseHasEnded,
-          plainText: preferences.textTimerPauseHasEnded,
-        ),
-        _buildStringSelectorTile(
-          context,
-          title: preferences.texts.chatTimerWorkingHasEnded,
-          plainText: preferences.textTimerWorkingHasEnded,
-        ),
-        _buildStringSelectorTile(
-          context,
-          title: preferences.texts.chatNewcomerGreetings,
-          plainText: preferences.textNewcomersGreetings,
-        ),
-        _buildStringSelectorTile(
-          context,
-          title: preferences.texts.chatUserHasConnected,
-          plainText: preferences.textUserHasConnectedGreetings,
-        ),
-      ],
+    return AnimatedExpandingCard(
+      header: Row(
+        children: [
+          Text(
+            preferences.texts.chatTitle,
+            style: TextStyle(
+                color: ThemeColor().configurationText,
+                fontWeight: FontWeight.bold,
+                fontSize: ThemeSize.text(context)),
+          ),
+          SizedBox(width: padding),
+          InfoTooltip(message: preferences.texts.chatTitleTooltip),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildStringSelectorTile(
+            context,
+            title: preferences.texts.chatTimerHasStarted,
+            plainText: preferences.textTimerHasStarted,
+          ),
+          _buildStringSelectorTile(
+            context,
+            title: preferences.texts.chatTimerSessionHasEnded,
+            plainText: preferences.textTimerActiveSessionHasEnded,
+          ),
+          _buildStringSelectorTile(
+            context,
+            title: preferences.texts.chatTimerPauseHasEnded,
+            plainText: preferences.textTimerPauseHasEnded,
+          ),
+          _buildStringSelectorTile(
+            context,
+            title: preferences.texts.chatTimerWorkingHasEnded,
+            plainText: preferences.textTimerWorkingHasEnded,
+          ),
+          _buildStringSelectorTile(
+            context,
+            title: preferences.texts.chatNewcomerGreetings,
+            plainText: preferences.textNewcomersGreetings,
+          ),
+          _buildStringSelectorTile(
+            context,
+            title: preferences.texts.chatUserHasConnected,
+            plainText: preferences.textUserHasConnectedGreetings,
+          ),
+        ],
+      ),
     );
   }
 

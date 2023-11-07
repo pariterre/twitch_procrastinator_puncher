@@ -46,7 +46,6 @@ class _IntSelectorTileState extends State<IntSelectorTile> {
         Text(widget.title,
             style: TextStyle(
                 color: ThemeColor().configurationText,
-                fontWeight: FontWeight.bold,
                 fontSize: ThemeSize.text(context))),
         Theme(
           data: ThemeData(

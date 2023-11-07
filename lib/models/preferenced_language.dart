@@ -80,7 +80,7 @@ class PreferencedLanguage extends PreferencedElement {
   String get controllerTitle {
     switch (_current) {
       case Language.english:
-        return 'Pomodoro controller';
+        return 'Timer controller';
       case Language.french:
         return 'Contrôles du minuteur';
     }
@@ -155,6 +155,15 @@ class PreferencedLanguage extends PreferencedElement {
         return 'Are you sure you want to reconnect to Twitch?';
       case Language.french:
         return 'Êtes-vous certain de vouloir reconnecter à Twitch?';
+    }
+  }
+
+  String get controllerConfigurationTitle {
+    switch (_current) {
+      case Language.english:
+        return 'Timer configuration';
+      case Language.french:
+        return 'Configuration du minuteur';
     }
   }
 
@@ -603,6 +612,42 @@ class PreferencedLanguage extends PreferencedElement {
     }
   }
 
+  String get followerRedeemTitle {
+    switch (_current) {
+      case Language.english:
+        return 'Follower redeem';
+      case Language.french:
+        return 'Récompense des spectateurs';
+    }
+  }
+
+  String get followerRedeemTitleTooltip {
+    switch (_current) {
+      case Language.english:
+        return 'The reedem of the followers requires you to be connected to Twitch.';
+      case Language.french:
+        return 'Les récompenses des spectateurs nécessitent que vous soyez connecté à Twitch.';
+    }
+  }
+
+  String get followerRedeemAddButton {
+    switch (_current) {
+      case Language.english:
+        return 'Add a new redeem';
+      case Language.french:
+        return 'Ajouter une nouvelle récompense';
+    }
+  }
+
+  String get followerRedeemLabel {
+    switch (_current) {
+      case Language.english:
+        return 'Write the exact name of the redeem';
+      case Language.french:
+        return 'Écrivez le nom exact de la récompse';
+    }
+  }
+
   String get hallOfFameTitle {
     switch (_current) {
       case Language.english:
@@ -804,9 +849,9 @@ class PreferencedLanguage extends PreferencedElement {
   String get chatTitle {
     switch (_current) {
       case Language.english:
-        return 'Chat messages';
+        return 'Chatbot messages';
       case Language.french:
-        return 'Messages de clavardage';
+        return 'Messages de clavardage automatiques';
     }
   }
 
