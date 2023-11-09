@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:twitch_procastinator_puncher/models/app_theme.dart';
 import 'package:twitch_procastinator_puncher/models/config.dart';
 import 'package:twitch_procastinator_puncher/models/preferenced_element.dart';
-import 'package:twitch_procastinator_puncher/models/redeem.dart';
+import 'package:twitch_procastinator_puncher/models/reward_redemption.dart';
 import 'package:twitch_procastinator_puncher/models/twitch_status.dart';
 import 'package:twitch_procastinator_puncher/providers/app_preferences.dart';
 import 'package:twitch_procastinator_puncher/providers/participants.dart';
@@ -82,7 +82,7 @@ class ConfigurationBoard extends StatelessWidget {
                     const Divider(),
                     _buildChatMessages(context),
                     const Divider(),
-                    _buildFollowerRedeem(context),
+                    _buildRewardRedemption(context),
                     const Divider(),
                     _buildHallOfFameOptions(context),
                     const Divider(),
@@ -606,7 +606,7 @@ class ConfigurationBoard extends StatelessWidget {
     );
   }
 
-  Widget _buildFollowerRedeem(BuildContext context) {
+  Widget _buildRewardRedemption(BuildContext context) {
     final preferences = AppPreferences.of(context);
     final padding = ThemePadding.normal(context);
 
@@ -615,39 +615,40 @@ class ConfigurationBoard extends StatelessWidget {
       header: Row(
         children: [
           Text(
-            preferences.texts.followerRedeemTitle,
+            preferences.texts.rewardRedemptionTitle,
             style: TextStyle(
                 color: ThemeColor().configurationText,
                 fontWeight: FontWeight.bold,
                 fontSize: ThemeSize.text(context)),
           ),
           SizedBox(width: padding),
-          InfoTooltip(message: preferences.texts.followerRedeemTitleTooltip),
+          InfoTooltip(message: preferences.texts.rewardRedemptionTitleTooltip),
         ],
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        ...preferences.redeems
+        ...preferences.rewardRedemptions
             .asMap()
             .keys
-            .map((index) => _buildRedeemSelectorTile(
+            .map((index) => _buildRewardRedemptionSelectorTile(
                   context,
-                  hint: '${preferences.texts.followerRedeemLabel} ${index + 1}',
-                  redeem: preferences.redeems[index],
-                  onDeleted: () => preferences.removeRedeemAt(index),
+                  hint:
+                      '${preferences.texts.rewardRedemptionLabel} ${index + 1}',
+                  rewardRedemption: preferences.rewardRedemptions[index],
+                  onDeleted: () => preferences.removeRewardRedemptionAt(index),
                 )),
         Center(
           child: Padding(
             padding: EdgeInsets.only(top: padding),
             child: ElevatedButton(
-                onPressed: () =>
-                    AppPreferences.of(context, listen: false).newRedeem(),
+                onPressed: () => AppPreferences.of(context, listen: false)
+                    .newRewardRedemption(),
                 style: ThemeButton.elevated,
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Icon(Icons.add, color: Colors.green),
                     Text(
-                      preferences.texts.followerRedeemAddButton,
+                      preferences.texts.rewardRedemptionAddButton,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                           color: Colors.black,
@@ -1045,10 +1046,10 @@ class ConfigurationBoard extends StatelessWidget {
     );
   }
 
-  Widget _buildRedeemSelectorTile(
+  Widget _buildRewardRedemptionSelectorTile(
     context, {
     required String hint,
-    required RedeemPreferenced redeem,
+    required RewardRedemptionPreferenced rewardRedemption,
     required Function() onDeleted,
   }) {
     final padding = ThemePadding.normal(context);
@@ -1060,10 +1061,10 @@ class ConfigurationBoard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           StringSelectorTile(
-            key: ValueKey(redeem.hashCode),
+            key: ValueKey(rewardRedemption.hashCode),
             title: hint,
-            initialText: redeem.title,
-            onTextChanged: (String value) => redeem.title = value,
+            initialText: rewardRedemption.title,
+            onTextChanged: (String value) => rewardRedemption.title = value,
           ),
           Row(
             mainAxisSize: MainAxisSize.min,
@@ -1072,14 +1073,15 @@ class ConfigurationBoard extends StatelessWidget {
             children: [
               Expanded(
                 child: SelectDropList(
-                    key: ValueKey(redeem.hashCode),
+                    key: ValueKey(rewardRedemption.hashCode),
                     paddingTop: padding / 2,
-                    heightBottomContainer: 20 + (Redeem.values.length - 1) * 42,
+                    heightBottomContainer:
+                        20 + (RewardRedemption.values.length - 1) * 42,
                     itemSelected: OptionItem(
-                        id: redeem.redeem.index.toString(),
-                        title: redeem.redeem.name(context)),
-                    dropListModel: DropListModel(Redeem.values
-                        .where((e) => e != Redeem.none)
+                        id: rewardRedemption.rewardRedemption.index.toString(),
+                        title: rewardRedemption.rewardRedemption.name(context)),
+                    dropListModel: DropListModel(RewardRedemption.values
+                        .where((e) => e != RewardRedemption.none)
                         .map(
                           (e) => OptionItem(
                               id: e.index.toString(), title: e.name(context)),
@@ -1088,7 +1090,8 @@ class ConfigurationBoard extends StatelessWidget {
                     showIcon: false,
                     showArrowIcon: true,
                     onOptionSelected: (value) {
-                      redeem.redeem = Redeem.values[int.parse(value.id!)];
+                      rewardRedemption.rewardRedemption =
+                          RewardRedemption.values[int.parse(value.id!)];
                     }),
               ),
               IconButton(

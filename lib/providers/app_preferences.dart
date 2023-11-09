@@ -37,7 +37,6 @@ const Map<String, dynamic> _defaultValues = {
   'textDuringPauseSession': r'Pause\n{timer}!',
   'textDuringPause': r'Pause!',
   'textDone': r'Congratulation!',
-  'redeem': null,
   'saveToTextFile': false,
   'useHallOfFame': true,
   'mustFollowForFaming': true,
@@ -117,16 +116,16 @@ class AppPreferences with ChangeNotifier {
     textDone.font = value;
   }
 
-  // Some options for the followers redeem
-  List<RedeemPreferenced> redeems;
-  void newRedeem() {
-    redeems.add(RedeemPreferenced());
-    redeems.last.onChanged = _save;
+  // Some options for the reward redemption
+  List<RewardRedemptionPreferenced> rewardRedemptions;
+  void newRewardRedemption() {
+    rewardRedemptions.add(RewardRedemptionPreferenced());
+    rewardRedemptions.last.onChanged = _save;
     _save();
   }
 
-  void removeRedeemAt(int index) {
-    redeems.removeAt(index);
+  void removeRewardRedemptionAt(int index) {
+    rewardRedemptions.removeAt(index);
     _save();
   }
 
@@ -319,7 +318,7 @@ class AppPreferences with ChangeNotifier {
         textDuringPauseSession: await TextOnTimer.deserialize(previousPreferences?['textDuringPauseSession'], _defaultValues['textDuringPauseSession']),
         textDuringPause: await TextOnTimer.deserialize(previousPreferences?['textDuringPause'], _defaultValues['textDuringPause']),
         textDone: await TextOnTimer.deserialize(previousPreferences?['textDone'], _defaultValues['textDone']),
-        redeems: (previousPreferences?['redeems'] as List?)?.map((e) => RedeemPreferenced.deserializeSync(e)).toList() ?? [],
+        rewardRedemptions: (previousPreferences?['rewardRedemptions'] as List?)?.map((e) => RewardRedemptionPreferenced.deserializeSync(e)).toList() ?? [],
         saveToTextFile: await PreferencedBool.deserialize(previousPreferences?['saveToTextFile'], _defaultValues['saveToTextFile']),
         useHallOfFame: await PreferencedBool.deserialize(previousPreferences?['useHallOfFame'], _defaultValues['useHallOfFame']),
         mustFollowForFaming: await PreferencedBool.deserialize(previousPreferences?['mustFollowForFaming'], _defaultValues['mustFollowForFaming']),
@@ -363,7 +362,7 @@ class AppPreferences with ChangeNotifier {
     required this.textDuringPauseSession,
     required this.textDuringPause,
     required this.textDone,
-    required this.redeems,
+    required this.rewardRedemptions,
     required this.saveToTextFile,
     required this.useHallOfFame,
     required this.mustFollowForFaming,
@@ -429,7 +428,8 @@ class AppPreferences with ChangeNotifier {
         'textDuringPauseSession': textDuringPauseSession.serialize(),
         'textDuringPause': textDuringPause.serialize(),
         'textDone': textDone.serialize(),
-        'redeems': redeems.map((e) => e.serialize()).toList(),
+        'rewardRedemptions':
+            rewardRedemptions.map((e) => e.serialize()).toList(),
         'saveToTextFile': saveToTextFile.serialize(),
         'useHallOfFame': useHallOfFame.serialize(),
         'mustFollowForFaming': mustFollowForFaming.serialize(),
@@ -490,7 +490,7 @@ class AppPreferences with ChangeNotifier {
     textDuringPause =
         await TextOnTimer.deserialize(null, _defaultValues['textDuringPause']);
     textDone = await TextOnTimer.deserialize(null, _defaultValues['textDone']);
-    redeems = [];
+    rewardRedemptions = [];
     saveToTextFile = await PreferencedBool.deserialize(
         null, _defaultValues['saveToTextFile']);
     useHallOfFame = await PreferencedBool.deserialize(
@@ -561,8 +561,8 @@ class AppPreferences with ChangeNotifier {
         await TextOnTimer.deserialize(map['textDuringPauseSession']);
     textDuringPause = await TextOnTimer.deserialize(map['textDuringPause']);
     textDone = await TextOnTimer.deserialize(map['textDone']);
-    redeems = (map['redeems'] as List?)
-            ?.map((e) => RedeemPreferenced.deserializeSync(e))
+    rewardRedemptions = (map['rewardRedemptions'] as List?)
+            ?.map((e) => RewardRedemptionPreferenced.deserializeSync(e))
             .toList() ??
         [];
     saveToTextFile = await PreferencedBool.deserialize(map['saveToTextFile']);
@@ -660,8 +660,8 @@ class AppPreferences with ChangeNotifier {
     textDuringPause.onChanged = _save;
     textDone.onChanged = _save;
 
-    for (var element in redeems) {
-      element.onChanged = _save;
+    for (var rewardRedemption in rewardRedemptions) {
+      rewardRedemption.onChanged = _save;
     }
 
     saveToTextFile.onChanged = _save;

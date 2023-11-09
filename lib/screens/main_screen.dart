@@ -213,8 +213,8 @@ class _MainScreenState extends State<MainScreen> {
     participants.greetNewcomerCallback = _greetNewComers;
     participants.greetUserHasConnectedCallback = _greetUserHasConnected;
 
-    // Connect the redeem
-    // TODO: Connect twitch callback when redeem is done (via _onRedeemRequest)
+    // Connect the reward redemption
+    // TODO: Connect twitch callback when reward redemption is done (via _onRewardRedemptionRequest)
   }
 
   List<String>? _moderators;
@@ -237,15 +237,15 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
-  void _onRedeemRequest(String title) {
-    AppPreferences.of(context, listen: false).redeems.forEach((redeem) {
-      if (redeem.title == title) {
-        PomodoroStatus.of(context, listen: false).addRedeem(redeem);
+  void _onRewardRedemptionRequest(String title) {
+    AppPreferences.of(context, listen: false).rewardRedemptions.forEach((e) {
+      if (e.title == title) {
+        PomodoroStatus.of(context, listen: false).addRewardRedemption(e);
         return;
       }
     });
-    // If we get here, the redeem is not related to the procrastinator puncher
-    // or the name of the redeem was wrong.
+    // If we get here, the reward redemption is not related to the procrastinator puncher
+    // or the name of the reward redemption was wrong.
   }
 
   @override

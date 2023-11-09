@@ -612,43 +612,43 @@ class PreferencedLanguage extends PreferencedElement {
     }
   }
 
-  String get followerRedeemTitle {
+  String get rewardRedemptionTitle {
     switch (_current) {
       case Language.english:
-        return 'Follower redeem';
+        return 'Reward redemption';
       case Language.french:
-        return 'Récompense des spectateurs';
+        return 'Réclamation de récompenses';
     }
   }
 
-  String get followerRedeemTitleTooltip {
+  String get rewardRedemptionTitleTooltip {
     switch (_current) {
       case Language.english:
-        return 'The reedem of the followers requires you to be connected to Twitch.';
+        return 'The reward redemption of the followers requires you to be connected to Twitch.';
       case Language.french:
-        return 'Les récompenses des spectateurs nécessitent que vous soyez connecté à Twitch.';
+        return 'La réclamation de récompenses nécessite que vous soyez connecté à Twitch.';
     }
   }
 
-  String get followerRedeemAddButton {
+  String get rewardRedemptionAddButton {
     switch (_current) {
       case Language.english:
-        return 'Add a new redeem';
+        return 'Add a new reward redemption';
       case Language.french:
-        return 'Ajouter une nouvelle récompense';
+        return 'Ajouter une réclamation de récompense';
     }
   }
 
-  String get followerRedeemNone {
+  String get rewardRedemptionNone {
     switch (_current) {
       case Language.english:
-        return 'Select a redeem';
+        return 'Select a reward';
       case Language.french:
-        return 'Sélectionner';
+        return 'Sélectionner une récompense';
     }
   }
 
-  String get followerRedeemLongerPause {
+  String get rewardRedemptionLongerPause {
     switch (_current) {
       case Language.english:
         return 'Longer pause';
@@ -657,7 +657,7 @@ class PreferencedLanguage extends PreferencedElement {
     }
   }
 
-  String get followerRedeemLongerSession {
+  String get rewardRedemptionLongerSession {
     switch (_current) {
       case Language.english:
         return 'Longer session';
@@ -666,12 +666,12 @@ class PreferencedLanguage extends PreferencedElement {
     }
   }
 
-  String get followerRedeemLabel {
+  String get rewardRedemptionLabel {
     switch (_current) {
       case Language.english:
-        return 'Write the exact name of the redeem';
+        return 'Write the exact name of the reward redemption';
       case Language.french:
-        return 'Écrivez le nom exact de la récompense';
+        return 'Écrivez le nom exact de la réclamation de récompense';
     }
   }
 

@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:twitch_procastinator_puncher/models/preferenced_element.dart';
-import 'package:twitch_procastinator_puncher/models/redeem.dart';
+import 'package:twitch_procastinator_puncher/models/reward_redemption.dart';
 
 enum StopWatchStatus { initializing, inSession, inPauseSession, paused, done }
 
@@ -12,7 +12,7 @@ class PomodoroStatus with ChangeNotifier {
   int _currentSession = 0;
   int get currentSession => _currentSession;
 
-  final List<RedeemPreferenced> _pendingRedeems = [];
+  final List<RewardRedemptionPreferenced> _pendingRewardRedemptions = [];
 
   Duration _timer = const Duration();
   StopWatchStatus _stopWatchStatus = StopWatchStatus.initializing;
@@ -59,8 +59,8 @@ class PomodoroStatus with ChangeNotifier {
     if (notify) notifyListeners();
   }
 
-  void addRedeem(RedeemPreferenced redeem) {
-    _pendingRedeems.add(redeem);
+  void addRewardRedemption(RewardRedemptionPreferenced rewardRedemption) {
+    _pendingRewardRedemptions.add(rewardRedemption);
   }
 
   ///
@@ -108,12 +108,13 @@ class PomodoroStatus with ChangeNotifier {
   int get _pauseDuration {
     final officialPause = getPauseDuration(_currentSession).inSeconds;
 
-    final redeemedPause = _pendingRedeems
-        .where((e) => e.redeem == Redeem.longerPause)
+    final rewardRedemptionPause = _pendingRewardRedemptions
+        .where((e) => e.rewardRedemption == RewardRedemption.longerPause)
         .fold(0, (prev, e) => prev + e.duration.inSeconds);
-    _pendingRedeems.removeWhere((e) => e.redeem == Redeem.longerPause);
+    _pendingRewardRedemptions
+        .removeWhere((e) => e.rewardRedemption == RewardRedemption.longerPause);
 
-    return officialPause + redeemedPause;
+    return officialPause + rewardRedemptionPause;
   }
 
   // This method is automatically called every seconds

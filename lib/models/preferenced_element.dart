@@ -8,7 +8,7 @@ import 'package:path/path.dart';
 import 'package:twitch_procastinator_puncher/models/config.dart';
 import 'package:twitch_procastinator_puncher/models/helpers.dart';
 import 'package:twitch_procastinator_puncher/models/participant.dart';
-import 'package:twitch_procastinator_puncher/models/redeem.dart';
+import 'package:twitch_procastinator_puncher/models/reward_redemption.dart';
 import 'package:twitch_procastinator_puncher/providers/app_preferences.dart';
 import 'package:twitch_procastinator_puncher/providers/participants.dart';
 import 'package:twitch_procastinator_puncher/providers/pomodoro_status.dart';
@@ -446,12 +446,12 @@ class TextOnTimer extends PreferencedText {
     });
 }
 
-class RedeemPreferenced extends PreferencedElement {
-  RedeemPreferenced({
-    Redeem redeem = Redeem.none,
+class RewardRedemptionPreferenced extends PreferencedElement {
+  RewardRedemptionPreferenced({
+    RewardRedemption rewardRedemption = RewardRedemption.none,
     String title = '',
     Duration duration = const Duration(minutes: 5),
-  })  : _redeem = redeem,
+  })  : _rewardRedemption = rewardRedemption,
         _title = title,
         _duration = duration;
 
@@ -462,10 +462,10 @@ class RedeemPreferenced extends PreferencedElement {
     if (onChanged != null) onChanged!();
   }
 
-  Redeem _redeem;
-  Redeem get redeem => _redeem;
-  set redeem(Redeem value) {
-    _redeem = value;
+  RewardRedemption _rewardRedemption;
+  RewardRedemption get rewardRedemption => _rewardRedemption;
+  set rewardRedemption(RewardRedemption value) {
+    _rewardRedemption = value;
     if (onChanged != null) onChanged!();
   }
 
@@ -476,18 +476,19 @@ class RedeemPreferenced extends PreferencedElement {
     if (onChanged != null) onChanged!();
   }
 
-  static RedeemPreferenced deserializeSync(map) => RedeemPreferenced(
+  static RewardRedemptionPreferenced deserializeSync(map) =>
+      RewardRedemptionPreferenced(
         title: map?['title'],
-        redeem: Redeem.values[map?['redeem']],
+        rewardRedemption: RewardRedemption.values[map?['rewardRedemption']],
         duration: Duration(seconds: map?['duration'] ?? 60 * 5),
       );
 
-  static Future<RedeemPreferenced> deserialize(map) async =>
+  static Future<RewardRedemptionPreferenced> deserialize(map) async =>
       deserializeSync(map);
 
   Map<String, dynamic> serialize() => {
         'title': title,
-        'redeem': redeem.index,
+        'rewardRedemption': rewardRedemption.index,
         'duration': duration.inSeconds,
       };
 }
