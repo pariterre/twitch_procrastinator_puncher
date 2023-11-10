@@ -648,7 +648,16 @@ class PreferencedLanguage extends PreferencedElement {
     }
   }
 
-  String get rewardRedemptionLongerPause {
+  String get rewardRedemptionAddTime {
+    switch (_current) {
+      case Language.english:
+        return 'Add time to the timer';
+      case Language.french:
+        return 'Ajouter au chronomètre';
+    }
+  }
+
+  String get rewardRedemptionNextPauseIsLonger {
     switch (_current) {
       case Language.english:
         return 'Longer pause';
@@ -657,7 +666,7 @@ class PreferencedLanguage extends PreferencedElement {
     }
   }
 
-  String get rewardRedemptionLongerSession {
+  String get rewardRedemptionNextSessionIsLonger {
     switch (_current) {
       case Language.english:
         return 'Longer session';

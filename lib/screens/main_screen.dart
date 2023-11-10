@@ -1,5 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:twitch_manager/models/twitch_events.dart';
 import 'package:twitch_manager/twitch_manager.dart';
 import 'package:twitch_procastinator_puncher/models/app_theme.dart';
 import 'package:twitch_procastinator_puncher/models/config.dart';
@@ -118,7 +119,7 @@ class _MainScreenState extends State<MainScreen> {
   Future<void> _startWorking() async {
     final preferences = AppPreferences.of(context, listen: false);
     if (_twitchManager!.isConnected) {
-      _twitchManager!.irc
+      _twitchManager!.chat
           .send(preferences.textTimerHasStarted.formattedText(context));
     }
   }
@@ -126,7 +127,7 @@ class _MainScreenState extends State<MainScreen> {
   Future<void> _activeSessionDone() async {
     final preferences = AppPreferences.of(context, listen: false);
     if (_twitchManager!.isConnected) {
-      _twitchManager!.irc.send(
+      _twitchManager!.chat.send(
           preferences.textTimerActiveSessionHasEnded.formattedText(context));
     }
 
@@ -140,7 +141,7 @@ class _MainScreenState extends State<MainScreen> {
   Future<void> _pauseSessionDone() async {
     final preferences = AppPreferences.of(context, listen: false);
     if (_twitchManager!.isConnected) {
-      _twitchManager!.irc
+      _twitchManager!.chat
           .send(preferences.textTimerPauseHasEnded.formattedText(context));
     }
 
@@ -154,7 +155,7 @@ class _MainScreenState extends State<MainScreen> {
   Future<void> _workingDone() async {
     final preferences = AppPreferences.of(context, listen: false);
     if (_twitchManager!.isConnected) {
-      _twitchManager!.irc
+      _twitchManager!.chat
           .send(preferences.textTimerWorkingHasEnded.formattedText(context));
     }
 
@@ -168,7 +169,7 @@ class _MainScreenState extends State<MainScreen> {
   void _greetNewComers(Participant participant) {
     final preferences = AppPreferences.of(context, listen: false);
     if (_twitchManager!.isConnected) {
-      _twitchManager!.irc.send(preferences.textNewcomersGreetings
+      _twitchManager!.chat.send(preferences.textNewcomersGreetings
           .formattedText(context, participant));
     }
     setState(() {});
@@ -177,7 +178,7 @@ class _MainScreenState extends State<MainScreen> {
   void _greetUserHasConnected(Participant participant) {
     final preferences = AppPreferences.of(context, listen: false);
     if (_twitchManager!.isConnected) {
-      _twitchManager!.irc.send(preferences.textUserHasConnectedGreetings
+      _twitchManager!.chat.send(preferences.textUserHasConnectedGreetings
           .formattedText(context, participant));
     }
     setState(() {});
@@ -191,7 +192,7 @@ class _MainScreenState extends State<MainScreen> {
         mockOptions: _twitchMockOptions,
         onFinishedConnexion: (manager) => Navigator.pop(context, manager),
         appInfo: twitchAppInfo,
-        loadPreviousSession: false,
+        reload: false,
       )),
     ));
 
@@ -208,13 +209,11 @@ class _MainScreenState extends State<MainScreen> {
         (await _twitchManager!.api.fetchModerators(includeStreamer: true))!;
 
     // Connect everything related to participants
-    _twitchManager!.irc.messageCallback = _onMessageReceived;
+    _twitchManager!.chat.addListener('1', _onMessageReceived);
+    _twitchManager!.events.addListener('1', _onRewardRedemptionRequest);
     participants.twitchManager = _twitchManager!;
     participants.greetNewcomerCallback = _greetNewComers;
     participants.greetUserHasConnectedCallback = _greetUserHasConnected;
-
-    // Connect the reward redemption
-    // TODO: Connect twitch callback when reward redemption is done (via _onRewardRedemptionRequest)
   }
 
   List<String>? _moderators;
@@ -237,15 +236,18 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
-  void _onRewardRedemptionRequest(String title) {
+  void _onRewardRedemptionRequest(TwitchEventResponse response) {
+    // Cycle through all the reward redemption defined by the streamer to see
+    // if one of them matches the currently redempted one.
     AppPreferences.of(context, listen: false).rewardRedemptions.forEach((e) {
-      if (e.title == title) {
+      // If so, add it to the timer settings
+      if (e.title == response.rewardRedemption) {
         PomodoroStatus.of(context, listen: false).addRewardRedemption(e);
         return;
       }
     });
-    // If we get here, the reward redemption is not related to the procrastinator puncher
-    // or the name of the reward redemption was wrong.
+    // If we get here, the reward redemption is not related to the
+    // procrastinator puncher or the name of the reward redemption was wrong.
   }
 
   @override

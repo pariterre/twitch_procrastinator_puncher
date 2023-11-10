@@ -60,7 +60,14 @@ class PomodoroStatus with ChangeNotifier {
   }
 
   void addRewardRedemption(RewardRedemptionPreferenced rewardRedemption) {
-    _pendingRewardRedemptions.add(rewardRedemption);
+    if (!rewardRedemption.rewardRedemption.isTimeRelated) return;
+
+    if (rewardRedemption.rewardRedemption.takesEffectNow) {
+      _timer += rewardRedemption.duration;
+      return;
+    } else {
+      _pendingRewardRedemptions.add(rewardRedemption);
+    }
   }
 
   ///
@@ -105,14 +112,31 @@ class PomodoroStatus with ChangeNotifier {
   /// Callback that announces that we arrived at the end
   Future<void> Function()? finishedWorkingGuiCallback;
 
+  ///
+  /// Get the total duration of the active session (official + reward redemptions)
+  int get _activeDuration {
+    final officialActive = getActiveDuration(_currentSession).inSeconds;
+
+    final rewardRedemptionActive = _pendingRewardRedemptions
+        .where(
+            (e) => e.rewardRedemption == RewardRedemption.addTimeToCurrentTimer)
+        .fold(0, (prev, e) => prev + e.duration.inSeconds);
+    _pendingRewardRedemptions.removeWhere(
+        (e) => e.rewardRedemption == RewardRedemption.addTimeToCurrentTimer);
+
+    return officialActive + rewardRedemptionActive;
+  }
+
+  ///
+  /// Get the total duration of the pause (official + reward redemptions)
   int get _pauseDuration {
     final officialPause = getPauseDuration(_currentSession).inSeconds;
 
     final rewardRedemptionPause = _pendingRewardRedemptions
-        .where((e) => e.rewardRedemption == RewardRedemption.longerPause)
+        .where((e) => e.rewardRedemption == RewardRedemption.nextPauseIsLonger)
         .fold(0, (prev, e) => prev + e.duration.inSeconds);
-    _pendingRewardRedemptions
-        .removeWhere((e) => e.rewardRedemption == RewardRedemption.longerPause);
+    _pendingRewardRedemptions.removeWhere(
+        (e) => e.rewardRedemption == RewardRedemption.nextPauseIsLonger);
 
     return officialPause + rewardRedemptionPause;
   }
@@ -157,7 +181,7 @@ class PomodoroStatus with ChangeNotifier {
         }
         _currentSession++;
         _stopWatchStatus = StopWatchStatus.inSession;
-        newTimerValue = getActiveDuration(_currentSession).inSeconds;
+        newTimerValue = _activeDuration;
       }
       _timer = Duration(seconds: newTimerValue);
     }
