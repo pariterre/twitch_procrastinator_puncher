@@ -266,30 +266,32 @@ class _MainScreenState extends State<MainScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                FutureBuilder(
-                    future: managerFactory,
-                    builder: (context, snapshot) {
-                      if (_twitchManager == null && snapshot.hasData) {
-                        _setTwitchManager(snapshot.data);
-                      }
+                Flexible(
+                  child: FutureBuilder(
+                      future: managerFactory,
+                      builder: (context, snapshot) {
+                        if (_twitchManager == null && snapshot.hasData) {
+                          _setTwitchManager(snapshot.data);
+                        }
 
-                      return ConfigurationBoard(
-                        startTimerCallback: _startTimer,
-                        pauseTimerCallback: _pauseTimer,
-                        resetTimerCallback: _resetTimer,
-                        gainFocusCallback: (hasFocus) {
-                          _statusWithFocus = hasFocus;
-                          if (isInitialized) setState(() {});
-                        },
-                        connectToTwitch: _connectToTwitch,
-                        twitchStatus: !snapshot.hasData
-                            ? TwitchStatus.initializing
-                            : _twitchManager != null &&
-                                    _twitchManager!.isConnected
-                                ? TwitchStatus.connected
-                                : TwitchStatus.notConnected,
-                      );
-                    }),
+                        return ConfigurationBoard(
+                          startTimerCallback: _startTimer,
+                          pauseTimerCallback: _pauseTimer,
+                          resetTimerCallback: _resetTimer,
+                          gainFocusCallback: (hasFocus) {
+                            _statusWithFocus = hasFocus;
+                            if (isInitialized) setState(() {});
+                          },
+                          connectToTwitch: _connectToTwitch,
+                          twitchStatus: !snapshot.hasData
+                              ? TwitchStatus.initializing
+                              : _twitchManager != null &&
+                                      _twitchManager!.isConnected
+                                  ? TwitchStatus.connected
+                                  : TwitchStatus.notConnected,
+                        );
+                      }),
+                ),
                 Column(
                   children: [
                     SizedBox(height: padding),

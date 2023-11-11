@@ -611,7 +611,6 @@ class ConfigurationBoard extends StatelessWidget {
     final padding = ThemePadding.normal(context);
 
     return AnimatedExpandingCard(
-      initialExpandedState: true,
       header: Row(
         children: [
           Text(
