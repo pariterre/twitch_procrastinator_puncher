@@ -40,3 +40,18 @@ const twitchScope = [
   TwitchScope.readModerator,
   TwitchScope.rewardRedemption,
 ];
+
+final twitchDebugPanelOptions = TwitchDebugPanelOptions(
+  chatters: [
+    TwitchChatterMock(displayName: 'Streamer', isModerator: true),
+    TwitchChatterMock(displayName: 'Moderator 1', isModerator: true),
+    TwitchChatterMock(displayName: 'Moderator 2', isModerator: true),
+    TwitchChatterMock(displayName: 'Viewer 1'),
+    TwitchChatterMock(displayName: 'Viewer 2'),
+  ],
+  chatMessages: const ['!startTimer', '!pauseTimer', '!resetTimer'],
+  redemptionRewardEvents: [
+    TwitchEventMock(rewardRedemption: 'Plus de plaisir!', cost: 5000),
+  ],
+);
+const bool isTwitchMockActive = true;

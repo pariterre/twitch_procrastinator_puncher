@@ -33,12 +33,10 @@ class _MainScreenState extends State<MainScreen> {
     useAuthenticationService: true,
     authenticationServiceAddress: authenticationServiceAddress,
   );
-  final _twitchMockOptions = const TwitchMockOptions(
-      isActive: true,
-      messagesModerators: ['!startTimer', '!pauseTimer', '!resetTimer']);
-  late Future<TwitchManager> managerFactory = _twitchMockOptions.isActive
+
+  late Future<TwitchManager> managerFactory = isTwitchMockActive
       ? TwitchManagerMock.factory(
-          appInfo: twitchAppInfo, mockOptions: _twitchMockOptions)
+          appInfo: twitchAppInfo, debugPanelOptions: twitchDebugPanelOptions)
       : TwitchManager.factory(appInfo: twitchAppInfo);
   StopWatchStatus _statusWithFocus = StopWatchStatus.initializing;
   bool isInitialized = false;
@@ -189,10 +187,11 @@ class _MainScreenState extends State<MainScreen> {
       context: context,
       builder: (context) => Dialog(
           child: TwitchAuthenticationScreen(
-        mockOptions: _twitchMockOptions,
         onFinishedConnexion: (manager) => Navigator.pop(context, manager),
         appInfo: twitchAppInfo,
         reload: false,
+        debugPanelOptions: twitchDebugPanelOptions,
+        isMockActive: isTwitchMockActive,
       )),
     ));
 
