@@ -59,11 +59,21 @@ class PomodoroStatus with ChangeNotifier {
     if (notify) notifyListeners();
   }
 
+  void _animateAddingTime(Duration duration) async {
+    const speed = 3;
+    for (int i = 0; i < duration.inSeconds; i += speed) {
+      await Future.delayed(const Duration(milliseconds: 10));
+      _timer += const Duration(seconds: speed);
+      notifyListeners();
+    }
+    notifyListeners();
+  }
+
   void addRewardRedemption(RewardRedemptionPreferenced rewardRedemption) {
     if (!rewardRedemption.rewardRedemption.isTimeRelated) return;
 
     if (rewardRedemption.rewardRedemption.takesEffectNow) {
-      _timer += rewardRedemption.duration;
+      _animateAddingTime(rewardRedemption.duration);
       return;
     } else {
       _pendingRewardRedemptions.add(rewardRedemption);
@@ -119,12 +129,13 @@ class PomodoroStatus with ChangeNotifier {
 
     final rewardRedemptionActive = _pendingRewardRedemptions
         .where(
-            (e) => e.rewardRedemption == RewardRedemption.addTimeToCurrentTimer)
+            (e) => e.rewardRedemption == RewardRedemption.nextSessionIslonger)
         .fold(0, (prev, e) => prev + e.duration.inSeconds);
     _pendingRewardRedemptions.removeWhere(
-        (e) => e.rewardRedemption == RewardRedemption.addTimeToCurrentTimer);
+        (e) => e.rewardRedemption == RewardRedemption.nextSessionIslonger);
+    _animateAddingTime(Duration(seconds: rewardRedemptionActive));
 
-    return officialActive + rewardRedemptionActive;
+    return officialActive;
   }
 
   ///
@@ -137,8 +148,9 @@ class PomodoroStatus with ChangeNotifier {
         .fold(0, (prev, e) => prev + e.duration.inSeconds);
     _pendingRewardRedemptions.removeWhere(
         (e) => e.rewardRedemption == RewardRedemption.nextPauseIsLonger);
+    _animateAddingTime(Duration(seconds: rewardRedemptionPause));
 
-    return officialPause + rewardRedemptionPause;
+    return officialPause;
   }
 
   // This method is automatically called every seconds
