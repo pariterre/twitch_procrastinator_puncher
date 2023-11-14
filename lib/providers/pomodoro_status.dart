@@ -60,10 +60,14 @@ class PomodoroStatus with ChangeNotifier {
   }
 
   void _animateAddingTime(Duration duration) async {
-    const speed = 3;
-    for (int i = 0; i < duration.inSeconds; i += speed) {
-      await Future.delayed(const Duration(milliseconds: 10));
-      _timer += const Duration(seconds: speed);
+    const frameRate = 10; // milliseconds
+    const nbFrames = 1000 / frameRate; // 1.0 seconds of animation
+    final increasingValue = duration.inMilliseconds ~/ nbFrames;
+
+    // This algorithm is not very precise as notifyListeners() takes time to call.
+    for (int i = 0; i < duration.inMilliseconds; i += increasingValue) {
+      await Future.delayed(const Duration(milliseconds: frameRate));
+      _timer += Duration(milliseconds: increasingValue);
       notifyListeners();
     }
     notifyListeners();

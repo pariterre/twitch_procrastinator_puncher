@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
+import 'package:twitch_manager/models/twitch_events.dart';
 import 'package:twitch_procastinator_puncher/models/config.dart';
 import 'package:twitch_procastinator_puncher/models/helpers.dart';
 import 'package:twitch_procastinator_puncher/models/participant.dart';
@@ -451,9 +452,11 @@ class RewardRedemptionPreferenced extends PreferencedElement {
     RewardRedemption rewardRedemption = RewardRedemption.none,
     String title = '',
     Duration duration = const Duration(minutes: 5),
+    String chatbotAnswer = '',
   })  : _rewardRedemption = rewardRedemption,
         _title = title,
-        _duration = duration;
+        _duration = duration,
+        _chatbotAnswer = chatbotAnswer;
 
   String _title;
   String get title => _title;
@@ -476,11 +479,29 @@ class RewardRedemptionPreferenced extends PreferencedElement {
     if (onChanged != null) onChanged!();
   }
 
+  String _chatbotAnswer;
+  String get chatbotAnswer => _chatbotAnswer;
+  set chatbotAnswer(String value) {
+    _chatbotAnswer = value;
+    if (onChanged != null) onChanged!();
+  }
+
+  String formattedChatbotAnswer(TwitchEventResponse response) {
+    var out = _chatbotAnswer
+        .replaceAll('{title}', title)
+        .replaceAll('{username}', response.requestingUser)
+        .replaceAll('{cost}', response.cost.toString())
+        .replaceAll('{message}', response.message);
+
+    return out;
+  }
+
   static RewardRedemptionPreferenced deserializeSync(map) =>
       RewardRedemptionPreferenced(
         title: map?['title'],
         rewardRedemption: RewardRedemption.values[map?['rewardRedemption']],
         duration: Duration(seconds: map?['duration'] ?? 60 * 5),
+        chatbotAnswer: map?['chatbotAnswer'] ?? '',
       );
 
   static Future<RewardRedemptionPreferenced> deserialize(map) async =>
@@ -490,5 +511,6 @@ class RewardRedemptionPreferenced extends PreferencedElement {
         'title': title,
         'rewardRedemption': rewardRedemption.index,
         'duration': duration.inSeconds,
+        'chatbotAnswer': chatbotAnswer,
       };
 }

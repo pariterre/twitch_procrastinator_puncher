@@ -639,6 +639,15 @@ class PreferencedLanguage extends PreferencedElement {
     }
   }
 
+  String get rewardRedemptionChatbotAnswer {
+    switch (_current) {
+      case Language.english:
+        return 'Chatbot answer';
+      case Language.french:
+        return 'Réponse du chatbot';
+    }
+  }
+
   String get rewardRedemptionNone {
     switch (_current) {
       case Language.english:

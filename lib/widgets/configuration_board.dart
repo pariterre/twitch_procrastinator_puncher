@@ -1052,6 +1052,7 @@ class ConfigurationBoard extends StatelessWidget {
     required Function() onDeleted,
   }) {
     final padding = ThemePadding.normal(context);
+    final texts = AppPreferences.of(context, listen: false).texts;
 
     return Padding(
       padding: EdgeInsets.only(bottom: 2 * padding),
@@ -1064,6 +1065,16 @@ class ConfigurationBoard extends StatelessWidget {
             title: hint,
             initialText: rewardRedemption.title,
             onTextChanged: (String value) => rewardRedemption.title = value,
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: padding),
+            child: StringSelectorTile(
+              key: ValueKey(rewardRedemption.hashCode),
+              title: texts.rewardRedemptionChatbotAnswer,
+              initialText: rewardRedemption.chatbotAnswer,
+              onTextChanged: (String value) =>
+                  rewardRedemption.chatbotAnswer = value,
+            ),
           ),
           Row(
             mainAxisSize: MainAxisSize.min,

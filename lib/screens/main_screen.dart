@@ -242,6 +242,7 @@ class _MainScreenState extends State<MainScreen> {
       // If so, add it to the timer settings
       if (e.title == response.rewardRedemption) {
         PomodoroStatus.of(context, listen: false).addRewardRedemption(e);
+        _twitchManager!.chat.send(e.formattedChatbotAnswer(response));
         return;
       }
     });
