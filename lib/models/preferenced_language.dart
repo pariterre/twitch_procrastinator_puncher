@@ -624,9 +624,24 @@ class PreferencedLanguage extends PreferencedElement {
   String get rewardRedemptionTitleTooltip {
     switch (_current) {
       case Language.english:
-        return 'The reward redemption of the followers requires you to be connected to Twitch.';
+        return 'The reward redemption of the followers requires you to be connected to Twitch.\n\n'
+            'It is possible to setup an automatic answer from the bot to any redemption\n'
+            'using the text field "Chatbot answer". To personalize the messages\n'
+            'sent to the chat, you can use the following tags:\n'
+            '    {title} - the current name of the redemption\n'
+            '    {username} - the name of the user who redempted the reward\n'
+            '    {cost} - the cost of the reward\n'
+            '    {message} - the message from the user in the redemption';
       case Language.french:
-        return 'La réclamation de récompenses nécessite que vous soyez connecté à Twitch.';
+        return 'La réclamation de récompenses nécessite que vous soyez connecté à Twitch.\n\n'
+            'Il est possible de configurer une réponse automatique du chatbot à une\n'
+            'réclamation en utilisant le champ de texte "Réponse du chatbot".\n'
+            'Pour personnaliser les messages envoyés dans le chat, vous pouvez\n'
+            'utiliser les balises suivantes :\n'
+            '    {title} - le nom de la réclamation en cours\n'
+            '    {username} - le nom de l\'utilisateur ayant fait la réclamation\n'
+            '    {cost} - le coût de la réclamation\n'
+            '    {message} - le message de l\'utilisateur dans la réclamation';
     }
   }
 
@@ -642,7 +657,7 @@ class PreferencedLanguage extends PreferencedElement {
   String get rewardRedemptionChatbotAnswer {
     switch (_current) {
       case Language.english:
-        return 'Chatbot answer';
+        return 'Chatbot answer. ';
       case Language.french:
         return 'Réponse du chatbot';
     }
