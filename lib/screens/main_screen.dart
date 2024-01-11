@@ -26,13 +26,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   TwitchManager? _twitchManager;
   final twitchAppInfo = TwitchAppInfo(
-    appName: twitchAppName,
-    twitchAppId: twitchAppId,
-    redirectAddress: twitchRedirect,
-    scope: twitchScope,
-    useAuthenticationService: true,
-    authenticationServiceAddress: authenticationServiceAddress,
-  );
+      appName: twitchAppName, twitchAppId: twitchAppId, scope: twitchScope);
 
   late Future<TwitchManager> managerFactory = isTwitchMockActive
       ? TwitchManagerMock.factory(
@@ -208,7 +202,7 @@ class _MainScreenState extends State<MainScreen> {
         (await _twitchManager!.api.fetchModerators(includeStreamer: true))!;
 
     // Connect everything related to participants
-    _twitchManager!.chat.addListener('1', _onMessageReceived);
+    _twitchManager!.chat.onMessageReceived(_onMessageReceived);
     _twitchManager!.events.addListener('1', _onRewardRedemptionRequest);
     participants.twitchManager = _twitchManager!;
     participants.greetNewcomerCallback = _greetNewComers;
@@ -257,55 +251,52 @@ class _MainScreenState extends State<MainScreen> {
     final padding = ThemePadding.normal(context);
 
     final widget = Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            height: windowHeight,
-            width: MediaQuery.of(context).size.width,
-            decoration: BoxDecoration(color: preferences.backgroundColor.value),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Flexible(
-                  child: FutureBuilder(
-                      future: managerFactory,
-                      builder: (context, snapshot) {
-                        if (_twitchManager == null && snapshot.hasData) {
-                          _setTwitchManager(snapshot.data);
-                        }
+      body: TwitchDebugOverlay(
+        manager: _twitchManager,
+        child: Container(
+          height: windowHeight,
+          width: MediaQuery.of(context).size.width,
+          decoration: BoxDecoration(color: preferences.backgroundColor.value),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Flexible(
+                child: FutureBuilder(
+                    future: managerFactory,
+                    builder: (context, snapshot) {
+                      if (_twitchManager == null && snapshot.hasData) {
+                        _setTwitchManager(snapshot.data);
+                      }
 
-                        return ConfigurationBoard(
-                          startTimerCallback: _startTimer,
-                          pauseTimerCallback: _pauseTimer,
-                          resetTimerCallback: _resetTimer,
-                          gainFocusCallback: (hasFocus) {
-                            _statusWithFocus = hasFocus;
-                            if (isInitialized) setState(() {});
-                          },
-                          connectToTwitch: _connectToTwitch,
-                          twitchStatus: !snapshot.hasData
-                              ? TwitchStatus.initializing
-                              : _twitchManager != null &&
-                                      _twitchManager!.isConnected
-                                  ? TwitchStatus.connected
-                                  : TwitchStatus.notConnected,
-                        );
-                      }),
-                ),
-                Column(
-                  children: [
-                    SizedBox(height: padding),
-                    PomodoroTimer(textWithFocus: _statusWithFocus),
-                    SizedBox(height: padding),
-                    if (preferences.useHallOfFame.value) const HallOfFame(),
-                  ],
-                ),
-              ],
-            ),
+                      return ConfigurationBoard(
+                        startTimerCallback: _startTimer,
+                        pauseTimerCallback: _pauseTimer,
+                        resetTimerCallback: _resetTimer,
+                        gainFocusCallback: (hasFocus) {
+                          _statusWithFocus = hasFocus;
+                          if (isInitialized) setState(() {});
+                        },
+                        connectToTwitch: _connectToTwitch,
+                        twitchStatus: !snapshot.hasData
+                            ? TwitchStatus.initializing
+                            : _twitchManager != null &&
+                                    _twitchManager!.isConnected
+                                ? TwitchStatus.connected
+                                : TwitchStatus.notConnected,
+                      );
+                    }),
+              ),
+              Column(
+                children: [
+                  SizedBox(height: padding),
+                  PomodoroTimer(textWithFocus: _statusWithFocus),
+                  SizedBox(height: padding),
+                  if (preferences.useHallOfFame.value) const HallOfFame(),
+                ],
+              ),
+            ],
           ),
-          if (_twitchManager != null)
-            TwitchDebugPanel(manager: _twitchManager!),
-        ],
+        ),
       ),
     );
     isInitialized = true; // Prevent from calling setState on gainFocus

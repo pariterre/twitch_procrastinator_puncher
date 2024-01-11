@@ -15,7 +15,7 @@ dependencies:
   provider: ^6.0.5
   arrow_pad: ^0.2.0
   flutter_colorpicker: ^1.0.3
-  audioplayers: ^4.1.0
+  audioplayers: ^5.2.1
   twitch_manager:
     path: ./plugins/twitch_manager
   window_manager: ^0.3.4

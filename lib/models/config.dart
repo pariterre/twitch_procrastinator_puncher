@@ -23,15 +23,12 @@ Future<void> declareAppDirectory() async {
   }
 }
 
-const webClientSite = 'https://procrastinatorpuncher.pariterre.net:8443';
+const webClientSite = 'https://procrastinatorpuncher.pariterre.net';
 const buyMeACoffeeLink = 'https://www.buymeacoffee.com/pariterre';
 const preferencesFilename = 'preferences.json';
 const textExportFilename = 'timer.txt';
 const twitchAppName = 'ProcrastinatorPuncher';
 const twitchAppId = 'mcysoxq3vitdjwcqn71f8opz11cyex';
-const twitchRedirect = 'https://twitchauthentication.pariterre.net:3000';
-const authenticationServiceAddress =
-    'wss://twitchauthentication.pariterre.net:3002';
 const twitchScope = [
   TwitchScope.chatRead,
   TwitchScope.chatEdit,
@@ -54,4 +51,4 @@ final twitchDebugPanelOptions = TwitchDebugPanelOptions(
     TwitchEventMock(rewardRedemption: 'Plus de plaisir!', cost: 5000),
   ],
 );
-const bool isTwitchMockActive = true;
+const bool isTwitchMockActive = false;
