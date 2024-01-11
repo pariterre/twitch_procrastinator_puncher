@@ -29,6 +29,7 @@ const preferencesFilename = 'preferences.json';
 const textExportFilename = 'timer.txt';
 const twitchAppName = 'ProcrastinatorPuncher';
 const twitchAppId = 'mcysoxq3vitdjwcqn71f8opz11cyex';
+const twitchRedirectDomain = 'twitchauthentication.pariterre.net';
 const twitchScope = [
   TwitchScope.chatRead,
   TwitchScope.chatEdit,

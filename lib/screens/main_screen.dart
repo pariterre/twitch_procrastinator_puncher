@@ -26,7 +26,11 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   TwitchManager? _twitchManager;
   final twitchAppInfo = TwitchAppInfo(
-      appName: twitchAppName, twitchAppId: twitchAppId, scope: twitchScope);
+    appName: twitchAppName,
+    twitchAppId: twitchAppId,
+    redirectDomain: twitchRedirectDomain,
+    scope: twitchScope,
+  );
 
   late Future<TwitchManager> managerFactory = isTwitchMockActive
       ? TwitchManagerMock.factory(
