@@ -247,6 +247,7 @@ class AppPreferences with ChangeNotifier {
         return prefs.getString(preferencesFilename);
       } else {
         final preferencesFile = File(_savepath);
+        if (!(await preferencesFile.exists())) return null;
         return await preferencesFile.readAsString();
       }
     }

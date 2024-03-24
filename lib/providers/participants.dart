@@ -188,6 +188,8 @@ class Participants extends ChangeNotifier {
         }
 
         final savedFile = File('${saveDir.path}/$_saveFilename');
+        if (!(await savedFile.exists())) return null;
+
         return await savedFile.readAsString();
       }
     }

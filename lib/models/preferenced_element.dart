@@ -206,9 +206,9 @@ class PreferencedImageFile extends PreferencedFile {
 
   PreferencedImageFile() : super();
 
-  PreferencedImageFile.fromRaw(Uint8List raw, {String? filepath, double? size})
+  PreferencedImageFile.fromRaw(Uint8List raw, {super.filepath, double? size})
       : _size = size ?? 1,
-        super(raw: raw, filepath: filepath) {
+        super(raw: raw) {
     if (_raw != null) _image = Image.memory(_raw!);
   }
 
@@ -280,8 +280,8 @@ class PreferencedSoundFile extends PreferencedFile {
 
   PreferencedSoundFile() : super();
 
-  PreferencedSoundFile.fromRaw(Uint8List raw, {String? filepath})
-      : super(raw: raw, filepath: filepath);
+  PreferencedSoundFile.fromRaw(Uint8List raw, {super.filepath})
+      : super(raw: raw);
 
   @override
   FileType get fileType => FileType.sound;
@@ -388,7 +388,7 @@ class PreferencedText extends PreferencedElement {
 }
 
 class UnformattedPreferencedText extends PreferencedText {
-  UnformattedPreferencedText(String text) : super(text, color: Colors.white);
+  UnformattedPreferencedText(super.text) : super(color: Colors.white);
 
   static Future<UnformattedPreferencedText> deserialize(
           Map<String, dynamic>? map,
@@ -407,14 +407,13 @@ class TextOnTimer extends PreferencedText {
   double _size;
 
   TextOnTimer(
-    String text, {
+    super.text, {
     required Offset offset,
     required double size,
     required super.color,
     super.onChanged,
   })  : _offset = offset,
-        _size = size,
-        super(text);
+        _size = size;
 
   // Offset of the text on the screen
   Offset get offset => _offset;

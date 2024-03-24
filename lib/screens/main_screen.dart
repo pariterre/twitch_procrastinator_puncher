@@ -78,7 +78,7 @@ class _MainScreenState extends State<MainScreen> {
           ElevatedButton(
             onPressed: () async {
               await launchUrl(Uri.parse(buyMeACoffeeLink));
-              if (mounted) Navigator.pop(context);
+              if (context.mounted) Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.purple,
