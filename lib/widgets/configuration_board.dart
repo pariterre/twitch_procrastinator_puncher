@@ -1192,14 +1192,30 @@ class ConfigurationBoard extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          StringSelectorTile(
-            key: ValueKey(automaticResponses.command.hashCode),
-            title: hint,
-            initialText: automaticResponses.command,
-            onTextChanged: (String value) => automaticResponses.command = value,
+          Row(
+            children: [
+              Expanded(
+                child: StringSelectorTile(
+                  key: ValueKey(automaticResponses.hashCode),
+                  title: hint,
+                  initialText: automaticResponses.command,
+                  onTextChanged: (String value) =>
+                      automaticResponses.command = value,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 12.0),
+                child: IconButton(
+                    onPressed: () => onDeleted(),
+                    icon: const Icon(
+                      Icons.delete,
+                      color: Colors.red,
+                    )),
+              )
+            ],
           ),
           StringSelectorTile(
-            key: ValueKey(automaticResponses.answer.hashCode),
+            key: ValueKey(automaticResponses.hashCode + 1),
             title: texts.chatbotAnswer,
             initialText: automaticResponses.answer.text,
             onTextChanged: (String value) =>

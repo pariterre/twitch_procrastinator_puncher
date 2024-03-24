@@ -1062,7 +1062,7 @@ class PreferencedLanguage extends PreferencedElement {
       case Language.english:
         return 'Write the command the bot should respond to';
       case Language.french:
-        return 'Écrivez la commande à laquelle le bot devrait répondre';
+        return 'Écrivez la commande à laquelle l\'agent conversationnel devrait répondre';
     }
   }
 
@@ -1071,7 +1071,7 @@ class PreferencedLanguage extends PreferencedElement {
       case Language.english:
         return 'Chatbot answer';
       case Language.french:
-        return 'Réponse du chatbot';
+        return 'Réponse de l\'agent conversationnel';
     }
   }
 }

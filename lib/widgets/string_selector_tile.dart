@@ -9,7 +9,7 @@ class StringSelectorTile extends StatefulWidget {
     super.key,
     required this.title,
     required this.initialText,
-    required this.onTextChanged,
+    this.onTextChanged,
     this.onSizeChanged,
     this.onMoveText,
     this.onFocusChanged,
@@ -19,7 +19,7 @@ class StringSelectorTile extends StatefulWidget {
 
   final String title;
   final String initialText;
-  final Function(String value) onTextChanged;
+  final Function(String value)? onTextChanged;
   final Function(PlusOrMinusSelection selection)? onSizeChanged;
   final Function(PressDirection direction)? onMoveText;
   final Function(bool gainedFocus)? onFocusChanged;
@@ -62,7 +62,9 @@ class _StringSelectorTileState extends State<StringSelectorTile> {
               child: TextFormField(
                 controller: _controller,
                 decoration: InputDecoration(labelText: widget.title),
-                onChanged: (value) => widget.onTextChanged(value),
+                onChanged: widget.onTextChanged == null
+                    ? null
+                    : (value) => widget.onTextChanged!(value),
                 maxLines: 2,
                 minLines: 2,
                 style: TextStyle(fontSize: ThemeSize.text(context)),
