@@ -1007,4 +1007,71 @@ class PreferencedLanguage extends PreferencedElement {
         return '* Connexion d\'un utilisateur';
     }
   }
+
+  String get chatbotTitle {
+    switch (_current) {
+      case Language.english:
+        return 'Chatbot reponses';
+      case Language.french:
+        return 'Réponses automatiques';
+    }
+  }
+
+  String get chatbotTitleTooltip {
+    switch (_current) {
+      case Language.english:
+        return 'These are all the message that the chatbot will automatically respond '
+            'to if a certain command is received. Typically, starting with a "!".'
+            'This option necessitate that you are connected to Twitch.\n\n'
+            'To personalize the messages sent to the chat, you can use '
+            'the following tags:\n'
+            '    {session} - the current session\n'
+            '    {nbSessions} the maximum number of sessions\n'
+            '    {timer} - the current value of the timer\n'
+            '    {sessionTime} - is the maximum time of the sessions\n'
+            '    {pauseTime} - is the maximum time of the pauses\n'
+            '    {done} - is the number of sessions collectively done\n'
+            '    {doneToday} - is the number of sessions collectively done today';
+      case Language.french:
+        return 'Réponses automatiquement envoyées par le chatbot lorsque qu\'une '
+            'commande spécifique a lieue. Cette option nécessite d\'être connecté '
+            'à Twitch.\n\n'
+            'Pour personnaliser les messages envoyés dans le chat, vous pouvez '
+            'utiliser les balises suivantes :\n'
+            '    {session} - la session en cours\n'
+            '    {nbSessions} - le nombre maximum de sessions\n'
+            '    {timer} - la valeur actuelle du minuteur\n'
+            '    {sessionTime} - la durée des sessions\n'
+            '    {pauseTime} - la durée des pauses\n'
+            '    {done} - le nombre de sessions collectivement réalisées\n'
+            '    {doneToday} - le nombre de sessions collectivement réalisées aujourd\'hui';
+    }
+  }
+
+  String get chatbotAddNew {
+    switch (_current) {
+      case Language.english:
+        return 'Add a new chatbot response';
+      case Language.french:
+        return 'Ajouter une nouvelle réponse automatique';
+    }
+  }
+
+  String get chatbotLabel {
+    switch (_current) {
+      case Language.english:
+        return 'Write the command the bot should respond to';
+      case Language.french:
+        return 'Écrivez la commande à laquelle le bot devrait répondre';
+    }
+  }
+
+  String get chatbotAnswer {
+    switch (_current) {
+      case Language.english:
+        return 'Chatbot answer';
+      case Language.french:
+        return 'Réponse du chatbot';
+    }
+  }
 }

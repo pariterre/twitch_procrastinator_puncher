@@ -446,6 +446,40 @@ class TextOnTimer extends PreferencedText {
     });
 }
 
+class AutomaticReponsePreferenced extends PreferencedElement {
+  AutomaticReponsePreferenced({
+    required String command,
+    required UnformattedPreferencedText answer,
+  })  : _command = command,
+        _answer = answer;
+
+  String _command;
+  String get command => _command;
+  set command(String value) {
+    _command = value;
+    if (onChanged != null) onChanged!();
+  }
+
+  UnformattedPreferencedText _answer;
+  UnformattedPreferencedText get answer => _answer;
+  set answer(UnformattedPreferencedText value) {
+    _answer = value;
+    if (onChanged != null) onChanged!();
+  }
+
+  static AutomaticReponsePreferenced deserializeSync(map) =>
+      AutomaticReponsePreferenced(
+        command: map?['command'],
+        answer: UnformattedPreferencedText.deserializeSync(map?['answer']),
+      );
+
+  static Future<AutomaticReponsePreferenced> deserialize(map) async =>
+      deserializeSync(map);
+
+  Map<String, dynamic> serialize() =>
+      {'command': command, 'answer': answer.serialize()};
+}
+
 class RewardRedemptionPreferenced extends PreferencedElement {
   RewardRedemptionPreferenced({
     RewardRedemption rewardRedemption = RewardRedemption.none,

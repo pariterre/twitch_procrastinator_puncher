@@ -117,6 +117,20 @@ class AppPreferences with ChangeNotifier {
   }
 
   // Some options for the reward redemption
+  List<AutomaticReponsePreferenced> automaticResponses;
+  void newAutomaticResponse() {
+    automaticResponses.add(AutomaticReponsePreferenced(
+        command: '', answer: UnformattedPreferencedText('')));
+    automaticResponses.last.onChanged = _save;
+    _save();
+  }
+
+  void removeAutomaticResponseAt(int index) {
+    automaticResponses.removeAt(index);
+    _save();
+  }
+
+  // Some options for the reward redemption
   List<RewardRedemptionPreferenced> rewardRedemptions;
   void newRewardRedemption() {
     rewardRedemptions.add(RewardRedemptionPreferenced());
@@ -319,6 +333,7 @@ class AppPreferences with ChangeNotifier {
         textDuringPauseSession: await TextOnTimer.deserialize(previousPreferences?['textDuringPauseSession'], _defaultValues['textDuringPauseSession']),
         textDuringPause: await TextOnTimer.deserialize(previousPreferences?['textDuringPause'], _defaultValues['textDuringPause']),
         textDone: await TextOnTimer.deserialize(previousPreferences?['textDone'], _defaultValues['textDone']),
+        automaticResponses: (previousPreferences?['automaticResponses'] as List?)?.map((e) => AutomaticReponsePreferenced.deserializeSync(e)).toList() ?? [],
         rewardRedemptions: (previousPreferences?['rewardRedemptions'] as List?)?.map((e) => RewardRedemptionPreferenced.deserializeSync(e)).toList() ?? [],
         saveToTextFile: await PreferencedBool.deserialize(previousPreferences?['saveToTextFile'], _defaultValues['saveToTextFile']),
         useHallOfFame: await PreferencedBool.deserialize(previousPreferences?['useHallOfFame'], _defaultValues['useHallOfFame']),
@@ -363,6 +378,7 @@ class AppPreferences with ChangeNotifier {
     required this.textDuringPauseSession,
     required this.textDuringPause,
     required this.textDone,
+    required this.automaticResponses,
     required this.rewardRedemptions,
     required this.saveToTextFile,
     required this.useHallOfFame,
@@ -429,6 +445,8 @@ class AppPreferences with ChangeNotifier {
         'textDuringPauseSession': textDuringPauseSession.serialize(),
         'textDuringPause': textDuringPause.serialize(),
         'textDone': textDone.serialize(),
+        'automaticResponses':
+            automaticResponses.map((e) => e.serialize()).toList(),
         'rewardRedemptions':
             rewardRedemptions.map((e) => e.serialize()).toList(),
         'saveToTextFile': saveToTextFile.serialize(),
@@ -491,6 +509,7 @@ class AppPreferences with ChangeNotifier {
     textDuringPause =
         await TextOnTimer.deserialize(null, _defaultValues['textDuringPause']);
     textDone = await TextOnTimer.deserialize(null, _defaultValues['textDone']);
+    automaticResponses = [];
     rewardRedemptions = [];
     saveToTextFile = await PreferencedBool.deserialize(
         null, _defaultValues['saveToTextFile']);
@@ -562,6 +581,10 @@ class AppPreferences with ChangeNotifier {
         await TextOnTimer.deserialize(map['textDuringPauseSession']);
     textDuringPause = await TextOnTimer.deserialize(map['textDuringPause']);
     textDone = await TextOnTimer.deserialize(map['textDone']);
+    automaticResponses = (map['automaticResponses'] as List?)
+            ?.map((e) => AutomaticReponsePreferenced.deserializeSync(e))
+            .toList() ??
+        [];
     rewardRedemptions = (map['rewardRedemptions'] as List?)
             ?.map((e) => RewardRedemptionPreferenced.deserializeSync(e))
             .toList() ??
@@ -660,6 +683,10 @@ class AppPreferences with ChangeNotifier {
     textDuringPauseSession.onChanged = _save;
     textDuringPause.onChanged = _save;
     textDone.onChanged = _save;
+
+    for (var automaticResponse in automaticResponses) {
+      automaticResponse.onChanged = _save;
+    }
 
     for (var rewardRedemption in rewardRedemptions) {
       rewardRedemption.onChanged = _save;

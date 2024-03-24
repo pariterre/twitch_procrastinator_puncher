@@ -231,6 +231,15 @@ class _MainScreenState extends State<MainScreen> {
         _resetTimer();
         break;
     }
+
+    // Check if the message is a command from a chatter
+    final responses =
+        AppPreferences.of(context, listen: false).automaticResponses;
+    for (var response in responses) {
+      if (response.command == message) {
+        _twitchManager!.chat.send(response.answer.formattedText(context));
+      }
+    }
   }
 
   void _onRewardRedemptionRequest(TwitchEventResponse response) {

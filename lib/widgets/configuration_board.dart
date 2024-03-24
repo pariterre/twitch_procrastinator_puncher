@@ -82,6 +82,8 @@ class ConfigurationBoard extends StatelessWidget {
                     const Divider(),
                     _buildChatMessages(context),
                     const Divider(),
+                    _buildChatBotResponse(context),
+                    const Divider(),
                     _buildRewardRedemption(context),
                     const Divider(),
                     _buildHallOfFameOptions(context),
@@ -1004,6 +1006,64 @@ class ConfigurationBoard extends StatelessWidget {
     );
   }
 
+  Widget _buildChatBotResponse(BuildContext context) {
+    final preferences = AppPreferences.of(context);
+    final padding = ThemePadding.normal(context);
+
+    return AnimatedExpandingCard(
+      header: Row(
+        children: [
+          Text(
+            preferences.texts.chatbotTitle,
+            style: TextStyle(
+                color: ThemeColor().configurationText,
+                fontWeight: FontWeight.bold,
+                fontSize: ThemeSize.text(context)),
+          ),
+          SizedBox(width: padding),
+          InfoTooltip(message: preferences.texts.chatbotTitleTooltip),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ...preferences.automaticResponses
+              .asMap()
+              .keys
+              .map((index) => _buildAutomaticResponseTile(
+                    context,
+                    hint: '${preferences.texts.chatbotLabel} ${index + 1}',
+                    automaticResponses: preferences.automaticResponses[index],
+                    onDeleted: () =>
+                        preferences.removeAutomaticResponseAt(index),
+                  )),
+          Center(
+            child: Padding(
+              padding: EdgeInsets.only(top: padding),
+              child: ElevatedButton(
+                  onPressed: () => AppPreferences.of(context, listen: false)
+                      .newAutomaticResponse(),
+                  style: ThemeButton.elevated,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.add, color: Colors.green),
+                      Text(
+                        preferences.texts.chatbotAddNew,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: ThemeSize.text(context)),
+                      ),
+                    ],
+                  )),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
   Widget _buildStringSelectorTile(
     context, {
     required String title,
@@ -1111,6 +1171,39 @@ class ConfigurationBoard extends StatelessWidget {
                     color: Colors.red,
                   )),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAutomaticResponseTile(
+    context, {
+    required String hint,
+    required AutomaticReponsePreferenced automaticResponses,
+    required Function() onDeleted,
+  }) {
+    final padding = ThemePadding.normal(context);
+    final texts = AppPreferences.of(context, listen: false).texts;
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: 2 * padding),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          StringSelectorTile(
+            key: ValueKey(automaticResponses.command.hashCode),
+            title: hint,
+            initialText: automaticResponses.command,
+            onTextChanged: (String value) => automaticResponses.command = value,
+          ),
+          StringSelectorTile(
+            key: ValueKey(automaticResponses.answer.hashCode),
+            title: texts.chatbotAnswer,
+            initialText: automaticResponses.answer.text,
+            onTextChanged: (String value) =>
+                automaticResponses.answer = UnformattedPreferencedText(value),
           ),
         ],
       ),
