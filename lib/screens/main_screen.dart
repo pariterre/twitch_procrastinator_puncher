@@ -216,10 +216,20 @@ class _MainScreenState extends State<MainScreen> {
   List<String>? _moderators;
 
   void _onMessageReceived(String sender, String message) async {
+    // Check if the message is a command from any chatter
+    final responses =
+        AppPreferences.of(context, listen: false).automaticResponses;
+    for (var response in responses) {
+      if (response.command == message) {
+        _twitchManager!.chat.send(response.answer.formattedText(context));
+      }
+    }
+
     // If we are not done fetching, we are really early in the process, so we
-    // can afford waiting a bit.
+    // can afford waiting a bit before checking if the sender is a moderator.
     if (_moderators == null || !_moderators!.contains(sender)) return;
 
+    // Check if the message is a command from a moderator
     switch (message) {
       case '!startTimer':
         _startTimer();
@@ -230,15 +240,6 @@ class _MainScreenState extends State<MainScreen> {
       case '!resetTimer':
         _resetTimer();
         break;
-    }
-
-    // Check if the message is a command from a chatter
-    final responses =
-        AppPreferences.of(context, listen: false).automaticResponses;
-    for (var response in responses) {
-      if (response.command == message) {
-        _twitchManager!.chat.send(response.answer.formattedText(context));
-      }
     }
   }
 
