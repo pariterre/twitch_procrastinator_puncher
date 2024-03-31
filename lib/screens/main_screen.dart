@@ -28,7 +28,7 @@ class _MainScreenState extends State<MainScreen> {
   final twitchAppInfo = TwitchAppInfo(
     appName: twitchAppName,
     twitchAppId: twitchAppId,
-    redirectDomain: twitchRedirectDomain,
+    redirectUri: twitchRedirectDomain,
     scope: twitchScope,
   );
 
@@ -183,14 +183,13 @@ class _MainScreenState extends State<MainScreen> {
   void _connectToTwitch() async {
     await _setTwitchManager(await showDialog<TwitchManager>(
       context: context,
-      builder: (context) => Dialog(
-          child: TwitchAuthenticationScreen(
-        onFinishedConnexion: (manager) => Navigator.pop(context, manager),
+      builder: (context) => TwitchAuthenticationDialog(
+        onConnexionEstablished: (manager) => Navigator.pop(context, manager),
         appInfo: twitchAppInfo,
         reload: false,
         debugPanelOptions: twitchDebugPanelOptions,
         isMockActive: isTwitchMockActive,
-      )),
+      ),
     ));
 
     setState(() {});
