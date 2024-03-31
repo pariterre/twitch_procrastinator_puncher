@@ -206,7 +206,7 @@ class _MainScreenState extends State<MainScreen> {
 
     // Connect everything related to participants
     _twitchManager!.chat.onMessageReceived(_onMessageReceived);
-    _twitchManager!.events.addListener('1', _onRewardRedemptionRequest);
+    _twitchManager!.events.addListener(_onRewardRedemptionRequest);
     participants.twitchManager = _twitchManager!;
     participants.greetNewcomerCallback = _greetNewComers;
     participants.greetUserHasConnectedCallback = _greetUserHasConnected;
