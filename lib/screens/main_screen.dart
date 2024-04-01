@@ -205,8 +205,9 @@ class _MainScreenState extends State<MainScreen> {
         (await _twitchManager!.api.fetchModerators(includeStreamer: true))!;
 
     // Connect everything related to participants
-    _twitchManager!.chat.onMessageReceived(_onMessageReceived);
-    _twitchManager!.events.addListener(_onRewardRedemptionRequest);
+    _twitchManager!.chat.onMessageReceived.startListening(_onMessageReceived);
+    _twitchManager!.events.onRewardRedeemed
+        .startListening(_onRewardRedemptionRequest);
     participants.twitchManager = _twitchManager!;
     participants.greetNewcomerCallback = _greetNewComers;
     participants.greetUserHasConnectedCallback = _greetUserHasConnected;
@@ -264,6 +265,7 @@ class _MainScreenState extends State<MainScreen> {
     final padding = ThemePadding.normal(context);
 
     final widget = Scaffold(
+      backgroundColor: Colors.transparent,
       body: TwitchDebugOverlay(
         manager: _twitchManager,
         child: Container(
