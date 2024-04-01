@@ -243,14 +243,14 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
-  void _onRewardRedemptionRequest(TwitchEventResponse response) {
+  void _onRewardRedemptionRequest(TwitchRewardRedemption redemption) {
     // Cycle through all the reward redemption defined by the streamer to see
     // if one of them matches the currently redempted one.
     AppPreferences.of(context, listen: false).rewardRedemptions.forEach((e) {
       // If so, add it to the timer settings
-      if (e.title == response.rewardRedemption) {
+      if (e.title == redemption.rewardRedemption) {
         PomodoroStatus.of(context, listen: false).addRewardRedemption(e);
-        _twitchManager!.chat.send(e.formattedChatbotAnswer(response));
+        _twitchManager!.chat.send(e.formattedChatbotAnswer(redemption));
         return;
       }
     });

@@ -49,7 +49,10 @@ final twitchDebugPanelOptions = TwitchDebugPanelOptions(
   ],
   chatMessages: const ['!startTimer', '!pauseTimer', '!resetTimer'],
   redemptionRewardEvents: [
-    TwitchEventMock(rewardRedemption: 'Plus de plaisir!', cost: 5000),
+    TwitchRewardRedemptionMock(
+        rewardRedemptionId: '12345',
+        rewardRedemption: 'Plus de plaisir!',
+        cost: 5000),
   ],
 );
-const bool isTwitchMockActive = false;
+const bool isTwitchMockActive = true;

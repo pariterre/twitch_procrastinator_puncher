@@ -519,7 +519,7 @@ class RewardRedemptionPreferenced extends PreferencedElement {
     if (onChanged != null) onChanged!();
   }
 
-  String formattedChatbotAnswer(TwitchEventResponse response) {
+  String formattedChatbotAnswer(TwitchEvent response) {
     var out = _chatbotAnswer
         .replaceAll('{title}', title)
         .replaceAll('{username}', response.requestingUser)
