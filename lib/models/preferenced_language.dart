@@ -624,7 +624,11 @@ class PreferencedLanguage extends PreferencedElement {
   String get rewardRedemptionTitleTooltip {
     switch (_current) {
       case Language.english:
-        return 'The reward redemption of the followers requires you to be connected to Twitch.\n\n'
+        return 'Create a new channel reward. The reward is not sent to Twitch until you\n'
+            'press the save button. By saving again, the same reward will be updated.\n'
+            'Note: it is not possible to modify a channel reward if it was not created\n'
+            'by this software.\n\n'
+            'The reward redemption of the followers requires you to be connected to Twitch.\n\n'
             'It is possible to setup an automatic answer from the bot to any redemption\n'
             'using the text field "Chatbot answer". To personalize the messages\n'
             'sent to the chat, you can use the following tags:\n'
@@ -633,7 +637,12 @@ class PreferencedLanguage extends PreferencedElement {
             '    {cost} - the cost of the reward\n'
             '    {message} - the message from the user in the redemption';
       case Language.french:
-        return 'La réclamation de récompenses nécessite que vous soyez connecté à Twitch.\n\n'
+        return 'Créer une nouvelle récompense de chaîne. La récompense est n\'envoyée.\n'
+            'à Twitch qu\'au moment où vous appuyez sur le bouton de sauvegarde.\n'
+            'En sauvegardant de nouveau, la même récompence sera mise à jour.\n'
+            'Note : il n\'est pas possible de modifier une récompense de chaîne\n'
+            'si elle n\'a pas été créée par ce logiciel.\n\n'
+            'La réclamation de récompenses nécessite que vous soyez connecté à Twitch.\n\n'
             'Il est possible de configurer une réponse automatique du chatbot à une\n'
             'réclamation en utilisant le champ de texte "Réponse du chatbot".\n'
             'Pour personnaliser les messages envoyés dans le chat, vous pouvez\n'
@@ -642,6 +651,53 @@ class PreferencedLanguage extends PreferencedElement {
             '    {username} - le nom de l\'utilisateur ayant fait la réclamation\n'
             '    {cost} - le coût de la réclamation\n'
             '    {message} - le message de l\'utilisateur dans la réclamation';
+    }
+  }
+
+  String get rewardRedemptionCannotSave {
+    switch (_current) {
+      case Language.english:
+        return 'Please connect to Twitch to save the reward redemption';
+      case Language.french:
+        return 'Veuillez vous connecter à Twitch pour sauvegarder la réclamation de récompense';
+    }
+  }
+
+  String get rewardRedemptionSuccess {
+    switch (_current) {
+      case Language.english:
+        return 'The reward redemption was successfully created/updated';
+      case Language.french:
+        return 'La réclamation de récompense a été créée/mise à jour avec succès';
+    }
+  }
+
+  String get rewardRedemptionFailed {
+    switch (_current) {
+      case Language.english:
+        return 'Failed to create/update the reward.\n'
+            'Make sure the title is valid (must be unique) and the cost is greater than or equal to 1.';
+      case Language.french:
+        return 'Impossible de créer/mettre à jour la récompense.\n'
+            'Assurez-vous que le titre est valide (doit être unique) et que le coût est supérieur ou égal à 1.';
+    }
+  }
+
+  String get rewardRedemptionRemovedSuccess {
+    switch (_current) {
+      case Language.english:
+        return 'The reward redemption was successfully removed';
+      case Language.french:
+        return 'La réclamation de récompense a été supprimée avec succès';
+    }
+  }
+
+  String get rewardRedemptionRemovedFailed {
+    switch (_current) {
+      case Language.english:
+        return 'Failed to remove the reward redemption';
+      case Language.french:
+        return 'Impossible de supprimer la réclamation de récompense';
     }
   }
 
@@ -660,6 +716,15 @@ class PreferencedLanguage extends PreferencedElement {
         return 'Chatbot answer. ';
       case Language.french:
         return 'Réponse du chatbot';
+    }
+  }
+
+  String get rewardRedemptionCost {
+    switch (_current) {
+      case Language.english:
+        return 'Cost of the reward';
+      case Language.french:
+        return 'Coût de la récompense';
     }
   }
 
@@ -702,9 +767,9 @@ class PreferencedLanguage extends PreferencedElement {
   String get rewardRedemptionLabel {
     switch (_current) {
       case Language.english:
-        return 'Write the exact name of the reward redemption';
+        return 'Write the name of the reward redemption';
       case Language.french:
-        return 'Écrivez le nom exact de la réclamation de récompense';
+        return 'Écrivez le nom de la réclamation de récompense';
     }
   }
 

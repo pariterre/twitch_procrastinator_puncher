@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:twitch_procastinator_puncher/models/app_theme.dart';
-import 'package:twitch_procastinator_puncher/models/preferenced_element.dart';
 
 class _DigitOnly extends TextInputFormatter {
   static final _reg = RegExp(r'^\d+$'); // any number
@@ -24,7 +23,7 @@ class IntSelectorTile extends StatefulWidget {
   });
 
   final String title;
-  final PreferencedInt initialValue;
+  final int initialValue;
   final Function(int value) onValidChange;
 
   @override

@@ -5,6 +5,7 @@ import 'package:twitch_manager/twitch_manager.dart';
 import 'package:twitch_procastinator_puncher/models/app_theme.dart';
 import 'package:twitch_procastinator_puncher/models/config.dart';
 import 'package:twitch_procastinator_puncher/models/participant.dart';
+import 'package:twitch_procastinator_puncher/models/preferenced_element.dart';
 import 'package:twitch_procastinator_puncher/models/twitch_status.dart';
 import 'package:twitch_procastinator_puncher/providers/app_preferences.dart';
 import 'package:twitch_procastinator_puncher/providers/participants.dart';
@@ -195,6 +196,62 @@ class _MainScreenState extends State<MainScreen> {
     setState(() {});
   }
 
+  Future<void> _onRewardRedemptionChanged(
+      {required int index, required bool wasDeleted}) async {
+    void showSnackBar(String message) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(message)));
+    }
+
+    final preferences = AppPreferences.of(context, listen: false);
+    final RewardRedemptionPreferenced reward =
+        preferences.rewardRedemptions[index];
+
+    if (wasDeleted) {
+      if (!(await _twitchManager!.api
+          .deleteRewardRedemption(reward: reward.toTwitch))) {
+        showSnackBar(preferences.texts.rewardRedemptionRemovedFailed);
+        return;
+      }
+      showSnackBar(preferences.texts.rewardRedemptionRemovedSuccess);
+
+      preferences.removeRewardRedemptionAt(index);
+      return;
+    }
+
+    // If we get here, then the reward redemption is either new or updated
+    if (reward.title.isEmpty || reward.cost < 0) {
+      // The reward redemption is not valid
+      showSnackBar(preferences.texts.rewardRedemptionFailed);
+      return;
+    }
+
+    if (reward.rewardId == null) {
+      // Create a new reward redemption
+      final request = TwitchRewardRedemption.empty(
+          rewardRedemption: reward.title, cost: reward.cost);
+      final id =
+          await _twitchManager!.api.createRewardRedemption(reward: request);
+      if (id == null) {
+        showSnackBar(preferences.texts.rewardRedemptionFailed);
+        return;
+      }
+      reward.rewardId = id;
+      showSnackBar(preferences.texts.rewardRedemptionSuccess);
+      return;
+    } else {
+      // Update an existing reward redemption
+      if (!(await _twitchManager!.api
+          .updateRewardRedemption(reward: reward.toTwitch))) {
+        showSnackBar(preferences.texts.rewardRedemptionFailed);
+        return;
+      }
+      showSnackBar(preferences.texts.rewardRedemptionSuccess);
+      return;
+    }
+  }
+
   Future<void> _setTwitchManager(TwitchManager? manager) async {
     if (manager == null || !manager.isConnected) return;
     final participants = Participants.of(context, listen: false);
@@ -244,16 +301,20 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void _onRewardRedemptionRequest(TwitchRewardRedemption redemption) {
+    final prefs = AppPreferences.of(context, listen: false);
+
     // Cycle through all the reward redemption defined by the streamer to see
     // if one of them matches the currently redempted one.
-    AppPreferences.of(context, listen: false).rewardRedemptions.forEach((e) {
+    for (var e in prefs.rewardRedemptions) {
       // If so, add it to the timer settings
       if (e.title == redemption.rewardRedemption) {
         PomodoroStatus.of(context, listen: false).addRewardRedemption(e);
+        _twitchManager!.api.updateRewardRedemptionStatus(
+            reward: redemption, status: TwitchRewardRedemptionStatus.fulfilled);
         _twitchManager!.chat.send(e.formattedChatbotAnswer(redemption));
-        return;
+        continue;
       }
-    });
+    }
     // If we get here, the reward redemption is not related to the
     // procrastinator puncher or the name of the reward redemption was wrong.
   }
@@ -298,6 +359,10 @@ class _MainScreenState extends State<MainScreen> {
                                     _twitchManager!.isConnected
                                 ? TwitchStatus.connected
                                 : TwitchStatus.notConnected,
+                        onRewardRedemptionChanged:
+                            _twitchManager?.isConnected ?? false
+                                ? _onRewardRedemptionChanged
+                                : null,
                       );
                     }),
               ),

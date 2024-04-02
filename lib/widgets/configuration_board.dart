@@ -38,6 +38,7 @@ class ConfigurationBoard extends StatelessWidget {
     required this.gainFocusCallback,
     required this.connectToTwitch,
     required this.twitchStatus,
+    required this.onRewardRedemptionChanged,
   });
 
   final Function() startTimerCallback;
@@ -46,6 +47,8 @@ class ConfigurationBoard extends StatelessWidget {
   final Function(StopWatchStatus hasFocus) gainFocusCallback;
   final Function()? connectToTwitch;
   final TwitchStatus twitchStatus;
+  final Function({required int index, required bool wasDeleted})?
+      onRewardRedemptionChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +87,7 @@ class ConfigurationBoard extends StatelessWidget {
                     const Divider(),
                     _buildChatBotResponse(context),
                     const Divider(),
-                    _buildRewardRedemption(context),
+                    _buildRewardRedemption(context, onRewardRedemptionChanged),
                     const Divider(),
                     _buildHallOfFameOptions(context),
                     const Divider(),
@@ -342,7 +345,7 @@ class ConfigurationBoard extends StatelessWidget {
         children: [
           IntSelectorTile(
             title: preferences.texts.controllerNumberOfSession,
-            initialValue: preferences.nbSessions,
+            initialValue: preferences.nbSessions.value,
             onValidChange: (value) => preferences.nbSessions.set(value),
           ),
           SizedBox(height: padding),
@@ -608,7 +611,10 @@ class ConfigurationBoard extends StatelessWidget {
     );
   }
 
-  Widget _buildRewardRedemption(BuildContext context) {
+  Widget _buildRewardRedemption(
+      BuildContext context,
+      Function({required int index, required bool wasDeleted})?
+          onRewardRedemptionChanged) {
     final preferences = AppPreferences.of(context);
     final padding = ThemePadding.normal(context);
 
@@ -635,29 +641,29 @@ class ConfigurationBoard extends StatelessWidget {
                   hint:
                       '${preferences.texts.rewardRedemptionLabel} ${index + 1}',
                   rewardRedemption: preferences.rewardRedemptions[index],
-                  onDeleted: () => preferences.removeRewardRedemptionAt(index),
+                  onChanged: onRewardRedemptionChanged == null
+                      ? null
+                      : ({required bool wasDeleted}) =>
+                          onRewardRedemptionChanged(
+                              index: index, wasDeleted: wasDeleted),
                 )),
         Center(
-          child: Padding(
-            padding: EdgeInsets.only(top: padding),
-            child: ElevatedButton(
-                onPressed: () => AppPreferences.of(context, listen: false)
-                    .newRewardRedemption(),
-                style: ThemeButton.elevated,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.add, color: Colors.green),
-                    Text(
-                      preferences.texts.rewardRedemptionAddButton,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontSize: ThemeSize.text(context)),
-                    ),
-                  ],
-                )),
-          ),
+          child: ElevatedButton(
+              onPressed: () => AppPreferences.of(context, listen: false)
+                  .newRewardRedemption(),
+              style: ThemeButton.elevated,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.add, color: Colors.green),
+                  Text(
+                    preferences.texts.rewardRedemptionAddButton,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: Colors.black, fontSize: ThemeSize.text(context)),
+                  ),
+                ],
+              )),
         ),
       ]),
     );
@@ -1109,7 +1115,7 @@ class ConfigurationBoard extends StatelessWidget {
     context, {
     required String hint,
     required RewardRedemptionPreferenced rewardRedemption,
-    required Function() onDeleted,
+    required Function({required bool wasDeleted})? onChanged,
   }) {
     final padding = ThemePadding.normal(context);
     final texts = AppPreferences.of(context, listen: false).texts;
@@ -1120,11 +1126,42 @@ class ConfigurationBoard extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          StringSelectorTile(
-            key: ValueKey(rewardRedemption.hashCode),
-            title: hint,
-            initialText: rewardRedemption.title,
-            onTextChanged: (String value) => rewardRedemption.title = value,
+          Row(
+            children: [
+              Expanded(
+                child: StringSelectorTile(
+                  key: ValueKey(rewardRedemption.hashCode),
+                  title: hint,
+                  initialText: rewardRedemption.title,
+                  onTextChanged: (String value) =>
+                      rewardRedemption.title = value,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Tooltip(
+                  message:
+                      onChanged == null ? texts.rewardRedemptionCannotSave : '',
+                  child: IconButton(
+                      onPressed: onChanged == null
+                          ? null
+                          : () => onChanged(wasDeleted: false),
+                      icon: Icon(
+                        Icons.save,
+                        color: onChanged == null ? Colors.grey : Colors.white,
+                      )),
+                ),
+              )
+            ],
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: padding),
+            child: IntSelectorTile(
+              key: ValueKey(rewardRedemption.hashCode),
+              title: texts.rewardRedemptionCost,
+              initialValue: rewardRedemption.cost,
+              onValidChange: (int value) => rewardRedemption.cost = value,
+            ),
           ),
           Padding(
             padding: EdgeInsets.only(top: padding),
@@ -1165,13 +1202,16 @@ class ConfigurationBoard extends StatelessWidget {
                     }),
               ),
               IconButton(
-                  onPressed: onDeleted,
-                  icon: const Icon(
+                  onPressed: onChanged == null
+                      ? null
+                      : () => onChanged(wasDeleted: true),
+                  icon: Icon(
                     Icons.delete,
-                    color: Colors.red,
+                    color: onChanged == null ? Colors.grey : Colors.red,
                   )),
             ],
           ),
+          const SizedBox(width: 300, child: Divider(color: Colors.white)),
         ],
       ),
     );

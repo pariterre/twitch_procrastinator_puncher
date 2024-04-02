@@ -484,17 +484,35 @@ class RewardRedemptionPreferenced extends PreferencedElement {
   RewardRedemptionPreferenced({
     RewardRedemption rewardRedemption = RewardRedemption.none,
     String title = '',
+    int cost = 1,
     Duration duration = const Duration(minutes: 5),
     String chatbotAnswer = '',
+    String? rewardId,
   })  : _rewardRedemption = rewardRedemption,
         _title = title,
+        _cost = cost,
         _duration = duration,
-        _chatbotAnswer = chatbotAnswer;
+        _chatbotAnswer = chatbotAnswer,
+        _rewardId = rewardId;
 
   String _title;
   String get title => _title;
   set title(String value) {
     _title = value;
+    if (onChanged != null) onChanged!();
+  }
+
+  int _cost;
+  int get cost => _cost;
+  set cost(int value) {
+    _cost = value;
+    if (onChanged != null) onChanged!();
+  }
+
+  String? _rewardId;
+  String? get rewardId => _rewardId;
+  set rewardId(String? value) {
+    _rewardId = value;
     if (onChanged != null) onChanged!();
   }
 
@@ -519,7 +537,11 @@ class RewardRedemptionPreferenced extends PreferencedElement {
     if (onChanged != null) onChanged!();
   }
 
-  String formattedChatbotAnswer(TwitchEvent response) {
+  TwitchRewardRedemption get toTwitch =>
+      TwitchRewardRedemption.empty(rewardRedemption: title, cost: cost)
+          .copyWith(rewardRedemptionId: rewardId);
+
+  String formattedChatbotAnswer(TwitchRewardRedemption response) {
     var out = _chatbotAnswer
         .replaceAll('{title}', title)
         .replaceAll('{username}', response.requestingUser)
@@ -531,10 +553,12 @@ class RewardRedemptionPreferenced extends PreferencedElement {
 
   static RewardRedemptionPreferenced deserializeSync(map) =>
       RewardRedemptionPreferenced(
-        title: map?['title'],
+        title: map?['title'] ?? '',
+        cost: map?['cost'] ?? -1,
         rewardRedemption: RewardRedemption.values[map?['rewardRedemption']],
         duration: Duration(seconds: map?['duration'] ?? 60 * 5),
         chatbotAnswer: map?['chatbotAnswer'] ?? '',
+        rewardId: map?['rewardId'],
       );
 
   static Future<RewardRedemptionPreferenced> deserialize(map) async =>
@@ -542,8 +566,10 @@ class RewardRedemptionPreferenced extends PreferencedElement {
 
   Map<String, dynamic> serialize() => {
         'title': title,
+        'cost': _cost,
         'rewardRedemption': rewardRedemption.index,
         'duration': duration.inSeconds,
         'chatbotAnswer': chatbotAnswer,
+        'rewardId': rewardId,
       };
 }

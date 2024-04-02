@@ -36,7 +36,8 @@ const twitchScope = [
   TwitchScope.chatters,
   TwitchScope.readFollowers,
   TwitchScope.readModerator,
-  TwitchScope.rewardRedemption,
+  TwitchScope.readRewardRedemption,
+  TwitchScope.manageRewardRedemption,
 ];
 
 final twitchDebugPanelOptions = TwitchDebugPanelOptions(
@@ -55,4 +56,4 @@ final twitchDebugPanelOptions = TwitchDebugPanelOptions(
         cost: 5000),
   ],
 );
-const bool isTwitchMockActive = true;
+const bool isTwitchMockActive = false;
