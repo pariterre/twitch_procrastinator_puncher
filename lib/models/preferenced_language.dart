@@ -676,10 +676,10 @@ class PreferencedLanguage extends PreferencedElement {
     switch (_current) {
       case Language.english:
         return 'Failed to create/update the reward.\n'
-            'Make sure the title is valid (must be unique) and the cost is greater than or equal to 1.';
+            'Make sure you are connected to Twitch, the title is valid (must be unique) and the cost is greater than or equal to 1.';
       case Language.french:
         return 'Impossible de créer/mettre à jour la récompense.\n'
-            'Assurez-vous que le titre est valide (doit être unique) et que le coût est supérieur ou égal à 1.';
+            'Assurez-vous que vous êtes connecté à Twitch, que le titre est valide (doit être unique) et que le coût est supérieur ou égal à 1.';
     }
   }
 
