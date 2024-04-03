@@ -488,17 +488,20 @@ class RewardRedemptionPreferenced extends PreferencedElement {
     Duration duration = const Duration(minutes: 5),
     String chatbotAnswer = '',
     String? rewardId,
+    bool isSavedToTwitch = false,
   })  : _rewardRedemption = rewardRedemption,
         _title = title,
         _cost = cost,
         _duration = duration,
         _chatbotAnswer = chatbotAnswer,
-        _rewardId = rewardId;
+        _rewardId = rewardId,
+        _isSavedToTwitch = isSavedToTwitch;
 
   String _title;
   String get title => _title;
   set title(String value) {
     _title = value;
+    _isSavedToTwitch = false;
     if (onChanged != null) onChanged!();
   }
 
@@ -506,6 +509,7 @@ class RewardRedemptionPreferenced extends PreferencedElement {
   int get cost => _cost;
   set cost(int value) {
     _cost = value;
+    _isSavedToTwitch = false;
     if (onChanged != null) onChanged!();
   }
 
@@ -513,6 +517,13 @@ class RewardRedemptionPreferenced extends PreferencedElement {
   String? get rewardId => _rewardId;
   set rewardId(String? value) {
     _rewardId = value;
+    if (onChanged != null) onChanged!();
+  }
+
+  bool _isSavedToTwitch = false;
+  bool get isSavedToTwitch => _isSavedToTwitch;
+  set isSavedToTwitch(bool value) {
+    _isSavedToTwitch = value;
     if (onChanged != null) onChanged!();
   }
 
@@ -538,7 +549,7 @@ class RewardRedemptionPreferenced extends PreferencedElement {
   }
 
   TwitchRewardRedemption get toTwitch =>
-      TwitchRewardRedemption.empty(rewardRedemption: title, cost: cost)
+      TwitchRewardRedemption.minimal(rewardRedemption: title, cost: cost)
           .copyWith(rewardRedemptionId: rewardId);
 
   String formattedChatbotAnswer(TwitchRewardRedemption response) {
@@ -553,23 +564,25 @@ class RewardRedemptionPreferenced extends PreferencedElement {
 
   static RewardRedemptionPreferenced deserializeSync(map) =>
       RewardRedemptionPreferenced(
+        rewardRedemption: RewardRedemption.values[map?['rewardRedemption']],
         title: map?['title'] ?? '',
         cost: map?['cost'] ?? -1,
-        rewardRedemption: RewardRedemption.values[map?['rewardRedemption']],
         duration: Duration(seconds: map?['duration'] ?? 60 * 5),
         chatbotAnswer: map?['chatbotAnswer'] ?? '',
         rewardId: map?['rewardId'],
+        isSavedToTwitch: map?['isSavedToTwitch'] ?? false,
       );
 
   static Future<RewardRedemptionPreferenced> deserialize(map) async =>
       deserializeSync(map);
 
   Map<String, dynamic> serialize() => {
+        'rewardRedemption': rewardRedemption.index,
         'title': title,
         'cost': _cost,
-        'rewardRedemption': rewardRedemption.index,
         'duration': duration.inSeconds,
         'chatbotAnswer': chatbotAnswer,
         'rewardId': rewardId,
+        'isSavedToTwitch': isSavedToTwitch,
       };
 }

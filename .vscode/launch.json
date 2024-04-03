@@ -8,6 +8,7 @@
             "name": "Procrastinator puncher",
             "request": "launch",
             "type": "dart",
+            "program": "lib/main.dart",
             "args": ["--web-browser-flag=--disable-web-security"]
         }
     ]

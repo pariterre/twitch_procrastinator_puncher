@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:twitch_procastinator_puncher/models/app_theme.dart';
 import 'package:twitch_procastinator_puncher/models/config.dart';
+import 'package:twitch_procastinator_puncher/models/enums.dart';
 import 'package:twitch_procastinator_puncher/models/preferenced_element.dart';
 import 'package:twitch_procastinator_puncher/models/reward_redemption.dart';
 import 'package:twitch_procastinator_puncher/models/twitch_status.dart';
@@ -38,7 +39,7 @@ class ConfigurationBoard extends StatelessWidget {
     required this.gainFocusCallback,
     required this.connectToTwitch,
     required this.twitchStatus,
-    required this.onRewardRedemptionChanged,
+    required this.onRewardRedemptionSaved,
   });
 
   final Function() startTimerCallback;
@@ -47,8 +48,9 @@ class ConfigurationBoard extends StatelessWidget {
   final Function(StopWatchStatus hasFocus) gainFocusCallback;
   final Function()? connectToTwitch;
   final TwitchStatus twitchStatus;
-  final Function({required int index, required bool wasDeleted})?
-      onRewardRedemptionChanged;
+  final Function(
+      {required int index,
+      required TypesOfModification modification}) onRewardRedemptionSaved;
 
   @override
   Widget build(BuildContext context) {
@@ -87,7 +89,7 @@ class ConfigurationBoard extends StatelessWidget {
                     const Divider(),
                     _buildChatBotResponse(context),
                     const Divider(),
-                    _buildRewardRedemption(context, onRewardRedemptionChanged),
+                    _buildRewardRedemption(context, onRewardRedemptionSaved),
                     const Divider(),
                     _buildHallOfFameOptions(context),
                     const Divider(),
@@ -613,8 +615,8 @@ class ConfigurationBoard extends StatelessWidget {
 
   Widget _buildRewardRedemption(
       BuildContext context,
-      Function({required int index, required bool wasDeleted})?
-          onRewardRedemptionChanged) {
+      Function({required int index, required TypesOfModification modification})
+          onRewardRedemptionSaved) {
     final preferences = AppPreferences.of(context);
     final padding = ThemePadding.normal(context);
 
@@ -640,12 +642,10 @@ class ConfigurationBoard extends StatelessWidget {
                   context,
                   hint:
                       '${preferences.texts.rewardRedemptionLabel} ${index + 1}',
-                  rewardRedemption: preferences.rewardRedemptions[index],
-                  onChanged: onRewardRedemptionChanged == null
-                      ? null
-                      : ({required bool wasDeleted}) =>
-                          onRewardRedemptionChanged(
-                              index: index, wasDeleted: wasDeleted),
+                  reward: preferences.rewardRedemptions[index],
+                  onSaved: ({required TypesOfModification modification}) =>
+                      onRewardRedemptionSaved(
+                          index: index, modification: modification),
                 )),
         Center(
           child: ElevatedButton(
@@ -1114,8 +1114,8 @@ class ConfigurationBoard extends StatelessWidget {
   Widget _buildRewardRedemptionSelectorTile(
     context, {
     required String hint,
-    required RewardRedemptionPreferenced rewardRedemption,
-    required Function({required bool wasDeleted})? onChanged,
+    required RewardRedemptionPreferenced reward,
+    required Function({required TypesOfModification modification}) onSaved,
   }) {
     final padding = ThemePadding.normal(context);
     final texts = AppPreferences.of(context, listen: false).texts;
@@ -1130,47 +1130,42 @@ class ConfigurationBoard extends StatelessWidget {
             children: [
               Expanded(
                 child: StringSelectorTile(
-                  key: ValueKey(rewardRedemption.hashCode),
+                  key: ValueKey(reward.hashCode),
                   title: hint,
-                  initialText: rewardRedemption.title,
-                  onTextChanged: (String value) =>
-                      rewardRedemption.title = value,
+                  initialText: reward.title,
+                  onTextChanged: (String value) => reward.title = value,
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 8.0),
-                child: Tooltip(
-                  message:
-                      onChanged == null ? texts.rewardRedemptionCannotSave : '',
-                  child: IconButton(
-                      onPressed: onChanged == null
-                          ? null
-                          : () => onChanged(wasDeleted: false),
-                      icon: Icon(
-                        Icons.save,
-                        color: onChanged == null ? Colors.grey : Colors.white,
-                      )),
-                ),
+                child: IconButton(
+                    onPressed: reward.isSavedToTwitch
+                        ? null
+                        : () => onSaved(
+                            modification: reward.rewardId == null
+                                ? TypesOfModification.created
+                                : TypesOfModification.updated),
+                    icon: Icon(Icons.save,
+                        color: reward.isSavedToTwitch ? null : Colors.white)),
               )
             ],
           ),
           Padding(
             padding: EdgeInsets.only(top: padding),
             child: IntSelectorTile(
-              key: ValueKey(rewardRedemption.hashCode),
+              key: ValueKey(reward.hashCode),
               title: texts.rewardRedemptionCost,
-              initialValue: rewardRedemption.cost,
-              onValidChange: (int value) => rewardRedemption.cost = value,
+              initialValue: reward.cost,
+              onValidChange: (int value) => reward.cost = value,
             ),
           ),
           Padding(
             padding: EdgeInsets.only(top: padding),
             child: StringSelectorTile(
-              key: ValueKey(rewardRedemption.hashCode),
+              key: ValueKey(reward.hashCode),
               title: texts.rewardRedemptionChatbotAnswer,
-              initialText: rewardRedemption.chatbotAnswer,
-              onTextChanged: (String value) =>
-                  rewardRedemption.chatbotAnswer = value,
+              initialText: reward.chatbotAnswer,
+              onTextChanged: (String value) => reward.chatbotAnswer = value,
             ),
           ),
           Row(
@@ -1180,13 +1175,13 @@ class ConfigurationBoard extends StatelessWidget {
             children: [
               Expanded(
                 child: SelectDropList(
-                    key: ValueKey(rewardRedemption.hashCode),
+                    key: ValueKey(reward.hashCode),
                     paddingTop: padding / 2,
                     heightBottomContainer:
                         20 + (RewardRedemption.values.length - 1) * 42,
                     itemSelected: OptionItem(
-                        id: rewardRedemption.rewardRedemption.index.toString(),
-                        title: rewardRedemption.rewardRedemption.name(context)),
+                        id: reward.rewardRedemption.index.toString(),
+                        title: reward.rewardRedemption.name(context)),
                     dropListModel: DropListModel(RewardRedemption.values
                         .where((e) => e != RewardRedemption.none)
                         .map(
@@ -1196,19 +1191,13 @@ class ConfigurationBoard extends StatelessWidget {
                         .toList()),
                     showIcon: false,
                     showArrowIcon: true,
-                    onOptionSelected: (value) {
-                      rewardRedemption.rewardRedemption =
-                          RewardRedemption.values[int.parse(value.id!)];
-                    }),
+                    onOptionSelected: (value) => reward.rewardRedemption =
+                        RewardRedemption.values[int.parse(value.id!)]),
               ),
               IconButton(
-                  onPressed: onChanged == null
-                      ? null
-                      : () => onChanged(wasDeleted: true),
-                  icon: Icon(
-                    Icons.delete,
-                    color: onChanged == null ? Colors.grey : Colors.red,
-                  )),
+                  onPressed: () =>
+                      onSaved(modification: TypesOfModification.deleted),
+                  icon: const Icon(Icons.delete, color: Colors.red)),
             ],
           ),
           const SizedBox(width: 300, child: Divider(color: Colors.white)),

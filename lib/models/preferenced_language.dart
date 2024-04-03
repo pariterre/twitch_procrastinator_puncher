@@ -695,9 +695,11 @@ class PreferencedLanguage extends PreferencedElement {
   String get rewardRedemptionRemovedFailed {
     switch (_current) {
       case Language.english:
-        return 'Failed to remove the reward redemption';
+        return 'Failed to remove the reward redemption. You may need to remove '
+            'it manually from Twitch';
       case Language.french:
-        return 'Impossible de supprimer la réclamation de récompense';
+        return 'Impossible de supprimer la réclamation de récompense. Vous devrez '
+            'peut-être la supprimer manuellement de Twitch';
     }
   }
 
