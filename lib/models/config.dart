@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:twitch_manager/twitch_manager.dart';
+import 'package:twitch_manager/twitch_app.dart';
 
 Directory? _appDirectory;
 Directory get appDirectory {
@@ -29,15 +29,18 @@ const preferencesFilename = 'preferences.json';
 const textExportFilename = 'timer.txt';
 const twitchAppName = 'ProcrastinatorPuncher';
 const twitchAppId = 'mcysoxq3vitdjwcqn71f8opz11cyex';
-const twitchRedirectDomain = 'twitchauthentication.pariterre.net';
+final twitchRedirectUri =
+    Uri.https('twitchauthentication.pariterre.net', 'twitch_redirect.html');
+final authenticationServerUri =
+    Uri.https('twitchserver.pariterre.net:3000', 'token');
 const twitchScope = [
-  TwitchScope.chatRead,
-  TwitchScope.chatEdit,
-  TwitchScope.chatters,
-  TwitchScope.readFollowers,
-  TwitchScope.readModerator,
-  TwitchScope.readRewardRedemption,
-  TwitchScope.manageRewardRedemption,
+  TwitchAppScope.chatRead,
+  TwitchAppScope.chatEdit,
+  TwitchAppScope.chatters,
+  TwitchAppScope.readFollowers,
+  TwitchAppScope.readModerator,
+  TwitchAppScope.readRewardRedemption,
+  TwitchAppScope.manageRewardRedemption,
 ];
 
 final twitchDebugPanelOptions = TwitchDebugPanelOptions(

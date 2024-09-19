@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
-import 'package:twitch_manager/models/twitch_events.dart';
+import 'package:twitch_manager/twitch_app.dart';
 import 'package:twitch_procastinator_puncher/models/config.dart';
 import 'package:twitch_procastinator_puncher/models/helpers.dart';
 import 'package:twitch_procastinator_puncher/models/participant.dart';

@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:twitch_manager/twitch_manager.dart';
+import 'package:twitch_manager/twitch_app.dart';
 import 'package:twitch_procastinator_puncher/helpers/file_picker_interface.dart';
 import 'package:twitch_procastinator_puncher/models/config.dart';
 import 'package:twitch_procastinator_puncher/models/participant.dart';
@@ -23,8 +23,8 @@ List<String> _extractUsersFromString(String value) {
 }
 
 class Participants extends ChangeNotifier {
-  TwitchManager? _twitchManager;
-  set twitchManager(TwitchManager manager) {
+  TwitchAppManager? _twitchManager;
+  set twitchManager(TwitchAppManager manager) {
     _twitchManager = manager;
     _checkWhoIsConnected();
     Timer.periodic(

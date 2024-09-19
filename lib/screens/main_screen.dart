@@ -1,7 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:twitch_manager/models/twitch_events.dart';
-import 'package:twitch_manager/twitch_manager.dart';
+import 'package:twitch_manager/twitch_app.dart';
 import 'package:twitch_procastinator_puncher/models/app_theme.dart';
 import 'package:twitch_procastinator_puncher/models/config.dart';
 import 'package:twitch_procastinator_puncher/models/enums.dart';
@@ -26,18 +25,19 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  TwitchManager? _twitchManager;
+  TwitchAppManager? _twitchManager;
   final twitchAppInfo = TwitchAppInfo(
     appName: twitchAppName,
-    twitchAppId: twitchAppId,
-    redirectUri: twitchRedirectDomain,
+    twitchClientId: twitchAppId,
+    twitchRedirectUri: twitchRedirectUri,
+    authenticationServerUri: authenticationServerUri,
     scope: twitchScope,
   );
 
-  late Future<TwitchManager> managerFactory = isTwitchMockActive
+  late Future<TwitchAppManager> managerFactory = isTwitchMockActive
       ? TwitchManagerMock.factory(
           appInfo: twitchAppInfo, debugPanelOptions: twitchDebugPanelOptions)
-      : TwitchManager.factory(appInfo: twitchAppInfo);
+      : TwitchAppManager.factory(appInfo: twitchAppInfo);
   StopWatchStatus _statusWithFocus = StopWatchStatus.initializing;
   bool isInitialized = false;
 
@@ -183,9 +183,9 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void _connectToTwitch() async {
-    await _setTwitchManager(await showDialog<TwitchManager>(
+    await _setTwitchManager(await showDialog<TwitchAppManager>(
       context: context,
-      builder: (context) => TwitchAuthenticationDialog(
+      builder: (context) => TwitchAppAuthenticationDialog(
         onConnexionEstablished: (manager) => Navigator.pop(context, manager),
         appInfo: twitchAppInfo,
         reload: false,
@@ -263,7 +263,7 @@ class _MainScreenState extends State<MainScreen> {
         .showSnackBar(SnackBar(content: Text(snackbarMessage)));
   }
 
-  Future<void> _setTwitchManager(TwitchManager? manager) async {
+  Future<void> _setTwitchManager(TwitchAppManager? manager) async {
     if (manager == null || !manager.isConnected) return;
     final participants = Participants.of(context, listen: false);
 
@@ -273,9 +273,8 @@ class _MainScreenState extends State<MainScreen> {
         (await _twitchManager!.api.fetchModerators(includeStreamer: true))!;
 
     // Connect everything related to participants
-    _twitchManager!.chat.onMessageReceived.startListening(_onMessageReceived);
-    _twitchManager!.events.onRewardRedeemed
-        .startListening(_onRewardRedemptionRequest);
+    _twitchManager!.chat.onMessageReceived.listen(_onMessageReceived);
+    _twitchManager!.events.onRewardRedeemed.listen(_onRewardRedemptionRequest);
     participants.twitchManager = _twitchManager!;
     participants.greetNewcomerCallback = _greetNewComers;
     participants.greetUserHasConnectedCallback = _greetUserHasConnected;
@@ -338,7 +337,7 @@ class _MainScreenState extends State<MainScreen> {
 
     final widget = Scaffold(
       backgroundColor: Colors.transparent,
-      body: TwitchDebugOverlay(
+      body: TwitchAppDebugOverlay(
         manager: _twitchManager,
         child: Container(
           height: windowHeight,
