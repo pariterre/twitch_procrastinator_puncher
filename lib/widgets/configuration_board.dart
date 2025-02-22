@@ -5,6 +5,7 @@ import 'package:dropdown_model_list/drop_down/model.dart';
 import 'package:dropdown_model_list/drop_down/select_drop_list.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:twitch_procastinator_puncher/models/app_theme.dart';
 import 'package:twitch_procastinator_puncher/models/config.dart';
 import 'package:twitch_procastinator_puncher/models/enums.dart';
@@ -234,6 +235,52 @@ class ConfigurationBoard extends StatelessWidget {
                       color: Colors.black, fontSize: ThemeSize.text(context)),
                 ),
               ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              SizedBox(
+                  width: 150,
+                  child: TextField(
+                    controller: TextEditingController(),
+                    decoration: InputDecoration(
+                        labelText:
+                            preferences.texts.controllerSelectCurrentSession,
+                        labelStyle: TextStyle(
+                            color: ThemeColor().configurationText,
+                            fontSize: ThemeSize.text(context))),
+                    onChanged: (value) {
+                      final session = int.tryParse(value);
+                      if (session == null) return;
+
+                      pomodoro.currentSession = session - 1; // 0-indexed
+                    },
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    style: TextStyle(color: ThemeColor().configurationText),
+                  )),
+              SizedBox(
+                  width: 100,
+                  child: TextField(
+                    controller: TextEditingController(),
+                    decoration: InputDecoration(
+                        labelText: preferences.texts.controllerSelectDuration,
+                        labelStyle: TextStyle(
+                            color: ThemeColor().configurationText,
+                            fontSize: ThemeSize.text(context))),
+                    inputFormatters: [TimeOnlyInputFormatter()],
+                    onChanged: (value) {
+                      if (!TimeOnlyInputFormatter.isValid(value)) return;
+                      final minutes = TimeOnlyInputFormatter.getMinutes(value);
+                      final seconds = TimeOnlyInputFormatter.getSeconds(value);
+                      final duration =
+                          Duration(minutes: minutes, seconds: seconds);
+                      if (duration.inSeconds == 0) return;
+
+                      pomodoro.timer = duration;
+                    },
+                    style: TextStyle(color: ThemeColor().configurationText),
+                  )),
             ],
           ),
           if (twitchStatus != TwitchStatus.initializing &&

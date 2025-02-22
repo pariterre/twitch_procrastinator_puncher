@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:twitch_procastinator_puncher/helpers/file_picker_interface.dart';
@@ -439,7 +440,8 @@ class AppPreferences with ChangeNotifier {
         'backgroundColor': backgroundColor.serialize(),
         'backgroundColorHallOfFame': backgroundColorHallOfFame.serialize(),
         'fontPomodoro': fontPomodoro.index,
-        'textColorHallOfFame': textColorHallOfFame.value,
+        'textColorHallOfFame':
+            int.parse('0x${textColorHallOfFame.toHexString()}'),
         'textDuringInitialization': textDuringInitialization.serialize(),
         'textDuringActiveSession': textDuringActiveSession.serialize(),
         'textDuringPauseSession': textDuringPauseSession.serialize(),

@@ -11,6 +11,10 @@ class PomodoroStatus with ChangeNotifier {
   bool _firstSessionStarted = false;
   int _currentSession = 0;
   int get currentSession => _currentSession;
+  set currentSession(int value) {
+    _currentSession = value;
+    notifyListeners();
+  }
 
   final List<RewardRedemptionPreferenced> _pendingRewardRedemptions = [];
 

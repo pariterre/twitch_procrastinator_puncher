@@ -4,7 +4,7 @@ import 'package:twitch_procastinator_puncher/models/app_theme.dart';
 import 'package:twitch_procastinator_puncher/models/helpers.dart';
 import 'package:twitch_procastinator_puncher/models/preferenced_element.dart';
 
-class _TimeOnly extends TextInputFormatter {
+class TimeOnlyInputFormatter extends TextInputFormatter {
   static final _reg = RegExp(r'^(\d*)(:(\d{0,2}))?$'); // Any format mm:ss or mm
 
   @override
@@ -85,11 +85,11 @@ class _TimeSelectorTileState extends State<TimeSelectorTile> {
               child: TextField(
                 textAlign: TextAlign.center,
                 controller: _controller,
-                inputFormatters: [_TimeOnly()],
+                inputFormatters: [TimeOnlyInputFormatter()],
                 onChanged: (value) {
-                  if (!_TimeOnly.isValid(value)) return;
-                  final minutes = _TimeOnly.getMinutes(value);
-                  final seconds = _TimeOnly.getSeconds(value);
+                  if (!TimeOnlyInputFormatter.isValid(value)) return;
+                  final minutes = TimeOnlyInputFormatter.getMinutes(value);
+                  final seconds = TimeOnlyInputFormatter.getSeconds(value);
                   widget.onValidChange(
                       Duration(minutes: minutes, seconds: seconds));
                 },

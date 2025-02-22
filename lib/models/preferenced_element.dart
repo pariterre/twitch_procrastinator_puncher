@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 import 'package:twitch_manager/twitch_app.dart';
@@ -91,12 +92,12 @@ class PreferencedColor extends PreferencedElement {
   }
 
   int serialize() {
-    return _value.value;
+    return int.parse('0x${_value.toHexString()}');
   }
 
-  static Future<PreferencedColor> deserialize(map,
-          [int defaultValue = 0xFF000000]) async =>
-      PreferencedColor(Color(map ?? defaultValue));
+  static Future<PreferencedColor> deserialize(value,
+          [defaultValue = 0xFF000000]) async =>
+      PreferencedColor(Color(value ?? defaultValue));
 
   Color _value;
   Color get value => _value;
@@ -383,8 +384,11 @@ class PreferencedText extends PreferencedElement {
     return PreferencedText(text, color: color, font: font);
   }
 
-  Map<String, dynamic> serialize() =>
-      {'text': _text, 'color': _color.value, 'font': _font.index};
+  Map<String, dynamic> serialize() => {
+        'text': _text,
+        'color': int.parse('0x${_color.toHexString()}'),
+        'font': _font.index
+      };
 }
 
 class UnformattedPreferencedText extends PreferencedText {

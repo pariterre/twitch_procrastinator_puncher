@@ -122,6 +122,24 @@ class PreferencedLanguage extends PreferencedElement {
     }
   }
 
+  String get controllerSelectCurrentSession {
+    switch (_current) {
+      case Language.english:
+        return 'Select session';
+      case Language.french:
+        return 'Choisir session';
+    }
+  }
+
+  String get controllerSelectDuration {
+    switch (_current) {
+      case Language.english:
+        return 'Select duration';
+      case Language.french:
+        return 'Choisir durée';
+    }
+  }
+
   String get controllerConnectTwitch {
     switch (_current) {
       case Language.english:
