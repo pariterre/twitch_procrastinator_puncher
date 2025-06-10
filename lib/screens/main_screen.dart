@@ -134,7 +134,8 @@ class _MainScreenState extends State<MainScreen> {
     final source = preferences.endCountdownSound.playableSource;
     if (source != null) {
       final player = AudioPlayer();
-      await player.play(source);
+      await player.play(source,
+          volume: preferences.endCountdownSound.volume / 1.0);
     }
   }
 
@@ -148,7 +149,8 @@ class _MainScreenState extends State<MainScreen> {
     final source = preferences.endActiveSessionSound.playableSource;
     if (source != null) {
       final player = AudioPlayer();
-      await player.play(source);
+      await player.play(source,
+          volume: preferences.endActiveSessionSound.volume / 1.0);
     }
   }
 
@@ -162,7 +164,8 @@ class _MainScreenState extends State<MainScreen> {
     final source = preferences.endPauseSessionSound.playableSource;
     if (source != null) {
       final player = AudioPlayer();
-      await player.play(source);
+      await player.play(source,
+          volume: preferences.endPauseSessionSound.volume / 1.0);
     }
   }
 
@@ -176,7 +179,8 @@ class _MainScreenState extends State<MainScreen> {
     final source = preferences.endWorkingSound.playableSource;
     if (source != null) {
       final player = AudioPlayer();
-      await player.play(source);
+      await player.play(source,
+          volume: preferences.endWorkingSound.volume / 1.0);
     }
   }
 

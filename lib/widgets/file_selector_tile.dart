@@ -64,7 +64,9 @@ class FileSelectorTile extends StatelessWidget {
 
   void _playSound() async {
     final player = AudioPlayer();
-    await player.play((file as PreferencedSoundFile).playableSource!);
+    final fileAsSoundFile = file as PreferencedSoundFile;
+    await player.play(fileAsSoundFile.playableSource!,
+        volume: fileAsSoundFile.volume / 1.0);
   }
 
   @override
@@ -127,8 +129,23 @@ class FileSelectorTile extends StatelessWidget {
                   )),
             if (file.fileType == FileType.sound && file.hasFile)
               SizedBox(
+                width: windowHeight * 0.1,
+                child: Slider(
+                  min: 0.0,
+                  max: 1.0,
+                  value: (file as PreferencedSoundFile).volume,
+                  onChanged: (value) {
+                    (file as PreferencedSoundFile).volume = value;
+                  },
+                  label:
+                      '${((file as PreferencedSoundFile).volume * 100).toInt()}%',
+                  divisions: 10,
+                ),
+              ),
+            if (file.fileType == FileType.sound && file.hasFile)
+              SizedBox(
                   height: windowHeight * 0.045,
-                  width: windowHeight * 0.045,
+                  width: windowHeight * 0.025,
                   child: InkWell(
                     onTap: _playSound,
                     child: const Icon(
@@ -138,7 +155,7 @@ class FileSelectorTile extends StatelessWidget {
                   )),
             SizedBox(
               height: windowHeight * 0.045,
-              width: windowHeight * 0.045,
+              width: windowHeight * 0.035,
               child: InkWell(
                 onTap: () => _pickFile(context),
                 child: const Icon(
@@ -150,7 +167,7 @@ class FileSelectorTile extends StatelessWidget {
             if (file.hasFile)
               SizedBox(
                 height: windowHeight * 0.045,
-                width: windowHeight * 0.045,
+                width: windowHeight * 0.025,
                 child: InkWell(
                   onTap: onFileDeleted,
                   child: const Icon(

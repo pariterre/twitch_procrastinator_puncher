@@ -273,17 +273,30 @@ class PreferencedImageFile extends PreferencedFile {
 }
 
 class PreferencedSoundFile extends PreferencedFile {
-  static Future<PreferencedSoundFile> fromPath(String filepath) async {
+  static Future<PreferencedSoundFile> fromPath(String filepath,
+      {required double volume}) async {
     final raw = await (kIsWeb
         ? PickedFile(filepath).readAsBytes()
         : File(filepath).readAsBytes());
-    return PreferencedSoundFile.fromRaw(raw, filepath: filepath);
+    return PreferencedSoundFile.fromRaw(raw,
+        filepath: filepath, volume: volume);
   }
 
-  PreferencedSoundFile() : super();
+  double _volume;
+  double get volume => _volume;
+  set volume(double value) {
+    _volume = value;
+    if (onChanged != null) onChanged!();
+  }
 
-  PreferencedSoundFile.fromRaw(Uint8List raw, {super.filepath})
-      : super(raw: raw);
+  PreferencedSoundFile({required double volume})
+      : _volume = volume,
+        super();
+
+  PreferencedSoundFile.fromRaw(Uint8List raw,
+      {super.filepath, required double volume})
+      : _volume = volume,
+        super(raw: raw);
 
   @override
   FileType get fileType => FileType.sound;
@@ -299,17 +312,28 @@ class PreferencedSoundFile extends PreferencedFile {
     }
   }
 
+  @override
+  Map<String, dynamic> serialize() {
+    return super.serialize()..addAll({'volume': volume});
+  }
+
   static Future<PreferencedSoundFile> deserialize(map) async {
     if (kIsWeb) {
       final raw = map?['raw'];
-      if (raw == null) return PreferencedSoundFile();
+      if (raw == null) {
+        return PreferencedSoundFile(volume: map?['volume'] ?? 1.0);
+      }
 
       return PreferencedSoundFile.fromRaw(
-          Uint8List.fromList((raw as List).map<int>((e) => e).toList()));
+          Uint8List.fromList((raw as List).map<int>((e) => e).toList()),
+          volume: map?['volume'] ?? 1.0);
     } else {
       final filepath = map?['filepath'];
-      if (filepath == null) return PreferencedSoundFile();
-      return await PreferencedSoundFile.fromPath(filepath);
+      if (filepath == null) {
+        return PreferencedSoundFile(volume: map?['volume'] ?? 1.0);
+      }
+      return await PreferencedSoundFile.fromPath(filepath,
+          volume: map?['volume'] ?? 1.0);
     }
   }
 }
