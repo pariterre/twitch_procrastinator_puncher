@@ -18,6 +18,7 @@ import 'package:twitch_procastinator_puncher/providers/pomodoro_status.dart';
 import 'package:twitch_procastinator_puncher/screens/main_screen.dart';
 import 'package:twitch_procastinator_puncher/widgets/animated_expanding_card.dart';
 import 'package:twitch_procastinator_puncher/widgets/are_you_sure_dialog.dart';
+import 'package:twitch_procastinator_puncher/widgets/bool_selector_tile.dart';
 import 'package:twitch_procastinator_puncher/widgets/checkbox_tile.dart';
 import 'package:twitch_procastinator_puncher/widgets/color_selector_tile.dart';
 import 'package:twitch_procastinator_puncher/widgets/dropmenu_selector_tile.dart';
@@ -52,6 +53,14 @@ class ConfigurationBoard extends StatelessWidget {
   final Function(
       {required int index,
       required TypesOfModification modification}) onRewardRedemptionSaved;
+
+  void _setTimer(AppPreferences preferences, BuildContext context) {
+    // We can set the timer without check as this method only set if the stop watch never ran
+    PomodoroStatus.of(context, listen: false).setTimer(
+        preferences.usePreSessionCountdown.value
+            ? preferences.preSessionCountdownDuration.value
+            : preferences.sessionDurations[0].value);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -353,10 +362,7 @@ class ConfigurationBoard extends StatelessWidget {
                 preferences.sessionDurations[index].set(value);
               }
 
-              // Set to index 0 as it only set if it has not run yet (i.e. the
-              // timer never ran)
-              PomodoroStatus.of(context, listen: false)
-                  .setTimer(preferences.sessionDurations[0].value);
+              _setTimer(preferences, context);
             },
           ),
           if (showPauseDuration)
@@ -398,24 +404,28 @@ class ConfigurationBoard extends StatelessWidget {
             onValidChange: (value) => preferences.nbSessions.set(value),
           ),
           SizedBox(height: padding),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Text(
-                preferences.texts.controllerSessionIndividually,
-                style: TextStyle(
-                    color: ThemeColor().configurationText,
-                    fontSize: ThemeSize.text(context)),
-              ),
-              Switch(
-                onChanged: (bool value) {
-                  preferences.managerSessionIndividually.value = value;
-                },
-                value: preferences.managerSessionIndividually.value,
-                activeColor: Colors.white,
-              ),
-            ],
-          ),
+          BoolSelectorTile(
+              title: preferences.texts.controllerUseCountdownBeforeStarting,
+              value: preferences.usePreSessionCountdown.value,
+              onChanged: (bool value) {
+                preferences.usePreSessionCountdown.value = value;
+                _setTimer(preferences, context);
+              }),
+          if (preferences.usePreSessionCountdown.value)
+            TimeSelectorTile(
+              title: preferences.texts.controllerCountdownBeforeStarting,
+              initialValue: preferences.preSessionCountdownDuration,
+              onValidChange: (value) {
+                preferences.preSessionCountdownDuration.set(value);
+                _setTimer(preferences, context);
+              },
+            ),
+          SizedBox(height: padding),
+          BoolSelectorTile(
+              title: preferences.texts.controllerSessionIndividually,
+              value: preferences.managerSessionIndividually.value,
+              onChanged: (bool value) =>
+                  preferences.managerSessionIndividually.value = value),
           if (!preferences.managerSessionIndividually.value)
             buildActiveAndPauseDurations(
                 index: 0,
@@ -446,6 +456,28 @@ class ConfigurationBoard extends StatelessWidget {
 
     return Column(
       children: [
+        FileSelectorTile(
+          title: preferences.texts.filesCountdownImage,
+          file: preferences.countdownBackgroundImage,
+          onFileSelected: (data) async {
+            if (data == null) return;
+
+            if (kIsWeb) {
+              await preferences.countdownBackgroundImage.setFileFromRaw(data);
+            } else {
+              await preferences.countdownBackgroundImage.setFile(data);
+            }
+          },
+          onFileDeleted: preferences.countdownBackgroundImage.clear,
+          onSizeChanged: (direction) {
+            if (direction == PlusOrMinusSelection.plus) {
+              preferences.countdownBackgroundImage.size += 0.1;
+            } else {
+              preferences.countdownBackgroundImage.size -= 0.1;
+            }
+          },
+        ),
+        SizedBox(height: padding * 0.5),
         FileSelectorTile(
           title: preferences.texts.filesActiveImage,
           file: preferences.activeBackgroundImage,
@@ -506,6 +538,19 @@ class ConfigurationBoard extends StatelessWidget {
               preferences.endBackgroundImage.size -= 0.05;
             }
           },
+        ),
+        SizedBox(height: padding * 0.5),
+        FileSelectorTile(
+          title: preferences.texts.filesCountdownSound,
+          file: preferences.endCountdownSound,
+          onFileSelected: (data) async {
+            if (kIsWeb) {
+              await preferences.endCountdownSound.setFileFromRaw(data);
+            } else {
+              await preferences.endCountdownSound.setFile(data);
+            }
+          },
+          onFileDeleted: preferences.endCountdownSound.clear,
         ),
         SizedBox(height: padding * 0.5),
         FileSelectorTile(
@@ -595,6 +640,15 @@ class ConfigurationBoard extends StatelessWidget {
             initialColor: preferences.textDuringInitialization.color,
             onColorChanged: (color) =>
                 preferences.textDuringInitialization.color = color,
+          ),
+          _buildStringSelectorTile(
+            context,
+            title: preferences.texts.timerPreSessionCountdown,
+            plainText: preferences.textDuringPreSessionCountdown,
+            focus: StopWatchStatus.inPreSessionCountdown,
+            initialColor: preferences.textDuringPreSessionCountdown.color,
+            onColorChanged: (color) =>
+                preferences.textDuringPreSessionCountdown.color = color,
           ),
           _buildStringSelectorTile(
             context,
@@ -1028,6 +1082,11 @@ class ConfigurationBoard extends StatelessWidget {
             context,
             title: preferences.texts.chatTimerHasStarted,
             plainText: preferences.textTimerHasStarted,
+          ),
+          _buildStringSelectorTile(
+            context,
+            title: preferences.texts.chatTimerPreSessionCountdownHasEnded,
+            plainText: preferences.textTimerPreSessionCountdownHasEnded,
           ),
           _buildStringSelectorTile(
             context,

@@ -37,6 +37,10 @@ void main() async {
       ChangeNotifierProvider(
           create: (context) => PomodoroStatus(
               getNbSession: () => preferences.nbSessions.value,
+              getPreSessionCountdownDuration: () =>
+                  preferences.usePreSessionCountdown.value
+                      ? preferences.preSessionCountdownDuration.value
+                      : Duration.zero,
               getActiveDuration: (int index) =>
                   preferences.sessionDurations[index].value,
               getPauseDuration: (int index) =>

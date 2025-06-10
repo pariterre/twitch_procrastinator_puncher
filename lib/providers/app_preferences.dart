@@ -20,12 +20,16 @@ const Map<String, dynamic> _defaultValues = {
   'texts': 0,
   'nbSessions': 4,
   'nextTimeAskingForACoffee': 0,
+  'usePreSessionCountdown': false,
+  'preSessionCountdownDuration': 0,
   'managerSessionIndividually': false,
   'sessionDuration': 50 * 60,
   'pauseDuration': 10 * 60,
+  'countdownBackgroundImage': null,
   'activeBackgroundImage': null,
   'pauseBackgroundImage': null,
   'endBackgroundImage': null,
+  'endCountdownSound': null,
   'endActiveSessionSound': null,
   'endPauseSessionSound': null,
   'endWorkingSound': null,
@@ -34,6 +38,7 @@ const Map<String, dynamic> _defaultValues = {
   'fontPomodoro': 1,
   'textColorHallOfFame': 0xFFFFFFFF,
   'textDuringInitialization': 'Welcome!',
+  'textDuringPreSessionCountdown': r'Countdown\n{timer}!',
   'textDuringActiveSession': r'Session {session}/{nbSessions}\n{timer}!',
   'textDuringPauseSession': r'Pause\n{timer}!',
   'textDuringPause': r'Pause!',
@@ -43,6 +48,8 @@ const Map<String, dynamic> _defaultValues = {
   'mustFollowForFaming': true,
   'hallOfFameScrollVelocity': 2000,
   'textTimerHasStarted': r'The session has started! Have a good work!',
+  'textTimerPreSessionCountdownHasEnded':
+      'The pre-session countdown is done! Let\'s start the session!',
   'textTimerActiveSessionHasEnded':
       r'The session {session} is done! Well done :)',
   'textTimerPauseHasEnded':
@@ -82,17 +89,23 @@ class AppPreferences with ChangeNotifier {
 
   final PreferencedInt _nextTimeAskingForACoffee;
 
+  // Countdown before the session starts
+  PreferencedBool usePreSessionCountdown;
+  PreferencedDuration preSessionCountdownDuration;
+
   // Session time
   PreferencedBool managerSessionIndividually;
   List<PreferencedDuration> sessionDurations;
   List<PreferencedDuration> pauseDurations;
 
-  // Background image during the countdown
+  // Background image during the countdowns
+  PreferencedImageFile countdownBackgroundImage;
   PreferencedImageFile activeBackgroundImage;
   PreferencedImageFile pauseBackgroundImage;
   PreferencedImageFile endBackgroundImage;
 
   // Sound during count downd
+  PreferencedSoundFile endCountdownSound;
   PreferencedSoundFile endActiveSessionSound;
   PreferencedSoundFile endPauseSessionSound;
   PreferencedSoundFile endWorkingSound;
@@ -103,6 +116,7 @@ class AppPreferences with ChangeNotifier {
 
   // Foreground texts
   TextOnTimer textDuringInitialization;
+  TextOnTimer textDuringPreSessionCountdown;
   TextOnTimer textDuringActiveSession;
   TextOnTimer textDuringPauseSession;
   TextOnTimer textDuringPause;
@@ -111,6 +125,7 @@ class AppPreferences with ChangeNotifier {
   AppFonts get fontPomodoro => textDuringInitialization.font;
   set fontPomodoro(AppFonts value) {
     textDuringInitialization.font = value;
+    textDuringPreSessionCountdown.font = value;
     textDuringActiveSession.font = value;
     textDuringPauseSession.font = value;
     textDuringPause.font = value;
@@ -152,6 +167,7 @@ class AppPreferences with ChangeNotifier {
   PreferencedInt hallOfFameScrollVelocity;
 
   UnformattedPreferencedText textTimerHasStarted;
+  UnformattedPreferencedText textTimerPreSessionCountdownHasEnded;
   UnformattedPreferencedText textTimerActiveSessionHasEnded;
   UnformattedPreferencedText textTimerPauseHasEnded;
   UnformattedPreferencedText textTimerWorkingHasEnded;
@@ -289,6 +305,12 @@ class AppPreferences with ChangeNotifier {
         texts: await PreferencedLanguage.deserialize(
             previousPreferences?['texts'], _defaultValues['texts']),
         nbSessions: nbSessions,
+        usePreSessionCountdown: await PreferencedBool.deserialize(
+            previousPreferences?['usePreSessionCountdown'],
+            _defaultValues['usePreSessionCountdown']),
+        preSessionCountdownDuration: PreferencedDuration.deserializeSync(
+            previousPreferences?['preSessionCountdownDuration'],
+            _defaultValues['preSessionCountdownDuration']),
         managerSessionIndividually: await PreferencedBool.deserialize(
             previousPreferences?['managerSessionIndividually'],
             _defaultValues['managerSessionIndividually']),
@@ -310,26 +332,26 @@ class AppPreferences with ChangeNotifier {
                 PreferencedDuration.deserializeSync(
                     null, _defaultValues['pauseDuration'])
             ],
+        countdownBackgroundImage: await PreferencedImageFile.deserialize(
+            previousPreferences?['countdownBackgroundImage']),
         activeBackgroundImage: await PreferencedImageFile.deserialize(
             previousPreferences?['activeBackgroundImage']),
         pauseBackgroundImage: await PreferencedImageFile.deserialize(
             previousPreferences?['pauseBackgroundImage']),
         endBackgroundImage: await PreferencedImageFile.deserialize(
             previousPreferences?['endBackgroundImage']),
+        endCountdownSound: await PreferencedSoundFile.deserialize(
+            previousPreferences?['endCountdownSound']),
         endActiveSessionSound: await PreferencedSoundFile.deserialize(
             previousPreferences?['endActiveSessionSound']),
-        endPauseSessionSound: await PreferencedSoundFile.deserialize(
-            previousPreferences?['endPauseSessionSound']),
-        endWorkingSound: await PreferencedSoundFile.deserialize(
-            previousPreferences?['endWorkingSound']),
-        backgroundColor: await PreferencedColor.deserialize(
-            previousPreferences?['backgroundColor'],
-            _defaultValues['backgroundColor']),
-        backgroundColorHallOfFame:
-            await PreferencedColor.deserialize(previousPreferences?['backgroundColorHallOfFame'], _defaultValues['backgroundColorHallOfFame']),
+        endPauseSessionSound: await PreferencedSoundFile.deserialize(previousPreferences?['endPauseSessionSound']),
+        endWorkingSound: await PreferencedSoundFile.deserialize(previousPreferences?['endWorkingSound']),
+        backgroundColor: await PreferencedColor.deserialize(previousPreferences?['backgroundColor'], _defaultValues['backgroundColor']),
+        backgroundColorHallOfFame: await PreferencedColor.deserialize(previousPreferences?['backgroundColorHallOfFame'], _defaultValues['backgroundColorHallOfFame']),
         fontPomodoro: previousPreferences?['fontPomodoro'] ?? _defaultValues['fontPomodoro'],
         textColorHallOfFame: previousPreferences?['textColorHallOfFame'] ?? _defaultValues['textColorHallOfFame'],
         textDuringInitialization: await TextOnTimer.deserialize(previousPreferences?['textDuringInitialization'], _defaultValues['textDuringInitialization']),
+        textDuringPreSessionCountdown: await TextOnTimer.deserialize(previousPreferences?['textDuringPreSessionCountdown'], _defaultValues['textDuringPreSessionCountdown']),
         textDuringActiveSession: await TextOnTimer.deserialize(previousPreferences?['textDuringActiveSession'], _defaultValues['textDuringActiveSession']),
         textDuringPauseSession: await TextOnTimer.deserialize(previousPreferences?['textDuringPauseSession'], _defaultValues['textDuringPauseSession']),
         textDuringPause: await TextOnTimer.deserialize(previousPreferences?['textDuringPause'], _defaultValues['textDuringPause']),
@@ -341,6 +363,7 @@ class AppPreferences with ChangeNotifier {
         mustFollowForFaming: await PreferencedBool.deserialize(previousPreferences?['mustFollowForFaming'], _defaultValues['mustFollowForFaming']),
         hallOfFameScrollVelocity: await PreferencedInt.deserialize(previousPreferences?['hallOfFameScrollVelocity'], _defaultValues['hallOfFameScrollVelocity']),
         textTimerHasStarted: await UnformattedPreferencedText.deserialize(previousPreferences?['textTimerHasStarted'], _defaultValues['textTimerHasStarted']),
+        textTimerPreSessionCountdownHasEnded: await UnformattedPreferencedText.deserialize(previousPreferences?['textTimerPreSessionCountdownHasEnded'], _defaultValues['textTimerPreSessionCountdownHasEnded']),
         textTimerActiveSessionHasEnded: await UnformattedPreferencedText.deserialize(previousPreferences?['textTimerActiveSessionHasEnded'], _defaultValues['textTimerActiveSessionHasEnded']),
         textTimerPauseHasEnded: await UnformattedPreferencedText.deserialize(previousPreferences?['textTimerPauseHasEnded'], _defaultValues['textTimerPauseHasEnded']),
         textTimerWorkingHasEnded: await UnformattedPreferencedText.deserialize(previousPreferences?['textTimerWorkingHasEnded'], _defaultValues['textTimerWorkingHasEnded']),
@@ -361,12 +384,16 @@ class AppPreferences with ChangeNotifier {
     required this.texts,
     required this.nbSessions,
     required PreferencedInt nextTimeAskingForACoffee,
+    required this.usePreSessionCountdown,
+    required this.preSessionCountdownDuration,
     required this.managerSessionIndividually,
     required this.sessionDurations,
     required this.pauseDurations,
+    required this.countdownBackgroundImage,
     required this.activeBackgroundImage,
     required this.pauseBackgroundImage,
     required this.endBackgroundImage,
+    required this.endCountdownSound,
     required this.endActiveSessionSound,
     required this.endPauseSessionSound,
     required this.endWorkingSound,
@@ -375,6 +402,7 @@ class AppPreferences with ChangeNotifier {
     required int fontPomodoro,
     required int textColorHallOfFame,
     required this.textDuringInitialization,
+    required this.textDuringPreSessionCountdown,
     required this.textDuringActiveSession,
     required this.textDuringPauseSession,
     required this.textDuringPause,
@@ -386,6 +414,7 @@ class AppPreferences with ChangeNotifier {
     required this.mustFollowForFaming,
     required this.hallOfFameScrollVelocity,
     required this.textTimerHasStarted,
+    required this.textTimerPreSessionCountdownHasEnded,
     required this.textTimerActiveSessionHasEnded,
     required this.textTimerPauseHasEnded,
     required this.textTimerWorkingHasEnded,
@@ -423,15 +452,21 @@ class AppPreferences with ChangeNotifier {
         'texts': texts.serialize(),
         'nbSessions': nbSessions.serialize(),
         'nextTimeAskingForACoffee': _nextTimeAskingForACoffee.serialize(),
+        'usePreSessionCountdown': usePreSessionCountdown.serialize(),
+        'preSessionCountdownDuration': preSessionCountdownDuration.serialize(),
         'managerSessionIndividually': managerSessionIndividually.serialize(),
         'sessionDurations': sessionDurations.map((e) => e.serialize()).toList(),
         'pauseDurations': pauseDurations.map((e) => e.serialize()).toList(),
+        'countdownBackgroundImage':
+            skipBinaryFiles ? null : countdownBackgroundImage.serialize(),
         'activeBackgroundImage':
             skipBinaryFiles ? null : activeBackgroundImage.serialize(),
         'pauseBackgroundImage':
             skipBinaryFiles ? null : pauseBackgroundImage.serialize(),
         'endBackgroundImage':
             skipBinaryFiles ? null : endBackgroundImage.serialize(),
+        'endCountdownSound':
+            skipBinaryFiles ? null : endCountdownSound.serialize(),
         'endActiveSessionSound':
             skipBinaryFiles ? null : endActiveSessionSound.serialize(),
         'endPauseSessionSound':
@@ -443,6 +478,8 @@ class AppPreferences with ChangeNotifier {
         'textColorHallOfFame':
             int.parse('0x${textColorHallOfFame.toHexString()}'),
         'textDuringInitialization': textDuringInitialization.serialize(),
+        'textDuringPreSessionCountdown':
+            textDuringPreSessionCountdown.serialize(),
         'textDuringActiveSession': textDuringActiveSession.serialize(),
         'textDuringPauseSession': textDuringPauseSession.serialize(),
         'textDuringPause': textDuringPause.serialize(),
@@ -456,6 +493,8 @@ class AppPreferences with ChangeNotifier {
         'mustFollowForFaming': mustFollowForFaming.serialize(),
         'hallOfFameScrollVelocity': hallOfFameScrollVelocity.serialize(),
         'textTimerHasStarted': textTimerHasStarted.serialize(),
+        'textTimerPreSessionCountdownHasEnded':
+            textTimerPreSessionCountdownHasEnded.serialize(),
         'textTimerActiveSessionHasEnded':
             textTimerActiveSessionHasEnded.serialize(),
         'textTimerPauseHasEnded': textTimerPauseHasEnded.serialize(),
@@ -480,6 +519,10 @@ class AppPreferences with ChangeNotifier {
         await PreferencedLanguage.deserialize(null, _defaultValues['texts']);
     nbSessions =
         await PreferencedInt.deserialize(null, _defaultValues['nbSessions']);
+    usePreSessionCountdown = await PreferencedBool.deserialize(
+        null, _defaultValues['usePreSessionCountdown']);
+    preSessionCountdownDuration = PreferencedDuration.deserializeSync(
+        null, _defaultValues['preSessionCountdownDuration']);
     managerSessionIndividually = await PreferencedBool.deserialize(
         null, _defaultValues['managerSessionIndividually']);
     sessionDurations = [
@@ -492,9 +535,11 @@ class AppPreferences with ChangeNotifier {
         PreferencedDuration.deserializeSync(
             null, _defaultValues['pauseDuration'])
     ];
+    countdownBackgroundImage = await PreferencedImageFile.deserialize(null);
     activeBackgroundImage = await PreferencedImageFile.deserialize(null);
     pauseBackgroundImage = await PreferencedImageFile.deserialize(null);
     endBackgroundImage = await PreferencedImageFile.deserialize(null);
+    endCountdownSound = await PreferencedSoundFile.deserialize(null);
     endActiveSessionSound = await PreferencedSoundFile.deserialize(null);
     endPauseSessionSound = await PreferencedSoundFile.deserialize(null);
     endWorkingSound = await PreferencedSoundFile.deserialize(null);
@@ -504,6 +549,8 @@ class AppPreferences with ChangeNotifier {
         null, _defaultValues['backgroundColorHallOfFame']);
     textDuringInitialization = await TextOnTimer.deserialize(
         null, _defaultValues['textDuringInitialization']);
+    textDuringPreSessionCountdown = await TextOnTimer.deserialize(
+        null, _defaultValues['textDuringPreSessionCountdown']);
     textDuringActiveSession = await TextOnTimer.deserialize(
         null, _defaultValues['textDuringActiveSession']);
     textDuringPauseSession = await TextOnTimer.deserialize(
@@ -523,6 +570,9 @@ class AppPreferences with ChangeNotifier {
         null, _defaultValues['hallOfFameScrollVelocity']);
     textTimerHasStarted = await UnformattedPreferencedText.deserialize(
         null, _defaultValues['textTimerHasStarted']);
+    textTimerPreSessionCountdownHasEnded =
+        await UnformattedPreferencedText.deserialize(
+            null, _defaultValues['textTimerPreSessionCountdownHasEnded']);
     textTimerActiveSessionHasEnded =
         await UnformattedPreferencedText.deserialize(
             null, _defaultValues['textTimerActiveSessionHasEnded']);
@@ -563,6 +613,12 @@ class AppPreferences with ChangeNotifier {
   void updateFromSerialized(map) async {
     texts = await PreferencedLanguage.deserialize(map['texts']);
     nbSessions = await PreferencedInt.deserialize(map['nbSessions']);
+    usePreSessionCountdown = await PreferencedBool.deserialize(
+        map['usePreSessionCountdown'],
+        _defaultValues['usePreSessionCountdown']);
+    preSessionCountdownDuration = PreferencedDuration.deserializeSync(
+        map['preSessionCountdownDuration'],
+        _defaultValues['preSessionCountdownDuration']);
     managerSessionIndividually =
         await PreferencedBool.deserialize(map['managerSessionIndividually']);
     sessionDurations = (map['sessionDurations'] as List)
@@ -577,6 +633,8 @@ class AppPreferences with ChangeNotifier {
         await PreferencedColor.deserialize(map['backgroundColorHallOfFame']);
     textDuringInitialization =
         await TextOnTimer.deserialize(map['textDuringInitialization']);
+    textDuringPreSessionCountdown =
+        await TextOnTimer.deserialize(map['textDuringPreSessionCountdown']);
     textDuringActiveSession =
         await TextOnTimer.deserialize(map['textDuringActiveSession']);
     textDuringPauseSession =
@@ -599,6 +657,9 @@ class AppPreferences with ChangeNotifier {
         await PreferencedInt.deserialize(map['hallOfFameScrollVelocity']);
     textTimerHasStarted = await UnformattedPreferencedText.deserialize(
         map['textTimerHasStarted']);
+    textTimerPreSessionCountdownHasEnded =
+        await UnformattedPreferencedText.deserialize(
+            map['textTimerPreSessionCountdownHasEnded']);
     textTimerActiveSessionHasEnded =
         await UnformattedPreferencedText.deserialize(
             map['textTimerActiveSessionHasEnded']);
@@ -654,6 +715,8 @@ class AppPreferences with ChangeNotifier {
       _save();
     };
     _nextTimeAskingForACoffee.onChanged = _save;
+    usePreSessionCountdown.onChanged = _save;
+    preSessionCountdownDuration.onChanged = _save;
     managerSessionIndividually.onChanged = _save;
 
     for (final duration in sessionDurations) {
@@ -662,7 +725,8 @@ class AppPreferences with ChangeNotifier {
     for (final duration in pauseDurations) {
       duration.onChanged = _save;
     }
-
+    countdownBackgroundImage.onChanged = _save;
+    countdownBackgroundImage.lastVisitedFolderCallback = _setLastVisited;
     activeBackgroundImage.onChanged = _save;
     activeBackgroundImage.lastVisitedFolderCallback = _setLastVisited;
     pauseBackgroundImage.onChanged = _save;
@@ -670,6 +734,8 @@ class AppPreferences with ChangeNotifier {
     endBackgroundImage.onChanged = _save;
     endBackgroundImage.lastVisitedFolderCallback = _setLastVisited;
 
+    endCountdownSound.onChanged = _save;
+    endCountdownSound.lastVisitedFolderCallback = _setLastVisited;
     endActiveSessionSound.onChanged = _save;
     endActiveSessionSound.lastVisitedFolderCallback = _setLastVisited;
     endPauseSessionSound.onChanged = _save;
@@ -681,6 +747,7 @@ class AppPreferences with ChangeNotifier {
     backgroundColorHallOfFame.onChanged = _save;
 
     textDuringInitialization.onChanged = _save;
+    textDuringPreSessionCountdown.onChanged = _save;
     textDuringActiveSession.onChanged = _save;
     textDuringPauseSession.onChanged = _save;
     textDuringPause.onChanged = _save;
@@ -699,6 +766,7 @@ class AppPreferences with ChangeNotifier {
     mustFollowForFaming.onChanged = _save;
 
     textTimerHasStarted.onChanged = _save;
+    textTimerPreSessionCountdownHasEnded.onChanged = _save;
     textTimerActiveSessionHasEnded.onChanged = _save;
     textTimerPauseHasEnded.onChanged = _save;
     textTimerWorkingHasEnded.onChanged = _save;

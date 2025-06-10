@@ -49,6 +49,8 @@ class _MainScreenState extends State<MainScreen> {
     // Connect the callback of the timer
     final pomodoro = PomodoroStatus.of(context, listen: false);
     pomodoro.timerHasStartedCallback = _startWorking;
+    pomodoro.preSessionCountdownHasFinishedGuiCallback =
+        _preSessionCountdownDone;
     pomodoro.activeSessionHasFinishedGuiCallback = _activeSessionDone;
     pomodoro.pauseHasFinishedGuiCallback = _pauseSessionDone;
     pomodoro.finishedWorkingGuiCallback = _workingDone;
@@ -116,15 +118,29 @@ class _MainScreenState extends State<MainScreen> {
 
   Future<void> _startWorking() async {
     final preferences = AppPreferences.of(context, listen: false);
-    if (_twitchManager!.isConnected) {
+    if (_twitchManager?.isConnected ?? false) {
       _twitchManager!.chat
           .send(preferences.textTimerHasStarted.formattedText(context));
     }
   }
 
+  Future<void> _preSessionCountdownDone() async {
+    final preferences = AppPreferences.of(context, listen: false);
+    if (_twitchManager?.isConnected ?? false) {
+      _twitchManager!.chat.send(preferences.textTimerPreSessionCountdownHasEnded
+          .formattedText(context));
+    }
+
+    final source = preferences.endCountdownSound.playableSource;
+    if (source != null) {
+      final player = AudioPlayer();
+      await player.play(source);
+    }
+  }
+
   Future<void> _activeSessionDone() async {
     final preferences = AppPreferences.of(context, listen: false);
-    if (_twitchManager!.isConnected) {
+    if (_twitchManager?.isConnected ?? false) {
       _twitchManager!.chat.send(
           preferences.textTimerActiveSessionHasEnded.formattedText(context));
     }
@@ -138,7 +154,7 @@ class _MainScreenState extends State<MainScreen> {
 
   Future<void> _pauseSessionDone() async {
     final preferences = AppPreferences.of(context, listen: false);
-    if (_twitchManager!.isConnected) {
+    if (_twitchManager?.isConnected ?? false) {
       _twitchManager!.chat
           .send(preferences.textTimerPauseHasEnded.formattedText(context));
     }
@@ -152,7 +168,7 @@ class _MainScreenState extends State<MainScreen> {
 
   Future<void> _workingDone() async {
     final preferences = AppPreferences.of(context, listen: false);
-    if (_twitchManager!.isConnected) {
+    if (_twitchManager?.isConnected ?? false) {
       _twitchManager!.chat
           .send(preferences.textTimerWorkingHasEnded.formattedText(context));
     }
@@ -166,7 +182,7 @@ class _MainScreenState extends State<MainScreen> {
 
   void _greetNewComers(Participant participant) {
     final preferences = AppPreferences.of(context, listen: false);
-    if (_twitchManager!.isConnected) {
+    if (_twitchManager?.isConnected ?? false) {
       _twitchManager!.chat.send(preferences.textNewcomersGreetings
           .formattedText(context, participant));
     }
@@ -175,7 +191,7 @@ class _MainScreenState extends State<MainScreen> {
 
   void _greetUserHasConnected(Participant participant) {
     final preferences = AppPreferences.of(context, listen: false);
-    if (_twitchManager!.isConnected) {
+    if (_twitchManager?.isConnected ?? false) {
       _twitchManager!.chat.send(preferences.textUserHasConnectedGreetings
           .formattedText(context, participant));
     }
@@ -190,7 +206,7 @@ class _MainScreenState extends State<MainScreen> {
         appInfo: twitchAppInfo,
         reload: false,
         debugPanelOptions: twitchDebugPanelOptions,
-        isMockActive: isTwitchMockActive,
+        useMocker: isTwitchMockActive,
       ),
     ));
 
@@ -365,8 +381,7 @@ class _MainScreenState extends State<MainScreen> {
                         connectToTwitch: _connectToTwitch,
                         twitchStatus: !snapshot.hasData
                             ? TwitchStatus.initializing
-                            : _twitchManager != null &&
-                                    _twitchManager!.isConnected
+                            : (_twitchManager?.isConnected ?? false)
                                 ? TwitchStatus.connected
                                 : TwitchStatus.notConnected,
                         onRewardRedemptionSaved: _onRewardRedemptionSaved,

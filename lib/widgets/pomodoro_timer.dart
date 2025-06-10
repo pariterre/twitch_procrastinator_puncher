@@ -33,6 +33,9 @@ class PomodoroTimer extends StatelessWidget {
       case StopWatchStatus.initializing:
         textOnPomodoro = preferences.textDuringInitialization;
         break;
+      case StopWatchStatus.inPreSessionCountdown:
+        textOnPomodoro = preferences.textDuringPreSessionCountdown;
+        break;
       case StopWatchStatus.inSession:
         textOnPomodoro = preferences.textDuringActiveSession;
         break;
@@ -75,11 +78,20 @@ class PomodoroTimer extends StatelessWidget {
     double imageSize = 1;
     final status = _statusToShow(context);
 
-    if (preferences.pauseBackgroundImage.image != null &&
+    if (preferences.countdownBackgroundImage.image != null &&
+        (status == StopWatchStatus.initializing &&
+            preferences.usePreSessionCountdown.value)) {
+      background = preferences.countdownBackgroundImage.image!;
+      imageSize = preferences.countdownBackgroundImage.size;
+    } else if (preferences.pauseBackgroundImage.image != null &&
         (status == StopWatchStatus.inPauseSession ||
             status == StopWatchStatus.paused)) {
       background = preferences.pauseBackgroundImage.image!;
       imageSize = preferences.pauseBackgroundImage.size;
+    } else if (preferences.countdownBackgroundImage.image != null &&
+        status == StopWatchStatus.inPreSessionCountdown) {
+      background = preferences.countdownBackgroundImage.image!;
+      imageSize = preferences.countdownBackgroundImage.size;
     } else if (preferences.endBackgroundImage.image != null &&
         status == StopWatchStatus.done) {
       background = preferences.endBackgroundImage.image!;

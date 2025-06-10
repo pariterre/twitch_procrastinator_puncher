@@ -78,7 +78,7 @@ class FileSelectorTile extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         SizedBox(
-          width: windowHeight * 0.27,
+          width: windowHeight * 0.28,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

@@ -194,10 +194,28 @@ class PreferencedLanguage extends PreferencedElement {
     }
   }
 
+  String get controllerUseCountdownBeforeStarting {
+    switch (_current) {
+      case Language.english:
+        return 'Use countdown before starting';
+      case Language.french:
+        return 'Utiliser un décompte avant de commencer';
+    }
+  }
+
+  String get controllerCountdownBeforeStarting {
+    switch (_current) {
+      case Language.english:
+        return 'Countdown before starting (mm:ss)';
+      case Language.french:
+        return 'Décompte avant de commencer (mm:ss)';
+    }
+  }
+
   String get controllerSessionIndividually {
     switch (_current) {
       case Language.english:
-        return 'Manager sessions individually';
+        return 'Manage sessions individually';
       case Language.french:
         return 'Gérer les sessions individuellement';
     }
@@ -248,6 +266,15 @@ class PreferencedLanguage extends PreferencedElement {
     }
   }
 
+  String get filesCountdownImage {
+    switch (_current) {
+      case Language.english:
+        return 'Image during countdown';
+      case Language.french:
+        return 'Image durant le décompte';
+    }
+  }
+
   String get filesActiveImage {
     switch (_current) {
       case Language.english:
@@ -272,6 +299,15 @@ class PreferencedLanguage extends PreferencedElement {
         return 'Image at the end of sessions';
       case Language.french:
         return 'Image à la fin des séances';
+    }
+  }
+
+  String get filesCountdownSound {
+    switch (_current) {
+      case Language.english:
+        return 'Alarm at the end of countdown';
+      case Language.french:
+        return 'Alarme à la fin du décompte';
     }
   }
 
@@ -565,6 +601,15 @@ class PreferencedLanguage extends PreferencedElement {
         return 'Introduction text';
       case Language.french:
         return 'Texte d\'introduction';
+    }
+  }
+
+  String get timerPreSessionCountdown {
+    switch (_current) {
+      case Language.english:
+        return 'Pre-session countdown text';
+      case Language.french:
+        return 'Texte de décompte avant la séance';
     }
   }
 
@@ -1045,6 +1090,15 @@ class PreferencedLanguage extends PreferencedElement {
         return 'Timer has started';
       case Language.french:
         return 'Le minuteur a commencé';
+    }
+  }
+
+  String get chatTimerPreSessionCountdownHasEnded {
+    switch (_current) {
+      case Language.english:
+        return 'The countdown before the session has ended';
+      case Language.french:
+        return 'Le décompte avant la session s\'est terminé';
     }
   }
 

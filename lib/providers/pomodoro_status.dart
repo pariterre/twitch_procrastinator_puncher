@@ -5,11 +5,18 @@ import 'package:provider/provider.dart';
 import 'package:twitch_procastinator_puncher/models/preferenced_element.dart';
 import 'package:twitch_procastinator_puncher/models/reward_redemption.dart';
 
-enum StopWatchStatus { initializing, inSession, inPauseSession, paused, done }
+enum StopWatchStatus {
+  initializing,
+  inPreSessionCountdown,
+  inSession,
+  inPauseSession,
+  paused,
+  done
+}
 
 class PomodoroStatus with ChangeNotifier {
   bool _firstSessionStarted = false;
-  int _currentSession = 0;
+  int _currentSession = -1; // -1 means pre-session countdown if enabled
   int get currentSession => _currentSession;
   set currentSession(int value) {
     _currentSession = value;
@@ -29,14 +36,25 @@ class PomodoroStatus with ChangeNotifier {
     notifyListeners();
   }
 
+  bool get hasPreSessionCountdown =>
+      getPreSessionCountdownDuration() != Duration.zero;
+
   ///
   /// Start the counter if it is not done
   void start() {
     if (_stopWatchStatus == StopWatchStatus.done) return;
 
-    _stopWatchStatus =
-        _stopWatchStatusBeforePausing ?? StopWatchStatus.inSession;
-    _stopWatchStatusBeforePausing = null;
+    if (_stopWatchStatusBeforePausing == null) {
+      // If we are starting the timer
+      reset(notify: false);
+      _stopWatchStatus = hasPreSessionCountdown
+          ? StopWatchStatus.inPreSessionCountdown
+          : StopWatchStatus.inSession;
+    } else {
+      // If we are resuming the timer
+      _stopWatchStatus = _stopWatchStatusBeforePausing!;
+      _stopWatchStatusBeforePausing = null;
+    }
     notifyListeners();
   }
 
@@ -55,10 +73,12 @@ class PomodoroStatus with ChangeNotifier {
   void reset({bool notify = true}) {
     // Reset all the internal states
     _firstSessionStarted = false;
-    _currentSession = 0;
+    _currentSession = hasPreSessionCountdown ? -1 : 0;
 
     _stopWatchStatus = StopWatchStatus.initializing;
-    _timer = getActiveDuration(_currentSession);
+    _timer = hasPreSessionCountdown
+        ? getPreSessionCountdownDuration()
+        : getActiveDuration(_currentSession);
 
     if (notify) notifyListeners();
   }
@@ -98,11 +118,13 @@ class PomodoroStatus with ChangeNotifier {
   }
 
   // CONSTRUCTORS
-  PomodoroStatus(
-      {required this.getNbSession,
-      required this.getActiveDuration,
-      required this.getPauseDuration,
-      required this.onSessionEnded}) {
+  PomodoroStatus({
+    required this.getNbSession,
+    required this.getPreSessionCountdownDuration,
+    required this.getActiveDuration,
+    required this.getPauseDuration,
+    required this.onSessionEnded,
+  }) {
     Timer.periodic(const Duration(seconds: 1), (Timer t) => _updateCounter());
   }
   static PomodoroStatus of(BuildContext context, {listen = true}) =>
@@ -110,6 +132,7 @@ class PomodoroStatus with ChangeNotifier {
 
   // TIMER CALLBACK
   int Function() getNbSession;
+  Duration Function() getPreSessionCountdownDuration;
   Duration Function(int index) getActiveDuration;
   Duration Function(int index) getPauseDuration;
   Function() onSessionEnded;
@@ -117,6 +140,10 @@ class PomodoroStatus with ChangeNotifier {
   ///
   /// Callback that announces that an active session has finished
   Future<void> Function()? timerHasStartedCallback;
+
+  ///
+  /// Callback that announces that the pre-session countdown has started
+  Future<void> Function()? preSessionCountdownHasFinishedGuiCallback;
 
   ///
   /// Callback that announces that an active session has finished
@@ -163,12 +190,25 @@ class PomodoroStatus with ChangeNotifier {
 
   // This method is automatically called every seconds
   void _updateCounter() {
-    if (_stopWatchStatus == StopWatchStatus.inSession) {
-      if (!_firstSessionStarted) {
-        if (timerHasStartedCallback != null) timerHasStartedCallback!();
-        _firstSessionStarted = true;
-      }
+    if (!_firstSessionStarted &&
+        _stopWatchStatus != StopWatchStatus.initializing) {
+      if (timerHasStartedCallback != null) timerHasStartedCallback!();
+      _firstSessionStarted = true;
+    }
 
+    if (_stopWatchStatus == StopWatchStatus.inPreSessionCountdown) {
+      // Decrement the counter, if it gets to zeros advance the session
+      int newTimerValue = _timer.inSeconds - 1;
+      if (newTimerValue <= 0) {
+        _stopWatchStatus = StopWatchStatus.inSession;
+        _currentSession = 0;
+        newTimerValue = _activeDuration;
+        if (preSessionCountdownHasFinishedGuiCallback != null) {
+          preSessionCountdownHasFinishedGuiCallback!();
+        }
+      }
+      _timer = Duration(seconds: newTimerValue);
+    } else if (_stopWatchStatus == StopWatchStatus.inSession) {
       // Decrement the counter, if it gets to zeros advance the session
       int newTimerValue = _timer.inSeconds - 1;
       if (newTimerValue <= 0) {
@@ -205,6 +245,7 @@ class PomodoroStatus with ChangeNotifier {
       }
       _timer = Duration(seconds: newTimerValue);
     }
+
     notifyListeners();
   }
 }

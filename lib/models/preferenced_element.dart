@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
@@ -238,9 +239,9 @@ class PreferencedImageFile extends PreferencedFile {
   Image? get image => _image;
 
   double _size = 1;
-  double get size => _size;
+  double get size => max(_size, 0);
   set size(double value) {
-    _size = value;
+    _size = max(value, 0);
     if (onChanged != null) onChanged!();
   }
 
