@@ -1,0 +1,21 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Build release",
+        "type": "shell",
+        "command": "make",
+        "args": [ "client" ],
+        "problemMatcher": [],
+        "isBackground": false,
+        "options": {
+          "env": {
+            "SSH_USER": "USER_FOR_SSH_SERVICE",
+            "SSH_SERVER": "SERVER_URL",
+            "SSH_FOLDER_CLIENT": "FOLDER_IN_SERVER"
+          }
+        }
+      }
+    ]
+  }
+  
