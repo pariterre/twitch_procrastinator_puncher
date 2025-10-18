@@ -23,9 +23,9 @@ list:
 client:
 	@echo "Building CLIENT project..."; \
 	PROJECT_FOLDER=$(BASE_FOLDER); \
-	# Make sure the authentication are provided (SSH_USER, SSH_SERVER, SSH_FOLDER_CLIENT) \
-	if [ -z "$${SSH_USER}" ] || [ -z "$${SSH_SERVER}" ] || [ -z "$${SSH_FOLDER_CLIENT}" ]; then \
-		echo "ERROR -- SSH_USER, SSH_SERVER, or SSH_FOLDER_CLIENT is not set. Please set them before building."; \
+	# Make sure the authentication are provided (PROCRASPUNCHER_SSH_USER, PROCRASPUNCHER_SSH_SERVER, PROCRASPUNCHER_SSH_FOLDER_CLIENT) \
+	if [ -z "$${PROCRASPUNCHER_SSH_USER}" ] || [ -z "$${PROCRASPUNCHER_SSH_SERVER}" ] || [ -z "$${PROCRASPUNCHER_SSH_FOLDER_CLIENT}" ]; then \
+		echo "ERROR -- PROCRASPUNCHER_SSH_USER, PROCRASPUNCHER_SSH_SERVER, or PROCRASPUNCHER_SSH_FOLDER_CLIENT is not set. Please set them before building."; \
 		exit 1; \
 	fi; \
 	cd $${PROJECT_FOLDER}; \
@@ -33,6 +33,6 @@ client:
 	flutter pub get; \
 	flutter build web --release; \
 	cd $(BASE_FOLDER); \
-	ssh $${SSH_USER}@$${SSH_SERVER} "cd $${SSH_FOLDER_CLIENT} && find . $(addprefix ! -name ,$(FOLDER_TO_KEEP)) -delete"; \
-	rsync -azvP $${PROJECT_FOLDER}/$(WEB_BUILD_FOLDER)/ $${SSH_USER}@$${SSH_SERVER}:$${SSH_FOLDER_CLIENT}; \
+	ssh $${PROCRASPUNCHER_SSH_USER}@$${PROCRASPUNCHER_SSH_SERVER} "cd $${PROCRASPUNCHER_SSH_FOLDER_CLIENT} && find . $(addprefix ! -name ,$(FOLDER_TO_KEEP)) -delete"; \
+	rsync -azvP $${PROJECT_FOLDER}/$(WEB_BUILD_FOLDER)/ $${PROCRASPUNCHER_SSH_USER}@$${PROCRASPUNCHER_SSH_SERVER}:$${PROCRASPUNCHER_SSH_FOLDER_CLIENT}; \
 	echo "Project built and sent successfully."

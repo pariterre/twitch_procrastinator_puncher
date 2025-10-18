@@ -10,9 +10,9 @@
         "isBackground": false,
         "options": {
           "env": {
-            "SSH_USER": "USER_FOR_SSH_SERVICE",
-            "SSH_SERVER": "SERVER_URL",
-            "SSH_FOLDER_CLIENT": "FOLDER_IN_SERVER"
+            "PROCRASPUNCHER_SSH_USER": "USER_FOR_SSH_SERVICE",
+            "PROCRASPUNCHER_SSH_SERVER": "SERVER_URL",
+            "PROCRASPUNCHER_SSH_FOLDER_CLIENT": "FOLDER_IN_SERVER"
           }
         }
       }
