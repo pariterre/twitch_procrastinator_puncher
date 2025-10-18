@@ -27,7 +27,7 @@ class BoolSelectorTile extends StatelessWidget {
         Switch(
           onChanged: onChanged,
           value: value,
-          activeColor: Colors.white,
+          activeThumbColor: Colors.white,
         ),
       ],
     );

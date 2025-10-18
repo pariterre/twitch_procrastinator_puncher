@@ -36,7 +36,7 @@ class DropMenuSelectorTile<T> extends StatelessWidget {
           child: Container(
             decoration: const BoxDecoration(color: Colors.white),
             child: DropdownButtonFormField<T>(
-                value: value,
+                initialValue: value,
                 style: TextStyle(
                     color: Colors.black,
                     fontSize: ThemeSize.text(context) * 1.20),

@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:collection/collection.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:twitch_manager/twitch_app.dart';
@@ -27,12 +30,12 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   TwitchAppManager? _twitchManager;
   final twitchAppInfo = TwitchAppInfo(
-    appName: twitchAppName,
-    twitchClientId: twitchAppId,
-    twitchRedirectUri: twitchRedirectUri,
-    authenticationServerUri: authenticationServerUri,
-    scope: twitchScope,
-  );
+      appName: twitchAppName,
+      twitchClientId: twitchAppId,
+      twitchRedirectUri: twitchRedirectUri,
+      authenticationServerUri: authenticationServerUri,
+      scope: twitchScope,
+      authenticationFlow: TwitchAuthenticationFlow.implicit);
 
   late Future<TwitchAppManager> managerFactory = isTwitchMockActive
       ? TwitchManagerMock.factory(
@@ -207,6 +210,7 @@ class _MainScreenState extends State<MainScreen> {
       context: context,
       builder: (context) => TwitchAppAuthenticationDialog(
         onConnexionEstablished: (manager) => Navigator.pop(context, manager),
+        onCancelConnexion: () => Navigator.pop(context, null),
         appInfo: twitchAppInfo,
         reload: false,
         debugPanelOptions: twitchDebugPanelOptions,
@@ -308,7 +312,11 @@ class _MainScreenState extends State<MainScreen> {
         AppPreferences.of(context, listen: false).automaticResponses;
     for (var response in responses) {
       if (response.command == message) {
-        _twitchManager!.chat.send(response.answer.formattedText(context));
+        final participant = Participants.of(context, listen: false)
+            .all
+            .firstWhereOrNull((e) => e.username == sender);
+        _twitchManager!.chat
+            .send(response.answer.formattedText(context, participant));
       }
     }
 

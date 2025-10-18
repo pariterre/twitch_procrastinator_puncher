@@ -1150,7 +1150,7 @@ class PreferencedLanguage extends PreferencedElement {
   String get chatbotTitle {
     switch (_current) {
       case Language.english:
-        return 'Chatbot reponses';
+        return 'Chatbot responses';
       case Language.french:
         return 'Réponses automatiques';
     }
@@ -1170,7 +1170,10 @@ class PreferencedLanguage extends PreferencedElement {
             '    {sessionTime} - is the maximum time of the sessions\n'
             '    {pauseTime} - is the maximum time of the pauses\n'
             '    {done} - is the number of sessions collectively done\n'
-            '    {doneToday} - is the number of sessions collectively done today';
+            '    {doneToday} - is the number of sessions collectively done today\n'
+            '    {username} - the name of a user requesting a response\n'
+            '    {userDone} - the number of completed sessions by the user requesting a response\n'
+            '    {userDoneToday} - the number of sessions completed today by the user requesting a response';
       case Language.french:
         return 'Réponses automatiquement envoyées par le chatbot lorsque qu\'une '
             'commande spécifique a lieue. Cette option nécessite d\'être connecté '
@@ -1183,7 +1186,10 @@ class PreferencedLanguage extends PreferencedElement {
             '    {sessionTime} - la durée des sessions\n'
             '    {pauseTime} - la durée des pauses\n'
             '    {done} - le nombre de sessions collectivement réalisées\n'
-            '    {doneToday} - le nombre de sessions collectivement réalisées aujourd\'hui';
+            '    {doneToday} - le nombre de sessions collectivement réalisées aujourd\'hui\n'
+            '    {username} - le nom d\'un utilisateur demandant une réponse\n'
+            '    {userDone} - le nombre de sessions terminées par l\'utilisateur demandant une réponse\n'
+            '    {userDoneToday} - le nombre de sessions terminées aujourd\'hui par l\'utilisateur demandant une réponse';
     }
   }
 

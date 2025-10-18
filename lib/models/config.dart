@@ -59,4 +59,5 @@ final twitchDebugPanelOptions = TwitchDebugPanelOptions(
         cost: 5000),
   ],
 );
-const bool isTwitchMockActive = false;
+const bool isTwitchMockActive =
+    bool.fromEnvironment('PROCRASPUNCHER_USE_TWITCH_MOCK', defaultValue: false);
