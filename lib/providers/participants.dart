@@ -131,30 +131,34 @@ class Participants extends ChangeNotifier {
     }
 
     // Connect new users
-    final allUsernames = all.map((e) => e.user.displayName);
+    // final allUsernames = all.map((e) => e.user.displayName);
     for (final chatter in chatters) {
-      // If the user is new to the channel
-      if (!allUsernames.contains(chatter.displayName)) {
-        final newParticipant = Participant(user: chatter);
-        newParticipant.connect();
-        all.add(newParticipant);
-        hasChanged = true;
-
-        if (greetNewcomerCallback != null) {
-          greetNewcomerCallback!(newParticipant);
-        }
-      }
-
       // Try to find the participant by login (which is unmutable)
       var participant =
           all.firstWhereOrNull((e) => e.user.login == chatter.login);
+
+      // Check if the participant can be found by display name (old version)
       if (participant == null) {
-        // If not found, try to find by display name (which was what done in the past).
-        // However, login can not be found by display name, so overwrite it with
-        // the new user object
-        participant =
-            all.firstWhere((e) => e.user.displayName == chatter.displayName);
-        participant.user = chatter;
+        participant = all
+            .firstWhereOrNull((e) => e.user.displayName == chatter.displayName);
+        if (participant != null) {
+          // If we have found a display name but not a login, it means it is a
+          // participant saved with an old version. So overwrite it with
+          // the new user object
+          participant.user = chatter;
+        }
+      }
+
+      // If the user is still not found then they are a newcomer
+      if (participant == null) {
+        participant = Participant(user: chatter);
+        participant.connect();
+        all.add(participant);
+        hasChanged = true;
+
+        if (greetNewcomerCallback != null) {
+          greetNewcomerCallback!(participant);
+        }
       }
 
       // If the user was not connected, connect them
