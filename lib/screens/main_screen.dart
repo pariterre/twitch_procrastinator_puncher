@@ -294,7 +294,8 @@ class _MainScreenState extends State<MainScreen> {
     // Set internals
     _twitchManager = manager;
     _moderators =
-        (await _twitchManager!.api.fetchModerators(includeStreamer: true))!;
+        (await _twitchManager!.api.fetchModerators(includeStreamer: true))
+            ?.toList();
 
     // Connect everything related to participants
     _twitchManager!.chat.onMessageReceived.listen(_onMessageReceived);
@@ -304,7 +305,7 @@ class _MainScreenState extends State<MainScreen> {
     participants.greetUserHasConnectedCallback = _greetUserHasConnected;
   }
 
-  List<String>? _moderators;
+  List<TwitchUser>? _moderators;
 
   void _onMessageReceived(String sender, String message) async {
     // Check if the message is a command from any chatter
@@ -326,7 +327,7 @@ class _MainScreenState extends State<MainScreen> {
 
     // If we are not done fetching, we are really early in the process, so we
     // can afford waiting a bit before checking if the sender is a moderator.
-    if (_moderators == null || !_moderators!.contains(sender)) return;
+    if (_moderators == null || !_moderators!.has(login: sender)) return;
 
     // Check if the message is a command from a moderator
     switch (message) {
