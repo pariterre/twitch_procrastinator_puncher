@@ -130,12 +130,9 @@ class Participants extends ChangeNotifier {
     }
 
     // Connect new users
-    // TODO When enough time has passed, change displayName to login or id to avoid collisions
     final allUsernames = all.map((e) => e.user.displayName);
-    for (var chatter in chatters) {
-      // TODO Change var to final when changing to login or id
+    for (final chatter in chatters) {
       // If the user is new to the channel
-      // if (!allUsernames.has(chatter)) { // TODO Uncomment when changing to login or id (and remove the next line)
       if (!allUsernames.contains(chatter.displayName)) {
         final newParticipant = Participant(user: chatter);
         newParticipant.connect();
@@ -147,13 +144,9 @@ class Participants extends ChangeNotifier {
         }
       }
 
-      // TODO Uncomment when changing to login or id (and remove the next line)
-      // final participant = all.firstWhere((e) => chatter == e.user);
       final participant =
           all.firstWhere((e) => e.user.displayName == chatter.displayName);
-
-      // TODO Remove this when changing to login or id
-      if (participant.user.id == '-1') {
+      if (participant.user.id == '-1' || participant.user.login == '-1') {
         participant.user = chatter;
       }
 
@@ -229,23 +222,8 @@ class Participants extends ChangeNotifier {
       participant.sessionsDoneToday = 0;
     }
 
-    // On a previous version of the code, only "username" was saved. Leading to
-    // now collinding participants (same username but different login/id). So for
-    // now, we combine the potentially duplicated participants into one.
-    // TODO After we leave some time to all the procratinator puncher users to have their saved files updated, "displayName" should be replaced by "login" or "id" to avoid future collisions.
-    final Map<String, Participant> uniqueParticipants = {};
-    for (final participant in participants) {
-      if (uniqueParticipants.containsKey(participant.user.displayName)) {
-        // Merge sessions done
-        uniqueParticipants[participant.user.displayName]!.sessionsDone +=
-            participant.sessionsDone;
-      } else {
-        uniqueParticipants[participant.user.displayName] = participant;
-      }
-    }
-
     return Participants._(
-      all: uniqueParticipants.values.toList(),
+      all: participants,
       mustFollowForFaming: mustFollowForFaming,
       whitelist: whitelist,
       blacklist: blacklist,

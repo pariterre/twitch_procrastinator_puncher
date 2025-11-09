@@ -316,14 +316,9 @@ class _MainScreenState extends State<MainScreen> {
         final chatter = await _twitchManager!.api.user(login: sender);
         if (!mounted) return;
 
-        // TODO Uncomment when changing to login or id (and remove the next line)
-        // final participant = Participants.of(context, listen: false)
-        //     .all
-        //     .firstWhereOrNull((e) => e.user == chatter);
         final participant = Participants.of(context, listen: false)
             .all
-            .firstWhereOrNull(
-                (e) => e.user.displayName == chatter?.displayName);
+            .firstWhereOrNull((e) => e.user.id == chatter?.id);
         _twitchManager!.chat
             .send(response.answer.formattedText(context, participant));
       }
