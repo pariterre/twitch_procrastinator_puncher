@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:twitch_manager/twitch_app.dart';
 
 class Participant {
-  String username;
+  TwitchUser user;
   int sessionsDone;
   int sessionsDoneToday;
   bool _wasPreviouslyConnected = false;
@@ -11,7 +12,7 @@ class Participant {
   TimeOfDay? connectedSince;
 
   Participant({
-    required this.username,
+    required this.user,
     this.sessionsDone = 0,
     this.sessionsDoneToday = 0,
   });
@@ -28,12 +29,18 @@ class Participant {
   }
 
   static Participant deserialize(map) => Participant(
-      username: map['username'],
+      user: TwitchUser(
+        id: map['user_id'] ?? '-1',
+        login: map['login'] ?? '-1',
+        displayName: map['username'] ?? '-1',
+      ),
       sessionsDone: map['sessionDone'],
       sessionsDoneToday: map['sessionsDoneToday'] ?? 0);
 
   Map<String, dynamic> serialize() => {
-        'username': username,
+        'user_id': user.id,
+        'login': user.login,
+        'username': user.displayName,
         'sessionDone': sessionsDone,
         'sessionsDoneToday': sessionsDoneToday,
       };

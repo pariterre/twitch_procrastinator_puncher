@@ -368,7 +368,7 @@ class PreferencedText extends PreferencedElement {
 
     if (participant != null) {
       out = out
-          .replaceAll('{username}', participant.username)
+          .replaceAll('{username}', participant.user.displayName)
           .replaceAll('{userDone}', participant.sessionsDone.toString())
           .replaceAll(
               '{userDoneToday}', participant.sessionsDoneToday.toString());

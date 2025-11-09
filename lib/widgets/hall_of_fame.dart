@@ -132,7 +132,7 @@ class _HallOfFameState extends State<HallOfFame> {
                             itemBuilder: (ctx, index, realIndex) {
                               final participant = participants[index];
                               return _FameTile(
-                                name: participant.username,
+                                name: participant.user.displayName,
                                 doneToday:
                                     participant.sessionsDoneToday.toString(),
                                 doneInAll: participant.sessionsDone.toString(),

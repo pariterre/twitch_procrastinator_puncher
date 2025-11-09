@@ -312,9 +312,18 @@ class _MainScreenState extends State<MainScreen> {
         AppPreferences.of(context, listen: false).automaticResponses;
     for (var response in responses) {
       if (response.command == message) {
+        // Get the username of the sender (i.e. login to username)
+        final chatter = await _twitchManager!.api.user(login: sender);
+        if (!mounted) return;
+
+        // TODO Uncomment when changing to login or id (and remove the next line)
+        // final participant = Participants.of(context, listen: false)
+        //     .all
+        //     .firstWhereOrNull((e) => e.user == chatter);
         final participant = Participants.of(context, listen: false)
             .all
-            .firstWhereOrNull((e) => e.username == sender);
+            .firstWhereOrNull(
+                (e) => e.user.displayName == chatter?.displayName);
         _twitchManager!.chat
             .send(response.answer.formattedText(context, participant));
       }

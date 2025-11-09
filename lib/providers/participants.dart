@@ -85,13 +85,15 @@ class Participants extends ChangeNotifier {
   ///
   /// The blacklist removes specific users from the all list (and prevent them
   /// to connect)
-  List<String> _blacklist;
+  List<String>? _blacklist;
   set blacklist(String value) {
-    _blacklist = _extractUsersFromString(value);
+    _blacklist = value.isEmpty ? null : _extractUsersFromString(value);
 
     // Remove from the list all blacklisted users
-    for (final username in _blacklist) {
-      all.removeWhere((e) => e.username == username);
+    for (final identifier in (_blacklist ?? [])) {
+      all.removeWhere((e) => (e.user.displayName == identifier ||
+          e.user.login == identifier ||
+          e.user.id == identifier));
     }
 
     notifyListeners();
@@ -101,10 +103,13 @@ class Participants extends ChangeNotifier {
     if (!_twitchManager!.isConnected) return;
 
     final chatters =
-        await _twitchManager!.api.fetchChatters(blacklist: _blacklist);
+        (await _twitchManager!.api.fetchChatters(blacklist: _blacklist))
+            ?.toList();
     if (chatters == null) return;
 
-    final followers = await _twitchManager!.api.fetchFollowers();
+    final followers =
+        (await _twitchManager!.api.fetchFollowers(includeStreamer: true))
+            ?.toList();
     if (followers == null) return;
 
     bool hasChanged = false;
@@ -114,10 +119,10 @@ class Participants extends ChangeNotifier {
       final chatter = chatters[i];
 
       // If the chatter is whitelisted, never remove
-      if (!_whitelist.contains(chatter)) {
+      if (!_whitelist.has(chatter)) {
         // If the chatter was blacklisted, or should (but does not) follow
-        if (_blacklist.contains(chatter) ||
-            (mustFollowForFaming && !followers.contains(chatter))) {
+        if ((_blacklist?.has(chatter) ?? false) ||
+            (mustFollowForFaming && !followers.has(user: chatter))) {
           chatters.removeWhere((e) => e == chatter);
           hasChanged = true;
         }
@@ -125,11 +130,14 @@ class Participants extends ChangeNotifier {
     }
 
     // Connect new users
-    final allUsernames = all.map((e) => e.username);
-    for (final chatter in chatters) {
+    // TODO When enough time has passed, change displayName to login or id to avoid collisions
+    final allUsernames = all.map((e) => e.user.displayName);
+    for (var chatter in chatters) {
+      // TODO Change var to final when changing to login or id
       // If the user is new to the channel
-      if (!allUsernames.contains(chatter)) {
-        final newParticipant = Participant(username: chatter);
+      // if (!allUsernames.has(chatter)) { // TODO Uncomment when changing to login or id (and remove the next line)
+      if (!allUsernames.contains(chatter.displayName)) {
+        final newParticipant = Participant(user: chatter);
         newParticipant.connect();
         all.add(newParticipant);
         hasChanged = true;
@@ -139,7 +147,16 @@ class Participants extends ChangeNotifier {
         }
       }
 
-      final participant = all.firstWhere((e) => e.username == chatter);
+      // TODO Uncomment when changing to login or id (and remove the next line)
+      // final participant = all.firstWhere((e) => chatter == e.user);
+      final participant =
+          all.firstWhere((e) => e.user.displayName == chatter.displayName);
+
+      // TODO Remove this when changing to login or id
+      if (participant.user.id == '-1') {
+        participant.user = chatter;
+      }
+
       // If the user was not connected, connect them
       if (!participant.isConnected) {
         // Greet them if it the first connexion today but is not a newcomer
@@ -212,8 +229,23 @@ class Participants extends ChangeNotifier {
       participant.sessionsDoneToday = 0;
     }
 
+    // On a previous version of the code, only "username" was saved. Leading to
+    // now collinding participants (same username but different login/id). So for
+    // now, we combine the potentially duplicated participants into one.
+    // TODO After we leave some time to all the procratinator puncher users to have their saved files updated, "displayName" should be replaced by "login" or "id" to avoid future collisions.
+    final Map<String, Participant> uniqueParticipants = {};
+    for (final participant in participants) {
+      if (uniqueParticipants.containsKey(participant.user.displayName)) {
+        // Merge sessions done
+        uniqueParticipants[participant.user.displayName]!.sessionsDone +=
+            participant.sessionsDone;
+      } else {
+        uniqueParticipants[participant.user.displayName] = participant;
+      }
+    }
+
     return Participants._(
-      all: participants,
+      all: uniqueParticipants.values.toList(),
       mustFollowForFaming: mustFollowForFaming,
       whitelist: whitelist,
       blacklist: blacklist,
