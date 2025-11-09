@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -144,9 +145,15 @@ class Participants extends ChangeNotifier {
         }
       }
 
-      final participant =
-          all.firstWhere((e) => e.user.displayName == chatter.displayName);
-      if (participant.user.id == '-1' || participant.user.login == '-1') {
+      // Try to find the participant by login (which is unmutable)
+      var participant =
+          all.firstWhereOrNull((e) => e.user.login == chatter.login);
+      if (participant == null) {
+        // If not found, try to find by display name (which was what done in the past).
+        // However, login can not be found by display name, so overwrite it with
+        // the new user object
+        participant =
+            all.firstWhere((e) => e.user.displayName == chatter.displayName);
         participant.user = chatter;
       }
 
